@@ -4,7 +4,6 @@
 
 class asset
     {
-		
     public:
 		asset();
 		~asset();
@@ -12,10 +11,6 @@ class asset
 		char filename[255];
 		char full_filename[255];
 		char extension[255];
-		int audio_streams[255]; // number of channels per stream
-		int num_audio_streams; // number of audio streams
-
-
 
 	private:
 		

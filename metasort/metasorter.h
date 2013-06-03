@@ -38,24 +38,24 @@ using namespace boost;
 #endif
 
 
-    class metasorter
-    {
+class metasorter
+{
 		
-    public:
-		metasorter(char*, boost::property_tree::ptree pt);
-		~metasorter();
-		int process_asset(asset*);
-		int parse_directory(int);
-		int process_rule(asset*, std::string, std::string);
-		bool string_replace(std::string&, const std::string&, const std::string&);
-		char path[255];
-		boost::property_tree::ptree pt;
+public:
+	metasorter(char*, boost::property_tree::ptree pt);
+	~metasorter();
+	int process_asset(asset*);
+	int parse_directory(int);
+	int process_rule(asset*, std::string, std::string);
+	bool string_replace(std::string&, const std::string&, const std::string&);
+	char path[255];
+	boost::property_tree::ptree pt;
  
-	private:
-		static const int MAX_CHAR = 1024;
-		int find_matches_ids[1024];
-		int find_matches_count;
-	};
+private:
+	static const int MAX_CHAR = 1024;
+	int find_matches_ids[1024];
+	int find_matches_count;
+};
 	
 
 #endif

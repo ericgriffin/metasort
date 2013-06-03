@@ -3,13 +3,11 @@
 #include "asset.h"
 
 asset::asset()
-{       
-	
+{
 }
 
 
 asset::~asset()
 {
-
 }
 

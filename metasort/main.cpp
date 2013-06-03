@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "metasorter.h"
 
 #include <boost/foreach.hpp>
@@ -11,7 +12,6 @@
 #include <boost/property_tree/info_parser.hpp>
 
 using namespace std;
-
 
 int main(int argc, char* argv[])
 {

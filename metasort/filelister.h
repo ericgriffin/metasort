@@ -33,9 +33,7 @@ public:
 	~FileLister();
 
 	int getNextFile(char*);
-	//void ReturnNextFile(char*, char*, char*, char*);
-	
-};
 
+};
 
 #endif

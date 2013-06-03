@@ -3,14 +3,12 @@
 #include "logfile.h"
 
 LogFile::LogFile(char* path)
-{       
-	
+{       	
 }
 
 
 LogFile::~LogFile()
 {
-
 }
 
 

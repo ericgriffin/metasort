@@ -4,7 +4,6 @@
 
 class LogFile
 {	
-
 public:
 	char path[255];
 	char filename[255];
@@ -13,5 +12,4 @@ public:
 	~LogFile();
 
 	char* timestamp();
-	
 };
