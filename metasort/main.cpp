@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	int err = 0;
 	int config_status = 0;
 	int runtype = 0;
-	int recurse = 0;
+	
 	int ok_to_run = 0;
 	int required_flags = 0;
 	char directory[255];
@@ -29,11 +29,7 @@ int main(int argc, char* argv[])
 	{
 		for (int i = 1; i < argc; i++) 
 		{ 
-			if (strcmp(argv[i], "-R") == 0)
-			{
-				recurse = 1;
-            }
-			else if (i + 1 != argc)
+			if (i + 1 != argc)
 			{
                 if (strcmp(argv[i], "-c") == 0)
 				{
@@ -51,18 +47,21 @@ int main(int argc, char* argv[])
 	if(ok_to_run)
 	{		
 		boost::property_tree::info_parser::read_info(config_file, pt);
-		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("watch_folders"))
+		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("folders"))
 		{
-			cout << "Looking in Root Folder: " << v.first.data() << endl;
+			int recurse = 0;
+			std::cout << "Searching Root Folder: " << v.first.data() << std::endl << std::endl;
+			if(strcmp(v.second.data().c_str(), "R") == 0)
+			{
+				recurse = 1;
+			}
 			metasorter sorter((char*)v.first.data(), pt);
 			sorter.parse_directory(recurse);
 		}
 	}
 	else
 	{
-		std::cout << "Usage:  metasort [flags] -c <config file>" << std::endl;
-		std::cout << "\nOptional Flags: " << std::endl;
-		std::cout << "\t-R : recurse subdirectories" << std::endl;
+		std::cout << "Usage:  metasort -c <config file>" << std::endl;
 	}
 	return err;
 }

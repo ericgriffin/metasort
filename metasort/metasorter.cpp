@@ -122,11 +122,9 @@
 		} while (From_Buffer_Size > 0);
 
 		fclose(F);
-
 		MI.Open_Buffer_Finalize();
 	
 		// Process rules from config file
-		
 		boost::property_tree::ptree pt1 = pt.get_child("rules");
 		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt1)
 		{
@@ -149,6 +147,26 @@
 					if(strcmp(u.first.data(), "video") == 0)
 					{
 						stream_type = Stream_Video;
+					}
+					if(strcmp(u.first.data(), "general") == 0)
+					{
+						stream_type = Stream_General;
+					}
+					if(strcmp(u.first.data(), "text") == 0)
+					{
+						stream_type = Stream_Text;
+					}
+					if(strcmp(u.first.data(), "other") == 0)
+					{
+						stream_type = Stream_Other;
+					}
+					if(strcmp(u.first.data(), "image") == 0)
+					{
+						stream_type = Stream_Image;
+					}
+					if(strcmp(u.first.data(), "menu") == 0)
+					{
+						stream_type = Stream_Menu;
 					}
 					
 					//std::cout << u.first.data() << " : " << y.first.data() << std::endl;
@@ -181,15 +199,6 @@
 				return 1;
 			}
 		}
-
-
-		//To_Display += MI.Inform();
-		#ifdef _UNICODE
-        //std::wcout << To_Display << std::endl;
-		#else
-        //std::cout  << To_Display << std::endl;
-		#endif
-		
 		return err;
 	}
 
@@ -197,7 +206,7 @@
 	int metasorter::process_rule(asset* _asset, std::string first, std::string second)
 	{
 		int err = 0;
-		std::cout << _asset->full_filename << " matches rule: " << first << " " << second << std::endl;
+		std::cout << std::endl << _asset->full_filename << " matches rule: " << first << " " << second << std::endl;
 
 		char_separator<char> sep("_");
 		tokenizer< char_separator<char> > tokens(first, sep);
@@ -208,11 +217,13 @@
 				std::string newfile(second);
 				newfile.append(_asset->filename);
 				std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
-				if (rename(_asset->full_filename, newfile.c_str()))
-				{
-					perror( NULL );
-				}
-	
+				std::ifstream ifs(_asset->full_filename, std::ios::binary);
+				std::ofstream ofs(newfile, std::ios::binary);
+				ofs << ifs.rdbuf();
+				ifs.close();
+				ofs.close();
+				 if( remove(_asset->full_filename) != 0 )
+					std::cout << "Error deleting file" << std::endl;
 			}
 
 			if(t.compare("copy") == 0)
@@ -236,7 +247,6 @@
 				std::cout << "Executing: " << execstring << std::endl;
 				system(execstring.c_str());
 			}
-
 		}
 
 		return err;
