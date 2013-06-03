@@ -1,11 +1,6 @@
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
-#include <iostream>
+// logfile.cpp
+
 #include <time.h>
-
-using namespace std;
-
 
 class LogFile
 {	

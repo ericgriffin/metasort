@@ -1,3 +1,5 @@
+// logfile.cpp
+
 #include "logfile.h"
 
 LogFile::LogFile(char* path)

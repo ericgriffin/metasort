@@ -1,9 +1,11 @@
+// filelister.h
+#ifndef FILELISTER_H
+#define FILELISTER_H 1
+
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include <iostream>
-
-using namespace std;
 
 
 class FileLister
@@ -17,11 +19,11 @@ public:
 	char filename[255];
 	char extension_filename[255];
 	char full_filename[255];
+	char extension[255];
 	char recurse_path[255];
 	char* current_token;
 	char* previous_token;
 	char* context;
-	int recurse;
 	int is_dir;
 	int end_of_file_listing;
 	
@@ -30,7 +32,10 @@ public:
 	FileLister(char*);
 	~FileLister();
 
-	int getNextFile();
-	void ReturnNextFile(char*);
+	int getNextFile(char*);
+	//void ReturnNextFile(char*, char*, char*, char*);
 	
 };
+
+
+#endif
