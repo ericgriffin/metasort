@@ -132,45 +132,58 @@ int metasorter::process_asset(asset* _asset)
 		int match = 1;
 		BOOST_FOREACH(boost::property_tree::ptree::value_type &u, pt1.get_child(v.first.data()))
 		{
-			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
+			//separate stream from stream number
+			std::string stream;
+			int stream_number = 0;
+			std::string s = u.first.data();
+			std::string delimiter = "_";
+			size_t pos = 0;
+			std::string token;
+			while ((pos = s.find(delimiter)) != std::string::npos)
 			{
-				#ifdef MEDIAINFO_LIBRARY
-					MediaInfoLib::stream_t stream_type;
-				#else
-					MediaInfoDLL::stream_t stream_type;
-				#endif
-					
-				if(strcmp(u.first.data(), "audio") == 0)
-				{
-					stream_type = Stream_Audio;
-				}
-				if(strcmp(u.first.data(), "video") == 0)
-				{
-					stream_type = Stream_Video;
-				}
-				if(strcmp(u.first.data(), "general") == 0)
-				{
-					stream_type = Stream_General;
-				}
-				if(strcmp(u.first.data(), "text") == 0)
-				{
-					stream_type = Stream_Text;
-				}
-				if(strcmp(u.first.data(), "other") == 0)
-				{
-					stream_type = Stream_Other;
-				}
-				if(strcmp(u.first.data(), "image") == 0)
-				{
-					stream_type = Stream_Image;
-				}
-				if(strcmp(u.first.data(), "menu") == 0)
-				{
-					stream_type = Stream_Menu;
-				}
-										
-				int stream_number = atoi((const char*)u.second.data().c_str());
-		
+				token = s.substr(0, pos);
+				stream.assign(token);
+				s.erase(0, pos + delimiter.length());
+			}
+			stream_number = atoi(s.c_str());
+			
+			#ifdef MEDIAINFO_LIBRARY
+				MediaInfoLib::stream_t stream_type;
+			#else
+				MediaInfoDLL::stream_t stream_type;
+			#endif
+
+			if(stream.compare( "audio") == 0)
+			{
+				stream_type = Stream_Audio;
+			}
+			if(stream.compare("video") == 0)
+			{
+				stream_type = Stream_Video;
+			}
+			if(stream.compare("general") == 0)
+			{
+				stream_type = Stream_General;
+			}
+			if(stream.compare("text") == 0)
+			{
+				stream_type = Stream_Text;
+			}
+			if(stream.compare("other") == 0)
+			{
+				stream_type = Stream_Other;
+			}
+			if(stream.compare("image") == 0)
+			{
+				stream_type = Stream_Image;
+			}
+			if(stream.compare("menu") == 0)
+			{
+				stream_type = Stream_Menu;
+			}
+
+			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
+			{								
 				wchar_t *parameter1 = new wchar_t[255];
 				mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
 				String parameter = String(parameter1);
@@ -181,7 +194,7 @@ int metasorter::process_asset(asset* _asset)
 				if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter2) == 0)				
 				{
 					// parameter matches
-					//std::cout << _asset->full_filename << " matches paramater rule " << v.second.data() << " on stream " << stream_number << " " << y.first.c_str() << " = " << y.second.data() << std::endl;
+					//std::cout << std::endl << _asset->full_filename << " matches paramater rule " << v.second.data() << " on stream " << stream_number << " " << y.first.c_str() << " = " << y.second.data().c_str() << std::endl;
 				}
 				else
 				{
@@ -258,3 +271,4 @@ bool metasorter::string_replace(std::string& str, const std::string& from, const
 	str.replace(start_pos, from.length(), to);
 	return true;
 }
+
