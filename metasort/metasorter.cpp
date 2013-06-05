@@ -241,16 +241,34 @@ int metasorter::process_asset(asset* _asset)
 			}
 
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
-			{								
+			{				
+				int exclude = 0;
+				// parameter name from config file
 				wchar_t *parameter1 = new wchar_t[255];
 				mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
 				String parameter = String(parameter1);
 
+				// check for exclusive parameter
+				String param_prefix;
+				param_prefix.assign(parameter,0,5);
+				if(param_prefix.compare(L"[NOT]") == 0)
+				{
+					exclude = 1;
+					parameter.assign(parameter, 5, parameter.length());
+				}
+
+				// parameter value from config file
 				wchar_t *parameter2 = new wchar_t[255];
 				mbstowcs(parameter2, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
 						
 				if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter2) == 0)				
 				{
+					if(exclude == 0)
+					{ }
+					else
+					{
+						match = 0;
+					}
 					// parameter matches
 					/*logstring.assign(_asset->full_filename);
 					logstring.append(" matches paramater rule ");
@@ -268,7 +286,12 @@ int metasorter::process_asset(asset* _asset)
 				}
 				else
 				{
-					match = 0;
+					if(exclude == 1)
+					{ }
+					else
+					{
+						match = 0;
+					}
 				}
 			}
 		}

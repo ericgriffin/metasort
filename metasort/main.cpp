@@ -21,7 +21,6 @@ int main(int argc, char* argv[])
 	
 	int ok_to_run = 0;
 	int required_flags = 0;
-	char directory[255];
 	char config_file[255];
 	boost::property_tree::ptree pt;
 
@@ -56,7 +55,7 @@ int main(int argc, char* argv[])
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("folders"))
 			{
 				int recurse = 0;
-				std::cout << "Searching Root Folder: " << v.first.data() << std::endl << std::endl;
+				std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl << std::endl;
 				if(strcmp(v.second.data().c_str(), "R") == 0)
 				{
 					recurse = 1;
