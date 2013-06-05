@@ -8,11 +8,65 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 {
 	strcpy(path, _path);
 	pt = _pt;
+	
+	optional<const boost::property_tree::ptree&> pt_check_existence;
+	
+	// check logging
+	pt_check_existence = pt.get_child_optional("logging");
+	if(pt_check_existence)
+	{
+		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("logging"))
+		{
+			if(strcmp(v.first.c_str(), "logfile") == 0)
+			{
+				logging = 1;
+				logfile.open(v.second.data().c_str());
+			}
+			else
+			{
+				cout << "No logging defined in config file - aborting" << endl;
+				exit(0);
+			}
+		}
+	}
+	else
+	{
+		cout << "No logging defined in config file - aborting" << endl;
+		logfile.close();
+		exit(0);
+	}
+
+	// check extensions
+	pt_check_existence = pt.get_child_optional("extensions");
+	if(!pt_check_existence)
+	{
+		cout << "No extensions defined in config file - aborting" << endl;
+		logfile.close();
+		exit(0);
+	}
+
+	// check rules
+	pt_check_existence = pt.get_child_optional("rules");
+	if(!pt_check_existence)
+	{
+		cout << "No rules defined in config file - aborting" << endl;
+		logfile.close();
+		exit(0);
+	}
+
+	logstring.assign("Entering folder ");
+	logstring.append(path);
+	logfile.write(logstring);
+
 }
 
 
 metasorter::~metasorter()
 {
+	logstring.assign("Leaving folder ");
+	logstring.append(path);
+	logfile.write(logstring);
+	logfile.close();
 }
 
 
@@ -96,7 +150,11 @@ int metasorter::process_asset(asset* _asset)
 	err = fopen_s(&F, _asset->full_filename, "rb");
 	if (F == 0)
 	{
-		std::cout << "Can't open file: " << _asset->full_filename << std::endl;
+		logstring.assign("Can't open file ");
+		logstring.append(_asset->full_filename);
+		logstring.append(" for processing");
+		logfile.write(logstring);
+		std::cout << "Can't open file: " << _asset->full_filename << " for processing" << std::endl;
 		return 1;
 	}
 	unsigned char* From_Buffer = new unsigned char[7 * 188];	//prepare a memory buffer for reading
@@ -194,6 +252,18 @@ int metasorter::process_asset(asset* _asset)
 				if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter2) == 0)				
 				{
 					// parameter matches
+					/*logstring.assign(_asset->full_filename);
+					logstring.append(" matches paramater rule ");
+					logstring.append(v.first.data());
+					logstring.append(":");
+					logstring.append(v.second.data());
+					logstring.append(" on stream ");
+					logstring.append(s.c_str());
+					logstring.append(" ");
+					logstring.append(y.first.c_str());
+					logstring.append(" = ");
+					logstring.append(y.second.data().c_str());
+					logfile.write(logstring);*/
 					//std::cout << std::endl << _asset->full_filename << " matches paramater rule " << v.second.data() << " on stream " << stream_number << " " << y.first.c_str() << " = " << y.second.data().c_str() << std::endl;
 				}
 				else
@@ -216,7 +286,13 @@ int metasorter::process_asset(asset* _asset)
 int metasorter::process_rule(asset* _asset, std::string first, std::string second)
 {
 	int err = 0;
-	std::cout << std::endl << _asset->full_filename << " matches rule: " << first << " " << second << std::endl;
+	logstring.assign(_asset->full_filename);
+	logstring.append(" matches rule: ");
+	logstring.append(first);
+	logstring.append(":");
+	logstring.append(second);
+	logfile.write(logstring);
+	std::cout << std::endl << _asset->full_filename << " matches rule " << first << ":" << second << std::endl;
 
 	char_separator<char> sep("_");
 	tokenizer< char_separator<char> > tokens(first, sep);
@@ -226,6 +302,11 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 		{
 			std::string newfile(second);
 			newfile.append(_asset->filename);
+			logstring.assign("Moving ");
+			logstring.append(_asset->full_filename);
+			logstring.append(" to ");
+			logstring.append(newfile);
+			logfile.write(logstring);
 			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
 			std::ifstream ifs(_asset->full_filename, std::ios::binary);
 			std::ofstream ofs(newfile, std::ios::binary);
@@ -233,13 +314,23 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			ifs.close();
 			ofs.close();
 				if( remove(_asset->full_filename) != 0 )
-				std::cout << "Error deleting file" << std::endl;
+				{
+					std::cout << "Error deleting file" << _asset->full_filename << std::endl;
+					logstring.append("Error deleting file");
+					logstring.append(_asset->full_filename);
+					logfile.write(logstring);
+				}
 		}
 
 		if(t.compare("copy") == 0)
 		{
 			std::string newfile(second);
 			newfile.append(_asset->filename);
+			logstring.assign("Copying ");
+			logstring.append(_asset->full_filename);
+			logstring.append(" to ");
+			logstring.append(newfile);
+			logfile.write(logstring);
 			std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
 			std::ifstream ifs(_asset->full_filename, std::ios::binary);
 			std::ofstream ofs(newfile, std::ios::binary);
@@ -254,6 +345,9 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			execstring.append(" ");
 			string_replace(execstring, "%s", _asset->full_filename);
 			while(string_replace(execstring, "/", "\\"));
+			logstring.assign("Executing: ");
+			logstring.append(execstring);
+			logfile.write(logstring);
 			std::cout << "Executing: " << execstring << std::endl;
 			system(execstring.c_str());
 		}

@@ -1,15 +1,30 @@
 // logfile.cpp
 
 #include <time.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+# include <cstdlib>
+# include <iomanip>
+# include <ctime>
+
+using namespace std;
 
 class LogFile
 {	
 public:
-	char path[255];
-	char filename[255];
-	
-	LogFile(char*);
+	std::string path;
+	std::string filename;
+
+	LogFile();
 	~LogFile();
 
-	char* timestamp();
+	ofstream logfile;
+	double cpu_time();
+	int *time_numbers();
+	void timestamp();
+	char *timestring();
+	int open(std::string);
+	int close();
+	void write(std::string);
 };

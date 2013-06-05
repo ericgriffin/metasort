@@ -47,16 +47,28 @@ int main(int argc, char* argv[])
 	if(ok_to_run)
 	{		
 		boost::property_tree::info_parser::read_info(config_file, pt);
-		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("folders"))
+		
+		// check for folders entry
+		optional<const boost::property_tree::ptree&> pt_check_existence;
+		pt_check_existence = pt.get_child_optional("folders");
+		if(pt_check_existence)
 		{
-			int recurse = 0;
-			std::cout << "Searching Root Folder: " << v.first.data() << std::endl << std::endl;
-			if(strcmp(v.second.data().c_str(), "R") == 0)
+			BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("folders"))
 			{
-				recurse = 1;
+				int recurse = 0;
+				std::cout << "Searching Root Folder: " << v.first.data() << std::endl << std::endl;
+				if(strcmp(v.second.data().c_str(), "R") == 0)
+				{
+					recurse = 1;
+				}
+				metasorter sorter((char*)v.first.data(), pt);
+				sorter.parse_directory(recurse);
 			}
-			metasorter sorter((char*)v.first.data(), pt);
-			sorter.parse_directory(recurse);
+		}
+		else
+		{
+			cout << "No folders defined in config file - aborting" << endl;
+			exit(0);
 		}
 	}
 	else

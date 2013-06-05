@@ -1,39 +1,15 @@
-// logfile.cpp
+# include <cstdlib>
+# include <iostream>
+# include <iomanip>
+# include <ctime>
 
-#include "logfile.h"
+using namespace std;
 
-LogFile::LogFile()
-{       	
-}
+# include "timestamp.h"
 
+//****************************************************************************80
 
-LogFile::~LogFile()
-{
-}
-
-
-int LogFile::open(std::string _filename)
-{
-	int err = 0;
-	logfile.open(_filename, fstream::app);
-	return err;
-}
-
-int LogFile::close()
-{
-	int err = 0;
-	logfile.close();
-	return err;
-}
-
-void LogFile::write(std::string _logdata)
-{
-	logfile << timestring() << " " << _logdata << endl;
-}
-
-
-
-double LogFile::cpu_time()
+double cpu_time ( )
 
 //****************************************************************************80
 //
@@ -73,7 +49,7 @@ double LogFile::cpu_time()
 }
 //****************************************************************************80
 
-int * LogFile::time_numbers()
+int *time_numbers ( )
 
 //****************************************************************************80
 //
@@ -127,7 +103,7 @@ int * LogFile::time_numbers()
 }
 //****************************************************************************80
 
-void LogFile::timestamp()
+void timestamp ( )
 
 //****************************************************************************80
 //
@@ -175,7 +151,7 @@ void LogFile::timestamp()
 }
 //****************************************************************************80
 
-char * LogFile::timestring()
+char *timestring ( )
 
 //****************************************************************************80
 //

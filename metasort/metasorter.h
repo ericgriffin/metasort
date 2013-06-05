@@ -17,6 +17,7 @@
 #include <boost/tokenizer.hpp>
 
 #include "asset.h"
+#include "logfile.h"
 
 #ifdef MEDIAINFO_LIBRARY
     #include "MediaInfo/MediaInfo.h" //Staticly-loaded library (.lib or .a or .so)
@@ -28,6 +29,7 @@
 
 using namespace MediaInfoNameSpace;
 using namespace boost;
+using namespace std;
 
 #ifdef __MINGW32__
     #ifdef _UNICODE
@@ -50,11 +52,15 @@ public:
 	bool string_replace(std::string&, const std::string&, const std::string&);
 	char path[255];
 	boost::property_tree::ptree pt;
+	std::string logstring;
+	LogFile logfile;
+	
  
 private:
 	static const int MAX_CHAR = 1024;
 	int find_matches_ids[1024];
 	int find_matches_count;
+	int logging;
 };
 	
 
