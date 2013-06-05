@@ -183,6 +183,7 @@ int metasorter::process_asset(asset* _asset)
 	fclose(F);
 	MI.Open_Buffer_Finalize();
 	
+
 	// Process rules from config file
 	boost::property_tree::ptree pt1 = pt.get_child("rules");
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt1)
@@ -243,6 +244,9 @@ int metasorter::process_asset(asset* _asset)
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
 			{				
 				int exclude = 0;
+				int greater_than = 0;
+				int less_than = 0;
+
 				// parameter name from config file
 				wchar_t *parameter1 = new wchar_t[255];
 				mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
@@ -262,36 +266,94 @@ int metasorter::process_asset(asset* _asset)
 					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
 
-				if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter_val.c_str()) == 0)				
+				// check for greater-than or less-than
+				param_prefix.assign(parameter_val,0,1);
+				if(param_prefix.compare(L">") == 0)
 				{
-					if(exclude == 0)
-					{ }
-					else
-					{
-						match = 0;
-					}
-					// parameter matches
-					/*logstring.assign(_asset->full_filename);
-					logstring.append(" matches paramater rule ");
-					logstring.append(v.first.data());
-					logstring.append(":");
-					logstring.append(v.second.data());
-					logstring.append(" on stream ");
-					logstring.append(s.c_str());
-					logstring.append(" ");
-					logstring.append(y.first.c_str());
-					logstring.append(" = ");
-					logstring.append(y.second.data().c_str());
-					logfile.write(logstring);*/
-					//std::cout << std::endl << _asset->full_filename << " matches paramater rule " << v.second.data() << " on stream " << stream_number << " " << y.first.c_str() << " = " << y.second.data().c_str() << std::endl;
+					greater_than = 1;
+					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
-				else
+				param_prefix.assign(parameter_val,0,1);
+				if(param_prefix.compare(L"<") == 0)
 				{
-					if(exclude == 1)
-					{ }
+					less_than = 1;
+					parameter_val.assign(parameter_val, 1, parameter_val.length());
+				}
+
+				// handle less-than comparison
+				if(less_than == 1)
+				{
+					char* param_intval = new char[255];
+					char* configparam_intval = new char[255];
+					wcstombs(param_intval, MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(param_intval));
+					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(configparam_intval));
+					if(atoi((const char*)param_intval) < atoi((const char*)configparam_intval))
+					{
+						if(exclude == 0)
+						{ }
+						else
+						{
+							match = 0;
+						}
+					}
 					else
 					{
-						match = 0;
+						if(exclude == 1)
+						{ }
+						else
+						{
+							match = 0;
+						}
+					}
+				}
+
+				// handle greater-than comparison
+				if(greater_than == 1)
+				{
+					char* param_intval = new char[255];
+					char* configparam_intval = new char[255];
+					wcstombs(param_intval, MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(param_intval));
+					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(configparam_intval));
+					if(atoi((const char*)param_intval) > atoi((const char*)configparam_intval))
+					{
+						if(exclude == 0)
+						{ }
+						else
+						{
+							match = 0;
+						}
+					}
+					else
+					{
+						if(exclude == 1)
+						{ }
+						else
+						{
+							match = 0;
+						}
+					}
+				}
+
+				// handle default comparison
+				if(greater_than == 0 && less_than == 0)
+				{
+					if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter_val.c_str()) == 0)				
+					{
+						if(exclude == 0)
+						{ }
+						else
+						{
+							match = 0;
+						}
+					}
+					else
+					{
+						if(exclude == 1)
+						{ }
+						else
+						{
+							match = 0;
+						}
 					}
 				}
 			}
