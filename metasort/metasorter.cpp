@@ -248,20 +248,21 @@ int metasorter::process_asset(asset* _asset)
 				mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
 				String parameter = String(parameter1);
 
+				// parameter value from config file
+				wchar_t *parameter_val1 = new wchar_t[255];
+				mbstowcs(parameter_val1, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
+				String parameter_val = String(parameter_val1);
+					
 				// check for exclusive parameter
 				String param_prefix;
-				param_prefix.assign(parameter,0,5);
-				if(param_prefix.compare(L"[NOT]") == 0)
+				param_prefix.assign(parameter_val,0,1);
+				if(param_prefix.compare(L"!") == 0)
 				{
 					exclude = 1;
-					parameter.assign(parameter, 5, parameter.length());
+					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
 
-				// parameter value from config file
-				wchar_t *parameter2 = new wchar_t[255];
-				mbstowcs(parameter2, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
-						
-				if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter2) == 0)				
+				if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter_val.c_str()) == 0)				
 				{
 					if(exclude == 0)
 					{ }
