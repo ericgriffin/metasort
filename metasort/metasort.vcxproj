@@ -188,6 +188,7 @@
       <UseIntelOptimizedHeaders>false</UseIntelOptimizedHeaders>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -200,6 +201,9 @@
       </LinkStatus>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

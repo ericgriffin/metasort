@@ -360,9 +360,19 @@ int metasorter::process_asset(asset* _asset)
 		}
 		if(match == 1)
 		{
-			// rule matches
+			// rule matches - process rule
 			process_rule(_asset, v.first.data(), v.second.data());
-			return 1;
+			
+			// don't continue processing remaining rules if file has been moved/deleted
+			char_separator<char> sep("_");
+			tokenizer< char_separator<char> > tokens((std::string)v.first.data(), sep);
+			BOOST_FOREACH (const std::string& t, tokens)
+			{
+				if(t.compare("move") == 0 || t.compare("delete") == 0)
+				{
+					return 1;
+				}
+			}
 		}
 	}
 	return err;
@@ -384,6 +394,15 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	tokenizer< char_separator<char> > tokens(first, sep);
 	BOOST_FOREACH (const std::string& t, tokens)
 	{
+		
+		if(t.compare("list") == 0)
+		{
+			ofstream listfile;
+			listfile.open(second, ios::app);
+			listfile << _asset->full_filename << endl;
+			listfile.close();
+		}
+
 		if(t.compare("move") == 0)
 		{
 			std::string newfile(second);
@@ -436,6 +455,20 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			logfile.write(logstring);
 			std::cout << "Executing: " << execstring << std::endl;
 			system(execstring.c_str());
+		}
+
+		if(t.compare("delete") == 0)
+		{
+			if(second.compare("IAMSURE") == 0)
+			{
+				if( remove(_asset->full_filename) != 0 )
+				{
+					std::cout << "Error deleting file" << _asset->full_filename << std::endl;
+					logstring.append("Error deleting file");
+					logstring.append(_asset->full_filename);
+					logfile.write(logstring);
+				}
+			}
 		}
 	}
 
