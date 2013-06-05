@@ -207,7 +207,7 @@ int metasorter::process_asset(asset* _asset)
 			stream_number = atoi(s.c_str());
 			
 			#ifdef MEDIAINFO_LIBRARY
-				MediaInfoLib::stream_t stream_type;
+				MediaInfoLib::stream_t stream_type = Stream_General;
 			#else
 				MediaInfoDLL::stream_t stream_type;
 			#endif
