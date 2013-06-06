@@ -191,6 +191,7 @@ int metasorter::process_asset(asset* _asset)
 		int match = 1;
 		BOOST_FOREACH(boost::property_tree::ptree::value_type &u, pt1.get_child(v.first.data()))
 		{
+			int file_info = 0;
 			//separate stream from stream number
 			std::string stream;
 			int stream_number = 0;
@@ -212,40 +213,21 @@ int metasorter::process_asset(asset* _asset)
 				MediaInfoDLL::stream_t stream_type;
 			#endif
 
-			if(stream.compare( "audio") == 0)
-			{
-				stream_type = Stream_Audio;
-			}
-			if(stream.compare("video") == 0)
-			{
-				stream_type = Stream_Video;
-			}
-			if(stream.compare("general") == 0)
-			{
-				stream_type = Stream_General;
-			}
-			if(stream.compare("text") == 0)
-			{
-				stream_type = Stream_Text;
-			}
-			if(stream.compare("other") == 0)
-			{
-				stream_type = Stream_Other;
-			}
-			if(stream.compare("image") == 0)
-			{
-				stream_type = Stream_Image;
-			}
-			if(stream.compare("menu") == 0)
-			{
-				stream_type = Stream_Menu;
-			}
+			if(stream.compare( "audio") == 0) stream_type = Stream_Audio;
+			if(stream.compare("video") == 0) stream_type = Stream_Video;
+			if(stream.compare("general") == 0) stream_type = Stream_General;
+			if(stream.compare("text") == 0) stream_type = Stream_Text;
+			if(stream.compare("other") == 0) stream_type = Stream_Other;
+			if(stream.compare("image") == 0) stream_type = Stream_Image;
+			if(stream.compare("menu") == 0) stream_type = Stream_Menu;
+			if(stream.compare("file") == 0) file_info = 1;
 
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
 			{				
 				int exclude = 0;
 				int greater_than = 0;
 				int less_than = 0;
+				String asset_param_val;
 
 				// parameter name from config file
 				wchar_t *parameter1 = new wchar_t[255];
@@ -256,7 +238,29 @@ int metasorter::process_asset(asset* _asset)
 				wchar_t *parameter_val1 = new wchar_t[255];
 				mbstowcs(parameter_val1, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
 				String parameter_val = String(parameter_val1);
+				
+				// assign asset parameter value
+				if(file_info == 0)
+				{
+					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
+				}
+				else if(file_info == 1)
+				{
+					if(wcscmp(parameter.c_str(), L"filesize") == 0)
+					{
+						std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
+						file_info_file.seekg( 0, std::ios::end );
 					
+						std::string tempstring;
+						String tempstring2;
+						tempstring = std::to_string(file_info_file.tellg() / 1024);
+						wchar_t *tempstring3 = new wchar_t[255];
+						mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
+						tempstring2.assign(tempstring3);
+						asset_param_val.assign(tempstring2);
+					}
+				}
+
 				// check for exclusive parameter
 				String param_prefix;
 				param_prefix.assign(parameter_val,0,1);
@@ -273,63 +277,62 @@ int metasorter::process_asset(asset* _asset)
 					greater_than = 1;
 					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
-				param_prefix.assign(parameter_val,0,1);
 				if(param_prefix.compare(L"<") == 0)
 				{
 					less_than = 1;
 					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
 
-				// handle less-than comparison
-				if(less_than == 1)
+				if(less_than == 1 || greater_than == 1)
 				{
-					char* param_intval = new char[255];
+					char* asset_param_intval = new char[255];
 					char* configparam_intval = new char[255];
-					wcstombs(param_intval, MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(param_intval));
+					wcstombs(asset_param_intval, asset_param_val.c_str(), sizeof(asset_param_intval));
 					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(configparam_intval));
-					if(atoi((const char*)param_intval) < atoi((const char*)configparam_intval))
-					{
-						if(exclude == 0)
-						{ }
-						else
-						{
-							match = 0;
-						}
-					}
-					else
-					{
-						if(exclude == 1)
-						{ }
-						else
-						{
-							match = 0;
-						}
-					}
-				}
 
-				// handle greater-than comparison
-				if(greater_than == 1)
-				{
-					char* param_intval = new char[255];
-					char* configparam_intval = new char[255];
-					wcstombs(param_intval, MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(param_intval));
-					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(configparam_intval));
-					if(atoi((const char*)param_intval) > atoi((const char*)configparam_intval))
+					// handle less-than comparison
+					if(less_than == 1)
 					{
-						if(exclude == 0)
-						{ }
+						if(atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
+						{
+							if(exclude == 0)
+							{ }
+							else
+							{
+								match = 0;
+							}
+						}
 						else
 						{
-							match = 0;
+							if(exclude == 1)
+							{ }
+							else
+							{
+								match = 0;
+							}
 						}
 					}
-					else
+
+					// handle greater-than comparison
+					if(greater_than == 1)
 					{
-						if(exclude == 1)
-						{ }
+						if(atoi((const char*)asset_param_intval) > atoi((const char*)configparam_intval))
+						{
+							if(exclude == 0)
+							{ }
+							else
+							{
+								match = 0;
+							}
+						}
 						else
 						{
-							match = 0;
+							if(exclude == 1)
+							{ }
+							else
+							{
+								match = 0;
+							}
 						}
 					}
 				}
@@ -337,7 +340,7 @@ int metasorter::process_asset(asset* _asset)
 				// handle default comparison
 				if(greater_than == 0 && less_than == 0)
 				{
-					if(wcscmp(MI.Get(stream_type, stream_number, parameter).c_str(), parameter_val.c_str()) == 0)				
+					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)				
 					{
 						if(exclude == 0)
 						{ }
@@ -355,7 +358,12 @@ int metasorter::process_asset(asset* _asset)
 							match = 0;
 						}
 					}
+					
 				}
+
+
+
+
 			}
 		}
 		if(match == 1)

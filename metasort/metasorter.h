@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <iomanip>
 #include <stdio.h>
+#include <sstream>
 #include <windows.h>
 #include <time.h>
 
