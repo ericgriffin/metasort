@@ -4,6 +4,7 @@
 #include "filelister.h"
 #include "asset.h"
 
+
 metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 {
 	strcpy(path, _path);
@@ -192,6 +193,7 @@ int metasorter::process_asset(asset* _asset)
 		BOOST_FOREACH(boost::property_tree::ptree::value_type &u, pt1.get_child(v.first.data()))
 		{
 			int file_info = 0;
+
 			//separate stream from stream number
 			std::string stream;
 			int stream_number = 0;
@@ -242,7 +244,12 @@ int metasorter::process_asset(asset* _asset)
 				// assign asset parameter value
 				if(file_info == 0)
 				{
-					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
+					if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
+					else
+					{
+						asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
+						//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl; 
+					}
 				}
 				else if(file_info == 1)
 				{
@@ -259,6 +266,12 @@ int metasorter::process_asset(asset* _asset)
 						tempstring2.assign(tempstring3);
 						asset_param_val.assign(tempstring2);
 					}
+					if(wcscmp(parameter.c_str(), L"fileage") == 0)
+					{
+						file_age(_asset);
+					}
+
+
 				}
 
 				// check for exclusive parameter
@@ -295,21 +308,13 @@ int metasorter::process_asset(asset* _asset)
 					{
 						if(atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
 						{
-							if(exclude == 0)
-							{ }
-							else
-							{
-								match = 0;
-							}
+							if(exclude == 0) { }
+							else match = 0; 
 						}
 						else
 						{
-							if(exclude == 1)
-							{ }
-							else
-							{
-								match = 0;
-							}
+							if(exclude == 1) { }
+							else match = 0;
 						}
 					}
 
@@ -318,21 +323,13 @@ int metasorter::process_asset(asset* _asset)
 					{
 						if(atoi((const char*)asset_param_intval) > atoi((const char*)configparam_intval))
 						{
-							if(exclude == 0)
-							{ }
-							else
-							{
-								match = 0;
-							}
+							if(exclude == 0) { }
+							else match = 0;
 						}
 						else
 						{
-							if(exclude == 1)
-							{ }
-							else
-							{
-								match = 0;
-							}
+							if(exclude == 1) { }
+							else match = 0;
 						}
 					}
 				}
@@ -342,28 +339,15 @@ int metasorter::process_asset(asset* _asset)
 				{
 					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)				
 					{
-						if(exclude == 0)
-						{ }
-						else
-						{
-							match = 0;
-						}
+						if(exclude == 0) { }
+						else match = 0;
 					}
 					else
 					{
-						if(exclude == 1)
-						{ }
-						else
-						{
-							match = 0;
-						}
-					}
-					
+						if(exclude == 1) { }
+						else match = 0;
+					}	
 				}
-
-
-
-
 			}
 		}
 		if(match == 1)
@@ -372,15 +356,18 @@ int metasorter::process_asset(asset* _asset)
 			process_rule(_asset, v.first.data(), v.second.data());
 			
 			// don't continue processing remaining rules if file has been moved/deleted
-			char_separator<char> sep("_");
-			tokenizer< char_separator<char> > tokens((std::string)v.first.data(), sep);
-			BOOST_FOREACH (const std::string& t, tokens)
+			char delimiters[] = "_";
+			char *tok  = new char[255];
+			tok = strtok((char*)v.first.data(), delimiters);
+    
+			while (tok != 0)
 			{
-				if(t.compare("move") == 0 || t.compare("delete") == 0)
+				if(strcmp(tok, "move") == 0 || strcmp(tok, "delete") == 0)
 				{
 					return 1;
 				}
-			}
+				tok = strtok(NULL, delimiters);
+			}			
 		}
 	}
 	return err;
@@ -493,3 +480,30 @@ bool metasorter::string_replace(std::string& str, const std::string& from, const
 	return true;
 }
 
+
+int metasorter::file_age(asset* _asset)
+{
+	int age = 0;
+
+	/*
+	WIN32_FIND_DATA FindFileData;
+    HANDLE hFind;
+    hFind = FindFirstFile((LPCWSTR)_asset->full_filename, &FindFileData);
+	const FILETIME  ftFile = FindFileData.ftCreationTime;
+	CTime ctFile = ftFile;
+    CTime ctNow = ctNow.GetCurrentTime();
+	CTimeSpan tsAge;
+    tsAge = ctNow - ctFile;
+	FILETIME ftAge;
+    ULARGE_INTEGER ulAgeInSeconds;
+	ulAgeInSeconds.QuadPart = tsAge.GetTotalSeconds() * 1E7;
+	ftAge.dwLowDateTime=ulAgeInSeconds.LowPart;
+    ftAge.dwHighDateTime = ulAgeInSeconds.HighPart;
+	SYSTEMTIME stAge;
+    FileTimeToSystemTime(&ftAge,&stAge);
+	strYears.Format("%d", stAge.wYear-1601);
+    strMonths.Format("%d",stAge.wMonth-1);
+    strDays.Format("%d",stAge.wDay-1);
+	*/
+	return age;
+}

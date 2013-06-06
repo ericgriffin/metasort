@@ -35,6 +35,9 @@
     <ClCompile Include="asset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="customparameters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="filelister.h">
@@ -47,6 +50,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="asset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="customparameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

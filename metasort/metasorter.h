@@ -47,16 +47,19 @@ class metasorter
 public:
 	metasorter(char*, boost::property_tree::ptree pt);
 	~metasorter();
-	int process_asset(asset*);
-	int parse_directory(int);
-	int process_rule(asset*, std::string, std::string);
-	bool string_replace(std::string&, const std::string&, const std::string&);
+	
 	char path[255];
 	boost::property_tree::ptree pt;
 	std::string logstring;
 	LogFile logfile;
-	
- 
+
+	int process_asset(asset*);
+	int parse_directory(int);
+	int process_rule(asset*, std::string, std::string);
+	bool string_replace(std::string&, const std::string&, const std::string&);
+	int file_age(asset*);
+	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String);
+
 private:
 	static const int MAX_CHAR = 1024;
 	int find_matches_ids[1024];
