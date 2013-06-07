@@ -222,7 +222,6 @@ int metasorter::process_asset(asset* _asset)
 			if(stream.compare("other") == 0) stream_type = Stream_Other;
 			if(stream.compare("image") == 0) stream_type = Stream_Image;
 			if(stream.compare("menu") == 0) stream_type = Stream_Menu;
-			if(stream.compare("file") == 0) file_info = 1;
 
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
 			{				
@@ -242,38 +241,14 @@ int metasorter::process_asset(asset* _asset)
 				String parameter_val = String(parameter_val1);
 				
 				// assign asset parameter value
-				if(file_info == 0)
+				
+				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
+				else
 				{
-					if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
-					else
-					{
-						asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
-						//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl; 
-					}
+					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
+					//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl; 
 				}
-				else if(file_info == 1)
-				{
-					if(wcscmp(parameter.c_str(), L"filesize") == 0)
-					{
-						std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
-						file_info_file.seekg( 0, std::ios::end );
-					
-						std::string tempstring;
-						String tempstring2;
-						tempstring = std::to_string(file_info_file.tellg() / 1024);
-						wchar_t *tempstring3 = new wchar_t[255];
-						mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
-						tempstring2.assign(tempstring3);
-						asset_param_val.assign(tempstring2);
-					}
-					if(wcscmp(parameter.c_str(), L"fileage") == 0)
-					{
-						file_age(_asset);
-					}
-
-
-				}
-
+				
 				// check for exclusive parameter
 				String param_prefix;
 				param_prefix.assign(parameter_val,0,1);
@@ -481,29 +456,3 @@ bool metasorter::string_replace(std::string& str, const std::string& from, const
 }
 
 
-int metasorter::file_age(asset* _asset)
-{
-	int age = 0;
-
-	/*
-	WIN32_FIND_DATA FindFileData;
-    HANDLE hFind;
-    hFind = FindFirstFile((LPCWSTR)_asset->full_filename, &FindFileData);
-	const FILETIME  ftFile = FindFileData.ftCreationTime;
-	CTime ctFile = ftFile;
-    CTime ctNow = ctNow.GetCurrentTime();
-	CTimeSpan tsAge;
-    tsAge = ctNow - ctFile;
-	FILETIME ftAge;
-    ULARGE_INTEGER ulAgeInSeconds;
-	ulAgeInSeconds.QuadPart = tsAge.GetTotalSeconds() * 1E7;
-	ftAge.dwLowDateTime=ulAgeInSeconds.LowPart;
-    ftAge.dwHighDateTime = ulAgeInSeconds.HighPart;
-	SYSTEMTIME stAge;
-    FileTimeToSystemTime(&ftAge,&stAge);
-	strYears.Format("%d", stAge.wYear-1601);
-    strMonths.Format("%d",stAge.wMonth-1);
-    strDays.Format("%d",stAge.wDay-1);
-	*/
-	return age;
-}
