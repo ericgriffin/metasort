@@ -14,11 +14,15 @@ int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaI
 		}
 		if(wcscmp(parameter.c_str(), L"file_size") == 0)
 		{
-			found = file_size(_asset_param_val, _MI);
+			found = file_size(_asset_param_val, _asset);
 		}
-		if(wcscmp(parameter.c_str(), L"file_age") == 0)
+		if(wcscmp(parameter.c_str(), L"file_modified_age") == 0)
 		{
-			found = file_age(_asset_param_val, _MI);
+			found = file_modified_age(_asset_param_val, _asset);
+		}
+		if(wcscmp(parameter.c_str(), L"file_created_age") == 0)
+		{
+			found = file_created_age(_asset_param_val, _asset);
 		}
 	}
 	return found;
@@ -50,46 +54,62 @@ int audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 }
 
 
-int file_size(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
+int file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
-	/*std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
+	std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
 	file_info_file.seekg( 0, std::ios::end );
-					
 	std::string tempstring;
 	String tempstring2;
 	tempstring = std::to_string(file_info_file.tellg() / 1024);
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
 	tempstring2.assign(tempstring3);
-	asset_param_val.assign(tempstring2);
-	*/
+	_asset_param_val.assign(tempstring2);	
 	return 1;
 }
 
-int file_age(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
+
+int file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	int age = 0;
+	std::string tempstring;
+	String tempstring2;
+	wchar_t *tempstring3 = new wchar_t[255];
 
-	/*
-	WIN32_FIND_DATA FindFileData;
-    HANDLE hFind;
-    hFind = FindFirstFile((LPCWSTR)_asset->full_filename, &FindFileData);
-	const FILETIME  ftFile = FindFileData.ftCreationTime;
-	CTime ctFile = ftFile;
-    CTime ctNow = ctNow.GetCurrentTime();
-	CTimeSpan tsAge;
-    tsAge = ctNow - ctFile;
-	FILETIME ftAge;
-    ULARGE_INTEGER ulAgeInSeconds;
-	ulAgeInSeconds.QuadPart = tsAge.GetTotalSeconds() * 1E7;
-	ftAge.dwLowDateTime=ulAgeInSeconds.LowPart;
-    ftAge.dwHighDateTime = ulAgeInSeconds.HighPart;
-	SYSTEMTIME stAge;
-    FileTimeToSystemTime(&ftAge,&stAge);
-	strYears.Format("%d", stAge.wYear-1601);
-    strMonths.Format("%d",stAge.wMonth-1);
-    strDays.Format("%d",stAge.wDay-1);
-	*/
+	boost::filesystem::path p(_asset->full_filename);
+
+	if (boost::filesystem::exists(p))
+	{
+		std::time_t file_mod_time = boost::filesystem::last_write_time(p);
+		std::time_t now = time(NULL);
+		tempstring = std::to_string((long)(difftime(now, file_mod_time) / 60));
+		mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
+		tempstring2.assign(tempstring3);
+		_asset_param_val.assign(tempstring2);
+	}
+	return 1;
+}
+
+
+int file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
+{
+	int age = 0;
+	std::string tempstring;
+	String tempstring2;
+	wchar_t *tempstring3 = new wchar_t[255];
+
+	std::time_t file_create_time;
+	std::time_t now = time(NULL);
+	struct tm* clock = new tm;
+	struct stat attrib;
+	stat(_asset->full_filename, &attrib);
+	clock = localtime(&(attrib.st_mtime));
+	file_create_time = mktime(clock);
+
+	tempstring = std::to_string((long)(difftime(now, file_create_time) / 60));
+	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
+	tempstring2.assign(tempstring3);
+	_asset_param_val.assign(tempstring2);
 
 	return 1;
 }

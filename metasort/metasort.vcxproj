@@ -199,7 +199,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>D:\Development\Projects\USAS\metasort\Mediainfo\ZenLib\Project\MSVC2012\Library\x64\Release;D:\Development\Projects\USAS\metasort\Mediainfo\zlib\projects\MSVC2010\x64\Release;D:\Development\Projects\USAS\metasort\Mediainfo\MediaInfoLib\Project\MSVC2012\Library\x64\Release;D:\Development\libs\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Development\Projects\USAS\metasort\Mediainfo\ZenLib\Project\MSVC2012\Library\x64\Release;D:\Development\Projects\USAS\metasort\Mediainfo\zlib\projects\MSVC2010\x64\Release;D:\Development\Projects\USAS\metasort\Mediainfo\MediaInfoLib\Project\MSVC2012\Library\x64\Release;D:\Development\libs\boost\stage\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>zlib.lib;ZenLib.lib;MediaInfo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkStatus>
       </LinkStatus>

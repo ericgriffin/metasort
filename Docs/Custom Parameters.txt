@@ -5,10 +5,14 @@ general:
 	Each digit in layout represents an audio stream, the lowest stream being the left-most digit. The value of each digit is the number of channels in the stream.
 	For example, "audio_layout 22" would catch any files which had 2 channels in the first stream, and 2 channels in the second stream. "audio_layout 11111111" would catch any files which had 1 channel in all 8 streams.
 	
---	filesize [size in KB]
-	catches files who's size is represented in Kilobytes.
+--	file_size [size in KB]
+	catches files who's size is represented by the field in Kilobytes.
 	
 	
---	fileage [#Y#O#D#H#M#S]
+--	file_create_age [minutes]
 
-	catches files who's age is represented in any combination of years, months, days, hours, minutes, or seconds.
+	catches files where the difference between the current time and the file's created date matches the [minutes] field, specified in minutes.
+	
+--	file_modified_age [minutes]
+
+	catches files where the difference between the current time and the file's modified date matches the [minutes] field, specified in minutes.
