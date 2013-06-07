@@ -57,7 +57,6 @@ public:
 	int parse_directory(int);
 	int process_rule(asset*, std::string, std::string);
 	bool string_replace(std::string&, const std::string&, const std::string&);
-	int file_age(asset*);
 	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String);
 
 private:
