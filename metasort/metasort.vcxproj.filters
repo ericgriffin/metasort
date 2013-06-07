@@ -23,9 +23,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="filelister.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="metasorter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,9 +37,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="filelister.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="metasorter.h">
       <Filter>Header Files</Filter>
     </ClInclude>

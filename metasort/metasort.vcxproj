@@ -24,7 +24,6 @@
   <ItemGroup>
     <ClCompile Include="asset.cpp" />
     <ClCompile Include="customparameters.cpp" />
-    <ClCompile Include="filelister.cpp" />
     <ClCompile Include="logfile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="metasorter.cpp" />
@@ -32,7 +31,6 @@
   <ItemGroup>
     <ClInclude Include="asset.h" />
     <ClInclude Include="customparameters.h" />
-    <ClInclude Include="filelister.h" />
     <ClInclude Include="logfile.h" />
     <ClInclude Include="metasorter.h" />
   </ItemGroup>

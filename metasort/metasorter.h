@@ -9,10 +9,11 @@
 #include <iomanip>
 #include <stdio.h>
 #include <sstream>
-#include <windows.h>
 #include <time.h>
 
 #include <boost/foreach.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/tokenizer.hpp>
@@ -54,7 +55,7 @@ public:
 	LogFile logfile;
 
 	int process_asset(asset*);
-	int parse_directory(int);
+	int traverse_directory(int);
 	int process_rule(asset*, std::string, std::string);
 	bool string_replace(std::string&, const std::string&, const std::string&);
 	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String);

@@ -1,5 +1,4 @@
 #include "metasorter.h"
-#include "filelister.h"
 #include "asset.h"
 #include "customparameters.h"
 

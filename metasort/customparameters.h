@@ -3,7 +3,6 @@
 #include <boost/filesystem/operations.hpp>
 
 #include "metasorter.h"
-#include "filelister.h"
 #include "asset.h"
 
 

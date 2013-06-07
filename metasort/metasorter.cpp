@@ -1,7 +1,6 @@
 // metasorter.cpp
 
 #include "metasorter.h"
-#include "filelister.h"
 #include "asset.h"
 
 
@@ -71,70 +70,81 @@ metasorter::~metasorter()
 }
 
 
-int metasorter::parse_directory(int _recurse)
+int metasorter::traverse_directory(int _recurse)
 {
 	int err = 0;
-	FileLister* fl = new FileLister(path);
+
 	asset* _asset = new asset;
-		
-	while(fl->getNextFile(fl->filename))
+	boost::filesystem::path dir_path = boost::filesystem::path(path);
+	boost::filesystem::directory_iterator itr(dir_path);
+	boost::filesystem::recursive_directory_iterator itr_r(dir_path);
+
+	if(_recurse == 0)
 	{
-		fl->is_dir = 0;
-		
-		strcpy(fl->full_filename, path);
-		strcat(fl->full_filename, fl->filename);
-		strcpy(fl->extension_filename, fl->filename);
-		fl->current_token = strtok_s(fl->extension_filename,"\.", &fl->context);
-		
-		while (fl->current_token != NULL)
+		// non-recursive search
+		while (itr != boost::filesystem::directory_iterator())
 		{
-			fl->previous_token = fl->current_token;
-			fl->current_token = strtok_s(NULL, "\.", &fl->context);
-		}
-
-		strcpy(fl->extension, fl->previous_token);
-
-		if(fl->found.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // IS A DIRECTORY
-		{
-			if(_recurse == 1)
+			// if it is a file
+			if(itr->status().type() != boost::filesystem::file_type::directory_file)
 			{
-				strcpy(fl->recurse_path, path);
-				strcat(fl->recurse_path, "\\");
-				strcat(fl->recurse_path, fl->filename);
-				strcat(fl->recurse_path, "\\");
-				metasorter recursed_sorter(fl->recurse_path, pt);
-				recursed_sorter.parse_directory(_recurse);
-			}
-			fl->is_dir = 1;
-		}
-		
-		if(fl->is_dir != 1)  // IS A FILE
-		{
-			strcpy(_asset->full_filename, fl->full_filename);
-			strcpy(_asset->filename, fl->filename);
-			strcpy(_asset->path, fl->path);
-			strcpy(_asset->extension, fl->extension);
+				strcpy(_asset->full_filename, itr->path().string().c_str());
+				strcpy(_asset->filename, itr->path().filename().string().c_str());
+				strcpy(_asset->path, path);
+				strcpy(_asset->extension, itr->path().filename().extension().string().c_str());
 
-			// filter extensions
-			int valid_extension = 0;
-
-			BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
-			{
-				if(strcmp(_asset->extension, v.first.data()) == 0)
+				// filter extensions
+				int valid_extension = 0;
+			
+				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
 				{
-					valid_extension = 1;
+					if(strcmp(_asset->extension, v.first.data()) == 0)
+					{
+						valid_extension = 1;
+					}
 				}
-			}
 
-			if(valid_extension == 1)
-			{
-				process_asset(_asset);					
+				if(valid_extension == 1)
+				{
+					process_asset(_asset);					
+				}		
 			}
+			++itr;
 		}
 	}
+	
+	if(_recurse == 1)
+	{
+		// recursive search
+		while (itr_r != boost::filesystem::recursive_directory_iterator())
+		{
+			// if it is a file
+			if(itr_r->status().type() != boost::filesystem::file_type::directory_file)
+			{
+				strcpy(_asset->full_filename, itr_r->path().string().c_str());
+				strcpy(_asset->filename, itr_r->path().filename().string().c_str());
+				strcpy(_asset->path, path);
+				strcpy(_asset->extension, itr_r->path().filename().extension().string().c_str());
 
+				// filter extensions
+				int valid_extension = 0;
+			
+				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
+				{
+					if(strcmp(_asset->extension, v.first.data()) == 0)
+					{
+						valid_extension = 1;
+					}
+				}
+
+				if(valid_extension == 1)
+				{
+					process_asset(_asset);					
+				}		
+			}
+			++itr_r;
+		}
+	}
 	delete _asset;
-	delete fl;
 	return err;
 }
 
@@ -241,7 +251,6 @@ int metasorter::process_asset(asset* _asset)
 				String parameter_val = String(parameter_val1);
 				
 				// assign asset parameter value
-				
 				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
 				else
 				{
@@ -249,7 +258,7 @@ int metasorter::process_asset(asset* _asset)
 					//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl; 
 				}
 				
-				// check for exclusive parameter
+				// check for and strip exclusive character
 				String param_prefix;
 				param_prefix.assign(parameter_val,0,1);
 				if(param_prefix.compare(L"!") == 0)
@@ -258,7 +267,7 @@ int metasorter::process_asset(asset* _asset)
 					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
 
-				// check for greater-than or less-than
+				// check for and strip greater-than or less-than
 				param_prefix.assign(parameter_val,0,1);
 				if(param_prefix.compare(L">") == 0)
 				{
@@ -273,6 +282,7 @@ int metasorter::process_asset(asset* _asset)
 
 				if(less_than == 1 || greater_than == 1)
 				{
+					// convert values to integers
 					char* asset_param_intval = new char[255];
 					char* configparam_intval = new char[255];
 					wcstombs(asset_param_intval, asset_param_val.c_str(), sizeof(asset_param_intval));
@@ -325,6 +335,7 @@ int metasorter::process_asset(asset* _asset)
 				}
 			}
 		}
+
 		if(match == 1)
 		{
 			// rule matches - process rule
@@ -358,7 +369,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	logstring.append(":");
 	logstring.append(second);
 	logfile.write(logstring);
-	std::cout << std::endl << _asset->full_filename << " matches rule " << first << ":" << second << std::endl;
+	std::cout << std::endl << _asset->full_filename << " MATCHES RULE " << first << ":" << second << std::endl;
 
 	char_separator<char> sep("_");
 	tokenizer< char_separator<char> > tokens(first, sep);
@@ -424,7 +435,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			logstring.append(execstring);
 			logfile.write(logstring);
 			std::cout << "Executing: " << execstring << std::endl;
-			system(execstring.c_str());
+			std::system(execstring.c_str());
 		}
 
 		if(t.compare("delete") == 0)

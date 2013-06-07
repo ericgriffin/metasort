@@ -55,13 +55,14 @@ int main(int argc, char* argv[])
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("folders"))
 			{
 				int recurse = 0;
-				std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl << std::endl;
+				std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl;
 				if(strcmp(v.second.data().c_str(), "R") == 0)
 				{
 					recurse = 1;
 				}
 				metasorter sorter((char*)v.first.data(), pt);
-				sorter.parse_directory(recurse);
+				//sorter.parse_directory(recurse);
+				sorter.traverse_directory(recurse);
 			}
 		}
 		else
