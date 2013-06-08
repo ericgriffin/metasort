@@ -193,6 +193,7 @@ int metasorter::process_asset(asset* _asset)
 
 	fclose(F);
 	MI.Open_Buffer_Finalize();
+	delete[] From_Buffer;
 	
 
 	// Process rules from config file
@@ -238,17 +239,26 @@ int metasorter::process_asset(asset* _asset)
 				int exclude = 0;
 				int greater_than = 0;
 				int less_than = 0;
+				int is_regex = 0;
 				String asset_param_val;
 
 				// parameter name from config file
-				wchar_t *parameter1 = new wchar_t[255];
-				mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
-				String parameter = String(parameter1);
+				wchar_t* parameter_char = charToWChar(y.first.c_str());
+				String parameter = String(parameter_char);
+				delete parameter_char;
+				//wchar_t *parameter1 = new wchar_t[255];
+				//mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
+				//String parameter = String(parameter1);
+				//delete[] parameter1;
 
 				// parameter value from config file
-				wchar_t *parameter_val1 = new wchar_t[255];
-				mbstowcs(parameter_val1, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
-				String parameter_val = String(parameter_val1);
+				wchar_t* parameter_val_char = charToWChar(y.second.data().c_str());
+				String parameter_val = String(parameter_val_char);
+				delete parameter_val_char;
+				//wchar_t *parameter_val1 = new wchar_t[255];
+				//mbstowcs(parameter_val1, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
+				//String parameter_val = String(parameter_val1);
+				//delete parameter_val1;
 				
 				// assign asset parameter value
 				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
@@ -280,6 +290,15 @@ int metasorter::process_asset(asset* _asset)
 					parameter_val.assign(parameter_val, 1, parameter_val.length());
 				}
 
+				// check for and strip regular expression
+				param_prefix.assign(parameter_val,0,7);
+				if(param_prefix.compare(L"[REGEX]") == 0)
+				{
+					is_regex = 1;
+					parameter_val.assign(parameter_val, 7, parameter_val.length());
+				}
+
+				// handle greater-than less-than
 				if(less_than == 1 || greater_than == 1)
 				{
 					// convert values to integers
@@ -317,10 +336,47 @@ int metasorter::process_asset(asset* _asset)
 							else match = 0;
 						}
 					}
+
+					delete asset_param_intval;
+					delete configparam_intval;
+				}
+
+				// handle regex comparison
+				if(greater_than == 0 && less_than == 0 && is_regex == 1)
+				{
+					wcout << "Processing regex " << asset_param_val.c_str() << " vs " << parameter_val.c_str() << endl;
+
+					// convert parameter_val to char*
+					char* pattern = new char[255];
+					wcstombs(pattern, parameter_val.c_str(), sizeof(parameter_val.c_str()) + 1);
+					boost::regex EXPR(pattern);
+
+					// convert MediaInfo::String::asset_param_val to std::string
+					std::string asset_param_val_str;
+					char* asset_param_val_char = new char[255];
+					wcstombs(asset_param_val_char, asset_param_val.c_str(), sizeof(asset_param_val.c_str()) + 1);
+					asset_param_val_str.assign(asset_param_val_char);
+					
+					wcout << "Processing pattern " << asset_param_val_str.c_str() << " vs " << pattern << endl;
+					if(boost::regex_match(asset_param_val_str, EXPR) == 1)
+					//if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)				
+					{
+
+						if(exclude == 0) { }
+						else match = 0;
+					}
+					else
+					{
+						if(exclude == 1) { }
+						else match = 0;
+					}
+
+					delete pattern;
+					delete asset_param_val_char;
 				}
 
 				// handle default comparison
-				if(greater_than == 0 && less_than == 0)
+				if(greater_than == 0 && less_than == 0 && is_regex == 0)
 				{
 					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)				
 					{
@@ -353,7 +409,8 @@ int metasorter::process_asset(asset* _asset)
 					return 1;
 				}
 				tok = strtok(NULL, delimiters);
-			}			
+			}
+			delete tok;
 		}
 	}
 	return err;
@@ -369,7 +426,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	logstring.append(":");
 	logstring.append(second);
 	logfile.write(logstring);
-	std::cout << std::endl << _asset->full_filename << " MATCHES RULE " << first << ":" << second << std::endl;
+	std::cout << std::endl << _asset->full_filename << " MATCHES RULE " << first << std::endl;
 
 	char_separator<char> sep("_");
 	tokenizer< char_separator<char> > tokens(first, sep);
@@ -464,6 +521,15 @@ bool metasorter::string_replace(std::string& str, const std::string& from, const
 		return false;
 	str.replace(start_pos, from.length(), to);
 	return true;
+}
+
+
+wchar_t* metasorter::charToWChar(const char* text)
+{
+    size_t size = strlen(text) + 1;
+    wchar_t* wa = new wchar_t[size];
+    mbstowcs(wa,text,size);
+    return wa;
 }
 
 

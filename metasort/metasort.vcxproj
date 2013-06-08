@@ -144,7 +144,7 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalLibraryDirectories>D:\Development\libs\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Development\libs\boost\stage\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -174,7 +174,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>Full</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -196,7 +196,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
+      <OptimizeReferences>false</OptimizeReferences>
       <AdditionalLibraryDirectories>D:\Development\Projects\USAS\metasort\Mediainfo\ZenLib\Project\MSVC2012\Library\x64\Release;D:\Development\Projects\USAS\metasort\Mediainfo\zlib\projects\MSVC2010\x64\Release;D:\Development\Projects\USAS\metasort\Mediainfo\MediaInfoLib\Project\MSVC2012\Library\x64\Release;D:\Development\libs\boost\stage\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>zlib.lib;ZenLib.lib;MediaInfo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkStatus>

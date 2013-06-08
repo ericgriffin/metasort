@@ -9,26 +9,38 @@ int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaI
 	{
 		if(wcscmp(parameter.c_str(), L"audio_layout") == 0)
 		{
-			found = audio_layout(_asset_param_val, _MI);
+			found = proc_audio_layout(_asset_param_val, _MI);
 		}
 		if(wcscmp(parameter.c_str(), L"file_size") == 0)
 		{
-			found = file_size(_asset_param_val, _asset);
+			found = proc_file_size(_asset_param_val, _asset);
 		}
 		if(wcscmp(parameter.c_str(), L"file_modified_age") == 0)
 		{
-			found = file_modified_age(_asset_param_val, _asset);
+			found = proc_file_modified_age(_asset_param_val, _asset);
 		}
 		if(wcscmp(parameter.c_str(), L"file_created_age") == 0)
 		{
-			found = file_created_age(_asset_param_val, _asset);
+			found = proc_file_created_age(_asset_param_val, _asset);
+		}
+		if(wcscmp(parameter.c_str(), L"file_name") == 0)
+		{
+			found = proc_file_name(_asset_param_val, _asset);
+		}
+		if(wcscmp(parameter.c_str(), L"file_extension") == 0)
+		{
+			found = proc_file_extension(_asset_param_val, _asset);
+		}
+		if(wcscmp(parameter.c_str(), L"file_path") == 0)
+		{
+			found = proc_file_path(_asset_param_val, _asset);
 		}
 	}
 	return found;
 }
 
 
-int audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
+int proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 {
 	MediaInfoLib::String audiostreamsstr;
 	MediaInfoLib::String streamchannelsstr;
@@ -49,11 +61,47 @@ int audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 		_asset_param_val.append(streamchannelsstr.c_str());
 	}
 
+	delete[] audiostreamschar;
+	delete[] streamchannels;
 	return 1;
 }
 
+int proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
+{
+	String tempstring2;
+	wchar_t *tempstring3 = new wchar_t[255];
+	mbstowcs(tempstring3, _asset->filename, sizeof(_asset->filename) + 1);
+	tempstring2.assign(tempstring3);
+	_asset_param_val.assign(tempstring2);
+	
+	wcout << "FILENAME: " << _asset->filename << " : " << _asset_param_val.c_str() << endl;
+	delete[] tempstring3;
+	return 1;
+}
 
-int file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int proc_file_extension(MediaInfoLib::String &_asset_param_val, asset* _asset)
+{
+	String tempstring2;
+	wchar_t *tempstring3 = new wchar_t[255];
+	mbstowcs(tempstring3, _asset->extension, sizeof(_asset->extension) + 1);
+	tempstring2.assign(tempstring3);
+	_asset_param_val.assign(tempstring2);
+	delete[] tempstring3;
+	return 1;
+}
+
+int proc_file_path(MediaInfoLib::String &_asset_param_val, asset* _asset)
+{
+	String tempstring2;
+	wchar_t *tempstring3 = new wchar_t[255];
+	mbstowcs(tempstring3, _asset->path, sizeof(_asset->path) + 1);
+	tempstring2.assign(tempstring3);
+	_asset_param_val.assign(tempstring2);
+	delete[] tempstring3;
+	return 1;
+}
+
+int proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
 	file_info_file.seekg( 0, std::ios::end );
@@ -61,14 +109,15 @@ int file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	String tempstring2;
 	tempstring = std::to_string(file_info_file.tellg() / 1024);
 	wchar_t *tempstring3 = new wchar_t[255];
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
+	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
-	_asset_param_val.assign(tempstring2);	
+	_asset_param_val.assign(tempstring2);
+	delete[] tempstring3;
 	return 1;
 }
 
 
-int file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	int age = 0;
 	std::string tempstring;
@@ -82,15 +131,16 @@ int file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 		std::time_t file_mod_time = boost::filesystem::last_write_time(p);
 		std::time_t now = time(NULL);
 		tempstring = std::to_string((long)(difftime(now, file_mod_time) / 60));
-		mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
+		mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 		tempstring2.assign(tempstring3);
 		_asset_param_val.assign(tempstring2);
 	}
+	delete[] tempstring3;
 	return 1;
 }
 
 
-int file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	int age = 0;
 	std::string tempstring;
@@ -106,9 +156,10 @@ int file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	file_create_time = mktime(clock);
 
 	tempstring = std::to_string((long)(difftime(now, file_create_time) / 60));
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring3));
+	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
+	delete[] tempstring3;
 
 	return 1;
 }

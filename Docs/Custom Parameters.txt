@@ -16,3 +16,10 @@ general:
 --	file_modified_age [minutes]
 
 	catches files where the difference between the current time and the file's modified date matches the [minutes] field, specified in minutes.
+	
+-- 	file_name [filename]
+
+-- 	file_extension [.extension]
+
+--	file_path [path]
+

@@ -58,6 +58,7 @@ public:
 	int traverse_directory(int);
 	int process_rule(asset*, std::string, std::string);
 	bool string_replace(std::string&, const std::string&, const std::string&);
+	wchar_t* charToWChar(const char*);
 	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String);
 
 private:
