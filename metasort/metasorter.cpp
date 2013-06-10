@@ -158,7 +158,8 @@ int metasorter::process_asset(asset* _asset)
 	MediaInfo MI;
 
 	FILE* F = NULL;
-	err = fopen_s(&F, _asset->full_filename, "rb");
+	F = fopen(_asset->full_filename, "rb");
+
 	if (F == 0)
 	{
 		logstring.assign("Can't open file ");

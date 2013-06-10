@@ -107,7 +107,7 @@ int proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	file_info_file.seekg( 0, std::ios::end );
 	std::string tempstring;
 	String tempstring2;
-	tempstring = std::to_string(file_info_file.tellg() / 1024);
+	tempstring = std::to_string((long long int)file_info_file.tellg() / 1024);
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
@@ -130,7 +130,7 @@ int proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset
 	{
 		std::time_t file_mod_time = boost::filesystem::last_write_time(p);
 		std::time_t now = time(NULL);
-		tempstring = std::to_string((long)(difftime(now, file_mod_time) / 60));
+		tempstring = std::to_string((long long int)(difftime(now, file_mod_time) / 60));
 		mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 		tempstring2.assign(tempstring3);
 		_asset_param_val.assign(tempstring2);
