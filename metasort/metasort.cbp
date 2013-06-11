@@ -49,11 +49,13 @@
 					<Add directory="D:/Development/libs/boost/stage/lib64" />
 				</Linker>
 			</Target>
-			<Target title="Release Win32">
-				<Option output="metasort" prefix_auto="1" extension_auto="1" />
+			<Target title="Release x86">
+				<Option output="../Release/metasort" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Release" />
 				<Option external_deps=";;;" />
-				<Option type="0" />
+				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-std=c++0x" />
 					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
@@ -65,16 +67,20 @@
 					<Add directory="../Mediainfo/ZenLib/Source" />
 				</Compiler>
 				<Linker>
-					<Add library="MediaInfo.lib" />
-					<Add library="ZenLib.lib" />
-					<Add library="zlib.lib" />
-					<Add directory="D:/Development/libs/boost/stage/lib" />
-					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/MediaInfoLib/Project/MSVC2012/Library/Win32/Release" />
-					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/zlib/projects/MSVC2010/Win32/Release" />
-					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/ZenLib/Project/MSVC2012/Library/Win32/Release" />
+					<Add library="../Mediainfo/MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a" />
+					<Add library="../Mediainfo/ZenLib/Project/GNU/Library/.libs/libzen.a" />
+					<Add library="../Mediainfo/zlib/libz.a" />
+					<Add library="../boost/stage/lib/libboost_system.a" />
+					<Add library="../boost/stage/lib/libboost_filesystem.a" />
+					<Add library="../boost/stage/lib/libboost_regex.a" />
+					<Add library="libpthread" />
+					<Add directory="../boost/stage/lib" />
+					<Add directory="../Mediainfo/MediaInfoLib/Project/GNU/Library/.libs" />
+					<Add directory="../Mediainfo/zlib" />
+					<Add directory="../Mediainfo/ZenLib/Project/GNU/Library/.libs" />
 				</Linker>
 			</Target>
-			<Target title="Debug Win32">
+			<Target title="Debug x86">
 				<Option output="metasort" prefix_auto="1" extension_auto="1" />
 				<Option external_deps=";;;" />
 				<Option type="0" />

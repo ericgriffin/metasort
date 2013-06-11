@@ -47,9 +47,9 @@ int proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 	char* audiostreamschar = new char[255];
 	char* streamchannels = new char[255];
 	int audiostreams = 0;
-	
+
 	audiostreamsstr.assign(_MI.Get(Stream_General, 0, L"AudioCount").c_str(), sizeof(audiostreamsstr));
-	
+
 	wcstombs(audiostreamschar, audiostreamsstr.c_str(), sizeof(audiostreamschar));
 	audiostreams = atoi((const char*)audiostreamschar);
 
@@ -73,7 +73,7 @@ int proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	mbstowcs(tempstring3, _asset->filename, sizeof(_asset->filename) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
-	
+
 	wcout << "FILENAME: " << _asset->filename << " : " << _asset_param_val.c_str() << endl;
 	delete[] tempstring3;
 	return 1;
@@ -155,7 +155,7 @@ int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	clock = localtime(&(attrib.st_mtime));
 	file_create_time = mktime(clock);
 
-	tempstring = std::to_string((long)(difftime(now, file_create_time) / 60));
+	tempstring = std::to_string((long long int)(difftime(now, file_create_time) / 60));
 	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
