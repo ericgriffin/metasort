@@ -40,4 +40,5 @@ general_0:
 	
 
 Regular Expressions:
-	All parameter values can be expresses as regular expressions by prefixing them with "[REGEX]
+	All parameter values can be expresses as regular expressions by prefixing them with "[REGEX]".
+	Ex. audio_layout [REGEX]2...
