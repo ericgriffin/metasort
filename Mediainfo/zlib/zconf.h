@@ -356,10 +356,8 @@ typedef uLong FAR uLongf;
    typedef Byte       *voidp;
 #endif
 
-#ifndef WIN32
 #if 1    /* was set to #if 1 by ./configure */
 #  define Z_HAVE_UNISTD_H
-#endif
 #endif
 
 #ifdef STDC
