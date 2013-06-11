@@ -8,9 +8,9 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 {
 	strcpy(path, _path);
 	pt = _pt;
-	
+
 	optional<const boost::property_tree::ptree&> pt_check_existence;
-	
+
 	// check logging
 	pt_check_existence = pt.get_child_optional("logging");
 	if(pt_check_existence)
@@ -94,7 +94,7 @@ int metasorter::traverse_directory(int _recurse)
 
 				// filter extensions
 				int valid_extension = 0;
-			
+
 				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
 				{
 					if(strcmp(_asset->extension, v.first.data()) == 0)
@@ -105,13 +105,13 @@ int metasorter::traverse_directory(int _recurse)
 
 				if(valid_extension == 1)
 				{
-					process_asset(_asset);					
-				}		
+					process_asset(_asset);
+				}
 			}
 			++itr;
 		}
 	}
-	
+
 	if(_recurse == 1)
 	{
 		// recursive search
@@ -127,7 +127,7 @@ int metasorter::traverse_directory(int _recurse)
 
 				// filter extensions
 				int valid_extension = 0;
-			
+
 				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
 				{
 					if(strcmp(_asset->extension, v.first.data()) == 0)
@@ -138,8 +138,8 @@ int metasorter::traverse_directory(int _recurse)
 
 				if(valid_extension == 1)
 				{
-					process_asset(_asset);					
-				}		
+					process_asset(_asset);
+				}
 			}
 			++itr_r;
 		}
@@ -154,7 +154,7 @@ int metasorter::process_asset(asset* _asset)
 {
 	int err = 0;
 	String To_Display;
-		
+
 	MediaInfo MI;
 
 	FILE* F = NULL;
@@ -178,7 +178,7 @@ int metasorter::process_asset(asset* _asset)
 
 	MI.Open_Buffer_Init(F_Size, 0);
 
-	do 
+	do
 	{
 		From_Buffer_Size = fread(From_Buffer, 1, 7 * 188, F);	//read data into buffer
 		size_t Status=MI.Open_Buffer_Continue(From_Buffer, From_Buffer_Size);	//Send the buffer to MediaInfo
@@ -195,7 +195,7 @@ int metasorter::process_asset(asset* _asset)
 	fclose(F);
 	MI.Open_Buffer_Finalize();
 	delete[] From_Buffer;
-	
+
 
 	// Process rules from config file
 	boost::property_tree::ptree pt1 = pt.get_child("rules");
@@ -220,7 +220,7 @@ int metasorter::process_asset(asset* _asset)
 				s.erase(0, pos + delimiter.length());
 			}
 			stream_number = atoi(s.c_str());
-			
+
 			#ifdef MEDIAINFO_LIBRARY
 				MediaInfoLib::stream_t stream_type = Stream_General;
 			#else
@@ -236,7 +236,7 @@ int metasorter::process_asset(asset* _asset)
 			if(stream.compare("menu") == 0) stream_type = Stream_Menu;
 
 			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
-			{				
+			{
 				int exclude = 0;
 				int greater_than = 0;
 				int less_than = 0;
@@ -260,15 +260,15 @@ int metasorter::process_asset(asset* _asset)
 				//mbstowcs(parameter_val1, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
 				//String parameter_val = String(parameter_val1);
 				//delete parameter_val1;
-				
+
 				// assign asset parameter value
 				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
 				else
 				{
 					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
-					//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl; 
+					//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl;
 				}
-				
+
 				// check for and strip exclusive character
 				String param_prefix;
 				param_prefix.assign(parameter_val,0,1);
@@ -314,7 +314,7 @@ int metasorter::process_asset(asset* _asset)
 						if(atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
 						{
 							if(exclude == 0) { }
-							else match = 0; 
+							else match = 0;
 						}
 						else
 						{
@@ -345,8 +345,6 @@ int metasorter::process_asset(asset* _asset)
 				// handle regex comparison
 				if(greater_than == 0 && less_than == 0 && is_regex == 1)
 				{
-					wcout << "Processing regex " << asset_param_val.c_str() << " vs " << parameter_val.c_str() << endl;
-
 					// convert parameter_val to char*
 					char* pattern = new char[255];
 					wcstombs(pattern, parameter_val.c_str(), sizeof(parameter_val.c_str()) + 1);
@@ -357,10 +355,8 @@ int metasorter::process_asset(asset* _asset)
 					char* asset_param_val_char = new char[255];
 					wcstombs(asset_param_val_char, asset_param_val.c_str(), sizeof(asset_param_val.c_str()) + 1);
 					asset_param_val_str.assign(asset_param_val_char);
-					
-					wcout << "Processing pattern " << asset_param_val_str.c_str() << " vs " << pattern << endl;
+
 					if(boost::regex_match(asset_param_val_str, EXPR) == 1)
-					//if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)				
 					{
 
 						if(exclude == 0) { }
@@ -379,7 +375,7 @@ int metasorter::process_asset(asset* _asset)
 				// handle default comparison
 				if(greater_than == 0 && less_than == 0 && is_regex == 0)
 				{
-					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)				
+					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
 					{
 						if(exclude == 0) { }
 						else match = 0;
@@ -388,7 +384,7 @@ int metasorter::process_asset(asset* _asset)
 					{
 						if(exclude == 1) { }
 						else match = 0;
-					}	
+					}
 				}
 			}
 		}
@@ -397,12 +393,12 @@ int metasorter::process_asset(asset* _asset)
 		{
 			// rule matches - process rule
 			process_rule(_asset, v.first.data(), v.second.data());
-			
+
 			// don't continue processing remaining rules if file has been moved/deleted
 			char delimiters[] = "_";
 			char *tok  = new char[255];
 			tok = strtok((char*)v.first.data(), delimiters);
-    
+
 			while (tok != 0)
 			{
 				if(strcmp(tok, "move") == 0 || strcmp(tok, "delete") == 0)
@@ -433,7 +429,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	tokenizer< char_separator<char> > tokens(first, sep);
 	BOOST_FOREACH (const std::string& t, tokens)
 	{
-		
+
 		if(t.compare("list") == 0)
 		{
 			ofstream listfile;
