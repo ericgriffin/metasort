@@ -394,9 +394,10 @@ int metasorter::process_asset(asset* _asset)
 			process_rule(_asset, v.first.data(), v.second.data());
 
 			// don't continue processing remaining rules if file has been moved/deleted
-			char delimiters[] = "_";
-			char *tok  = new char[255];
-			tok = strtok((char*)v.first.data(), delimiters);
+			const char delimiters[] = "_";
+			char *tok;
+			std::string rulename = std::string((char*)v.first.data());
+			tok = strtok((char*)rulename.c_str(), delimiters);
 
 			while (tok != 0)
 			{
