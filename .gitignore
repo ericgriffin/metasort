@@ -43,7 +43,10 @@ build/
 *.scc
 *.o
 *.lo
-*.so
+*.so*
+*.Plo
+*.a
+*.la*
 
 # Visual C++ cache files
 ipch/
