@@ -305,8 +305,8 @@ int metasorter::process_asset(asset* _asset)
 					// convert values to integers
 					char* asset_param_intval = new char[255];
 					char* configparam_intval = new char[255];
-					wcstombs(asset_param_intval, asset_param_val.c_str(), sizeof(asset_param_intval));
-					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(configparam_intval));
+					wcstombs(asset_param_intval, asset_param_val.c_str(), sizeof(asset_param_val.c_str()) + 1);
+					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(parameter_val.c_str()) + 1);
 
 					// handle less-than comparison
 					if(less_than == 1)
