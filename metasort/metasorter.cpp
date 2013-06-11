@@ -348,17 +348,16 @@ int metasorter::process_asset(asset* _asset)
 					// convert parameter_val to char*
 					char* pattern = new char[255];
 					wcstombs(pattern, parameter_val.c_str(), sizeof(parameter_val.c_str()) + 1);
-					boost::regex EXPR(pattern);
+					boost::regex EXPR(pattern, boost::regex::basic);
 
 					// convert MediaInfo::String::asset_param_val to std::string
 					std::string asset_param_val_str;
 					char* asset_param_val_char = new char[255];
-					wcstombs(asset_param_val_char, asset_param_val.c_str(), sizeof(asset_param_val.c_str()) + 1);
+					wcstombs(asset_param_val_char, asset_param_val.c_str(), asset_param_val.length() + 1);
 					asset_param_val_str.assign(asset_param_val_char);
 
 					if(boost::regex_match(asset_param_val_str, EXPR) == 1)
 					{
-
 						if(exclude == 0) { }
 						else match = 0;
 					}
@@ -368,8 +367,8 @@ int metasorter::process_asset(asset* _asset)
 						else match = 0;
 					}
 
-					delete pattern;
-					delete asset_param_val_char;
+					delete[] pattern;
+					delete[] asset_param_val_char;
 				}
 
 				// handle default comparison

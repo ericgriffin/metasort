@@ -58,7 +58,7 @@ int proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 
 	audiostreamsstr.assign(_MI.Get(Stream_General, 0, L"AudioCount").c_str(), sizeof(audiostreamsstr));
 
-	wcstombs(audiostreamschar, audiostreamsstr.c_str(), sizeof(audiostreamsstr.c_str() + 1));
+	wcstombs(audiostreamschar, audiostreamsstr.c_str(), audiostreamsstr.length() + 1);
 	audiostreams = atoi((const char*)audiostreamschar);
 
 	_asset_param_val.assign(L"");
