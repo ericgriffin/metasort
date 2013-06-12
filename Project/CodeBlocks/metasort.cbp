@@ -99,16 +99,16 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="../../source/asset.cpp" />
+		<Unit filename="../../source/asset.h" />
+		<Unit filename="../../source/customparameters.cpp" />
+		<Unit filename="../../source/customparameters.h" />
+		<Unit filename="../../source/logfile.cpp" />
+		<Unit filename="../../source/logfile.h" />
+		<Unit filename="../../source/main.cpp" />
+		<Unit filename="../../source/metasorter.cpp" />
+		<Unit filename="../../source/metasorter.h" />
 		<Unit filename="MediaInfoDLL/MediaInfoDLL.def" />
-		<Unit filename="asset.cpp" />
-		<Unit filename="asset.h" />
-		<Unit filename="customparameters.cpp" />
-		<Unit filename="customparameters.h" />
-		<Unit filename="logfile.cpp" />
-		<Unit filename="logfile.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="metasorter.cpp" />
-		<Unit filename="metasorter.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

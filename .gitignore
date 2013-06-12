@@ -48,7 +48,6 @@ build/
 *.Plo
 *.a
 *.la*
-*.depend
 
 # Visual C++ cache files
 ipch/
