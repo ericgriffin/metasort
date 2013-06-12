@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="metasort" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug x64">
+				<Option output="metasort" prefix_auto="1" extension_auto="1" />
+				<Option external_deps=";;;" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-ansi" />
+					<Add option="-DWIN32" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="../Mediainfo/MediaInfoLib/Source" />
+					<Add directory="../Mediainfo/ZenLib/Source" />
+					<Add directory="../boost" />
+				</Compiler>
+				<Linker>
+					<Add directory="D:/Development/libs/boost/stage/lib64" />
+				</Linker>
+			</Target>
+			<Target title="Release x64">
+				<Option output="metasort" prefix_auto="1" extension_auto="1" />
+				<Option external_deps=";;;" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/MediaInfoLib/Source" />
+					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/ZenLib/Source" />
+					<Add directory="D:/Development/libs/boost" />
+				</Compiler>
+				<Linker>
+					<Add library="zlib.lib" />
+					<Add library="ZenLib.lib" />
+					<Add library="MediaInfo.lib" />
+					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/ZenLib/Project/MSVC2012/Library/x64/Release" />
+					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/zlib/projects/MSVC2010/x64/Release" />
+					<Add directory="D:/Development/Projects/USAS/metasort/Mediainfo/MediaInfoLib/Project/MSVC2012/Library/x64/Release" />
+					<Add directory="D:/Development/libs/boost/stage/lib64" />
+				</Linker>
+			</Target>
+			<Target title="Release x86">
+				<Option output="../Release/metasort" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Release" />
+				<Option external_deps=";;;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-std=c++0x" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-DUNICODE" />
+					<Add directory="../boost" />
+					<Add directory="../Mediainfo/MediaInfoLib/Source" />
+					<Add directory="../Mediainfo/ZenLib/Source" />
+				</Compiler>
+				<Linker>
+					<Add library="../Mediainfo/MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a" />
+					<Add library="../Mediainfo/ZenLib/Project/GNU/Library/.libs/libzen.a" />
+					<Add library="../Mediainfo/zlib/libz.a" />
+					<Add library="../boost/stage/lib/libboost_system.a" />
+					<Add library="../boost/stage/lib/libboost_filesystem.a" />
+					<Add library="../boost/stage/lib/libboost_regex.a" />
+					<Add library="libpthread" />
+					<Add directory="../boost/stage/lib" />
+					<Add directory="../Mediainfo/MediaInfoLib/Project/GNU/Library/.libs" />
+					<Add directory="../Mediainfo/zlib" />
+					<Add directory="../Mediainfo/ZenLib/Project/GNU/Library/.libs" />
+				</Linker>
+			</Target>
+			<Target title="Debug x86">
+				<Option output="metasort" prefix_auto="1" extension_auto="1" />
+				<Option external_deps=";;;" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="C:/Users/Eric/Desktop/metasort/Mediainfo/ZenLib/Source" />
+					<Add directory="C:/Users/Eric/Desktop/metasort/Mediainfo/MediaInfoLib/Source/" />
+					<Add directory="D:/Development/libs/boost" />
+				</Compiler>
+				<Linker>
+					<Add directory="D:/Development/libs/boost/stage/lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="MediaInfoDLL/MediaInfoDLL.def" />
+		<Unit filename="asset.cpp" />
+		<Unit filename="asset.h" />
+		<Unit filename="customparameters.cpp" />
+		<Unit filename="customparameters.h" />
+		<Unit filename="logfile.cpp" />
+		<Unit filename="logfile.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="metasorter.cpp" />
+		<Unit filename="metasorter.h" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
