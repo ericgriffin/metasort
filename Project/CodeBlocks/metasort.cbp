@@ -42,7 +42,6 @@
 					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
-					<Add option="-DUNICODE" />
 				</Compiler>
 			</Target>
 			<Target title="Debug x86">
@@ -60,6 +59,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-std=c++0x" />
+			<Add option="-DUNICODE" />
 			<Add directory="../../Libraries/boost" />
 			<Add directory="../../Libraries/ZenLib/Source" />
 			<Add directory="../../Libraries/MediaInfoLib/Source" />
