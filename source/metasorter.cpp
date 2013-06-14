@@ -85,7 +85,8 @@ int metasorter::traverse_directory(int _recurse)
 		while (itr != boost::filesystem::directory_iterator())
 		{
 			// if it is a file
-			if(itr->status().type() != boost::filesystem::file_type::directory_file)
+			//if(itr->status().type() != boost::filesystem::file_type::directory_file)
+			if(itr->status().type() != 4)
 			{
 				strcpy(_asset->full_filename, itr->path().string().c_str());
 				strcpy(_asset->filename, itr->path().filename().string().c_str());
@@ -118,7 +119,8 @@ int metasorter::traverse_directory(int _recurse)
 		while (itr_r != boost::filesystem::recursive_directory_iterator())
 		{
 			// if it is a file
-			if(itr_r->status().type() != boost::filesystem::file_type::directory_file)
+			//if(itr_r->status().type() != boost::filesystem::file_type::directory_file)
+			if(itr->status().type() != 4)
 			{
 				strcpy(_asset->full_filename, itr_r->path().string().c_str());
 				strcpy(_asset->filename, itr_r->path().filename().string().c_str());
@@ -433,7 +435,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 		if(t.compare("list") == 0)
 		{
 			ofstream listfile;
-			listfile.open(second, ios::app);
+			listfile.open(second.c_str(), ios::app);
 			listfile << _asset->full_filename << endl;
 			listfile.close();
 		}
@@ -449,7 +451,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			logfile.write(logstring);
 			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
 			std::ifstream ifs(_asset->full_filename, std::ios::binary);
-			std::ofstream ofs(newfile, std::ios::binary);
+			std::ofstream ofs(newfile.c_str(), std::ios::binary);
 			ofs << ifs.rdbuf();
 			ifs.close();
 			ofs.close();
@@ -473,7 +475,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			logfile.write(logstring);
 			std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
 			std::ifstream ifs(_asset->full_filename, std::ios::binary);
-			std::ofstream ofs(newfile, std::ios::binary);
+			std::ofstream ofs(newfile.c_str(), std::ios::binary);
 			ofs << ifs.rdbuf();
 			ifs.close();
 			ofs.close();

@@ -3,7 +3,7 @@
 #include "logfile.h"
 
 LogFile::LogFile()
-{       	
+{
 }
 
 
@@ -15,7 +15,7 @@ LogFile::~LogFile()
 int LogFile::open(std::string _filename)
 {
 	int err = 0;
-	logfile.open(_filename, fstream::app);
+	logfile.open(_filename.c_str(), fstream::app);
 	return err;
 }
 
@@ -38,18 +38,18 @@ double LogFile::cpu_time()
 //****************************************************************************80
 //
 //  Purpose:
-// 
+//
 //    CPU_TIME reports the elapsed CPU time.
 //
 //  Discussion:
 //
 //    The data available to this routine through "CLOCK" is not very reliable,
-//    and hence the values of CPU_TIME returned should not be taken too 
+//    and hence the values of CPU_TIME returned should not be taken too
 //    seriously, especially when short intervals are being timed.
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -66,7 +66,7 @@ double LogFile::cpu_time()
 {
   double value;
 
-  value = ( double ) std::clock ( ) 
+  value = ( double ) std::clock ( )
         / ( double ) CLOCKS_PER_SEC;
 
   return value;
@@ -92,7 +92,7 @@ int * LogFile::time_numbers()
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -141,7 +141,7 @@ void LogFile::timestamp()
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -189,7 +189,7 @@ char * LogFile::timestring()
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
