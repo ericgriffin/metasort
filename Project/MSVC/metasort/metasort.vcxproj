@@ -92,22 +92,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\Windows\$(Platform)\</OutDir>
+    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\Windows\$(Platform)\</OutDir>
+    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\Windows\$(Platform)\</OutDir>
+    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>
     </LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\Windows\$(Platform)\</OutDir>
+    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,12 +122,15 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\boost\stage\Windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(Platform)\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <Bscmake>
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -149,12 +152,15 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\boost\stage\Windows\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(Platform)\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <Bscmake>
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost64.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -180,13 +186,16 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\boost\stage\Windows\lib;$(ProjectDir)\..\..\..\Libraries\MediaInfoLib\Project\MSVC2012\Library\Win32\Release;$(ProjectDir)\..\..\..\Libraries\zlib\projects\MSVC2010\Win32\Release;$(ProjectDir)\..\..\..\Libraries\ZenLib\Project\MSVC2012\Library\Win32\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\boost\stage\lib;$(ProjectDir)\..\..\..\Libraries\MediaInfoLib\Project\MSVC2012\Library\Win32\Release;$(ProjectDir)\..\..\..\Libraries\zlib\projects\MSVC2010\Win32\Release;$(ProjectDir)\..\..\..\Libraries\ZenLib\Project\MSVC2012\Library\Win32\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(Platform)\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <Bscmake>
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -217,7 +226,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\ZenLib\Project\MSVC2012\Library\x64\Release;$(ProjectDir)\..\..\..\Libraries\zlib\projects\MSVC2010\x64\Release;$(ProjectDir)\..\..\..\Libraries\MediaInfoLib\Project\MSVC2012\Library\x64\Release;$(ProjectDir)\..\..\..\Libraries\boost\stage\Windows\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\Libraries\ZenLib\Project\MSVC2012\Library\x64\Release;$(ProjectDir)\..\..\..\Libraries\zlib\projects\MSVC2010\x64\Release;$(ProjectDir)\..\..\..\Libraries\MediaInfoLib\Project\MSVC2012\Library\x64\Release;$(ProjectDir)\..\..\..\Libraries\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>zlib.lib;ZenLib.lib;MediaInfo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkStatus>
       </LinkStatus>
@@ -228,6 +237,9 @@
       <PreserveSbr>true</PreserveSbr>
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost64.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
