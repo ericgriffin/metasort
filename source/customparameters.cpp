@@ -8,11 +8,8 @@
 void m_itoa(int value, std::string& buf, int base){
 
 	int i = 30;
-
 	buf = "";
-
 	for(; value && i ; --i, value /= base) buf = "0123456789abcdef"[value % base] + buf;
-
 }
 
 int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI, asset* _asset, MediaInfoLib::stream_t stream_type, int stream_number, MediaInfoLib::String parameter)
@@ -128,7 +125,6 @@ int proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	String tempstring2;
 
 	m_itoa((int)(file_info_file.tellg() / 1024), tempstring, 10);
-	//tempstring = std::to_string((long long int)file_info_file.tellg() / 1024);
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
@@ -154,7 +150,6 @@ int proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset
 	file_modified_time = mktime(clock);
 
     m_itoa((int)(difftime(now, file_modified_time) / 60), tempstring, 10);
-	//tempstring = std::to_string((long long int)(difftime(now, file_modified_time) / 60));
 	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
@@ -180,13 +175,11 @@ int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	file_create_time = mktime(clock);
 
     m_itoa((int)(difftime(now, file_create_time) / 60), tempstring, 10);
-	tempstring = std::string(buffer);
-	//tempstring = std::to_string((long long int)(difftime(now, file_create_time) / 60));
 	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
+	
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;
-
 	return 1;
 }
 
