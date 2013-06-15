@@ -164,7 +164,6 @@ int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	std::string tempstring;
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
-	char buffer[255];
 
 	std::time_t file_create_time;
 	std::time_t now = time(NULL);

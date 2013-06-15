@@ -205,8 +205,6 @@ int metasorter::process_asset(asset* _asset)
 		int match = 1;
 		BOOST_FOREACH(boost::property_tree::ptree::value_type &u, pt1.get_child(v.first.data()))
 		{
-			int file_info = 0;
-
 			//separate stream from stream number
 			std::string stream;
 			int stream_number = 0;

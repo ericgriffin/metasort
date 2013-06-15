@@ -15,10 +15,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	int err = 0;
-	int config_status = 0;
-	int runtype = 0;
-	
+	int err = 0;	
 	int ok_to_run = 0;
 	int required_flags = 0;
 	char config_file[255];
