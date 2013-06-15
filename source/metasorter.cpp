@@ -3,6 +3,7 @@
 #include "metasorter.h"
 #include "asset.h"
 
+using namespace boost::filesystem;
 
 metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 {
@@ -86,7 +87,7 @@ int metasorter::traverse_directory(int _recurse)
 		{
 			// if it is a file
 			//if(itr->status().type() != boost::filesystem::file_type::directory_file)
-			if(itr->status().type() != 4)
+			if(itr->status().type() != directory_file)
 			{
 				strcpy(_asset->full_filename, itr->path().string().c_str());
 				strcpy(_asset->filename, itr->path().filename().string().c_str());
@@ -119,8 +120,9 @@ int metasorter::traverse_directory(int _recurse)
 		while (itr_r != boost::filesystem::recursive_directory_iterator())
 		{
 			// if it is a file
-			//if(itr_r->status().type() != boost::filesystem::file_type::directory_file)
-			if(itr->status().type() != 4)
+			//boost::filesystem::file_type directory_type = directory_file;
+            if(itr_r->status().type() != directory_file)
+			//if(itr->status().type() != 4)
 			{
 				strcpy(_asset->full_filename, itr_r->path().string().c_str());
 				strcpy(_asset->filename, itr_r->path().filename().string().c_str());
