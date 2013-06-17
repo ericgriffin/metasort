@@ -18,8 +18,9 @@ int main(int argc, char* argv[])
 	int err = 0;	
 	int ok_to_run = 0;
 	int required_flags = 0;
-	char config_file[255];
-	boost::property_tree::ptree pt;
+	int config_num = 0;
+	char config_file[255][255];
+	boost::property_tree::ptree pt[255];
 
 	if (argc > 2)
 	{
@@ -29,12 +30,13 @@ int main(int argc, char* argv[])
 			{
                 if (strcmp(argv[i], "-c") == 0)
 				{
-                    strcpy(config_file, argv[i + 1]);
+                    strcpy(config_file[config_num], argv[i + 1]);
+					config_num++;
 					required_flags++;
                 } 
 			}
 		}
-		if(required_flags == 1)
+		if(required_flags > 0)
 		{
 			ok_to_run = 1;
 		}
@@ -42,30 +44,32 @@ int main(int argc, char* argv[])
 
 	if(ok_to_run)
 	{		
-		boost::property_tree::info_parser::read_info(config_file, pt);
+		for(int q = 0; q < config_num; q++)
+		{
+			boost::property_tree::info_parser::read_info(config_file[q], pt[q]);
 		
-		// check for folders entry
-		optional<const boost::property_tree::ptree&> pt_check_existence;
-		pt_check_existence = pt.get_child_optional("folders");
-		if(pt_check_existence)
-		{
-			BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("folders"))
+			// check for folders entry
+			optional<const boost::property_tree::ptree&> pt_check_existence;
+			pt_check_existence = pt[q].get_child_optional("folders");
+			if(pt_check_existence)
 			{
-				int recurse = 0;
-				std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl;
-				if(strcmp(v.second.data().c_str(), "R") == 0)
+				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folders"))
 				{
-					recurse = 1;
+					int recurse = 0;
+					std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl;
+					if(strcmp(v.second.data().c_str(), "R") == 0)
+					{
+						recurse = 1;
+					}
+					metasorter sorter((char*)v.first.data(), pt[q]);
+					sorter.traverse_directory(recurse);
 				}
-				metasorter sorter((char*)v.first.data(), pt);
-				//sorter.parse_directory(recurse);
-				sorter.traverse_directory(recurse);
 			}
-		}
-		else
-		{
-			cout << "No folders defined in config file - aborting" << endl;
-			exit(0);
+			else
+			{
+				cout << "No folders defined in config file - aborting" << endl;
+				exit(0);
+			}
 		}
 	}
 	else
