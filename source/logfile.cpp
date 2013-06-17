@@ -34,35 +34,6 @@ void LogFile::write(std::string _logdata)
 
 
 double LogFile::cpu_time()
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    CPU_TIME reports the elapsed CPU time.
-//
-//  Discussion:
-//
-//    The data available to this routine through "CLOCK" is not very reliable,
-//    and hence the values of CPU_TIME returned should not be taken too
-//    seriously, especially when short intervals are being timed.
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    08 July 2009
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    Output, double CPU_TIME, the current total elapsed CPU time in second.
-//
 {
   double value;
 
@@ -71,41 +42,9 @@ double LogFile::cpu_time()
 
   return value;
 }
-//****************************************************************************80
+
 
 int * LogFile::time_numbers()
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    TIME_NUMBERS returns the data as a string of integers.
-//
-//  Example:
-//
-//    2001  Year
-//    5     Month
-//    31    Day
-//    9     Hour (0-23)
-//    45    Minute
-//    12    Second
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    05 June 2011
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    Output, int TIME_NUMBERS[6], the year, month, day, hour, minute and second.
-//
 {
   const struct std::tm *tm_ptr;
   std::time_t now;
@@ -125,36 +64,9 @@ int * LogFile::time_numbers()
 
   return value;
 }
-//****************************************************************************80
+
 
 void LogFile::timestamp()
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    TIMESTAMP prints the current YMDHMS date as a time stamp.
-//
-//  Example:
-//
-//    31 May 2001 09:45:54 AM
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    08 July 2009
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    None
-//
 {
 # define TIME_SIZE 40
 
@@ -173,36 +85,9 @@ void LogFile::timestamp()
   return;
 # undef TIME_SIZE
 }
-//****************************************************************************80
+
 
 char * LogFile::timestring()
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    TIMESTRING returns the current YMDHMS date as a string.
-//
-//  Example:
-//
-//    31 May 2001 09:45:54 AM
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    08 July 2009
-//
-//  Author:
-//
-//    John Burkardt
-//
-//  Parameters:
-//
-//    Output, char *TIMESTRING, a string containing the current YMDHMS date.
-//
 {
 # define TIME_SIZE 40
 
