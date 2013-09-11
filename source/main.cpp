@@ -19,6 +19,9 @@ int main(int argc, char* argv[])
 	int ok_to_run = 0;
 	int required_flags = 0;
 	int config_num = 0;
+	int input_file_process = 0;
+	int input_file_num = 0;
+	char input_file[255][255];
 	char config_file[255][255];
 	boost::property_tree::ptree pt[255];
 
@@ -33,7 +36,13 @@ int main(int argc, char* argv[])
                     strcpy(config_file[config_num], argv[i + 1]);
 					config_num++;
 					required_flags++;
-                } 
+                }
+				if (strcmp(argv[i], "-i") == 0)
+				{
+					input_file_process = 1;
+                    strcpy(input_file[input_file_num], argv[i + 1]);
+					input_file_num++;
+                }
 			}
 		}
 		if(required_flags > 0)
@@ -51,24 +60,37 @@ int main(int argc, char* argv[])
 			// check for folders entry
 			optional<const boost::property_tree::ptree&> pt_check_existence;
 			pt_check_existence = pt[q].get_child_optional("folders");
-			if(pt_check_existence)
+			
+			
+			if(input_file_process == 0)  // if processing folders from config
 			{
-				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folders"))
+				if(pt_check_existence)
 				{
-					int recurse = 0;
-					std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl;
-					if(strcmp(v.second.data().c_str(), "R") == 0)
+					BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folders"))
 					{
-						recurse = 1;
+						int recurse = 0;
+						std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl;
+						if(strcmp(v.second.data().c_str(), "R") == 0)
+						{
+							recurse = 1;
+						}
+						metasorter sorter((char*)v.first.data(), pt[q]);
+						sorter.traverse_directory(recurse);
 					}
-					metasorter sorter((char*)v.first.data(), pt[q]);
-					sorter.traverse_directory(recurse);
+				}
+				else
+				{
+					cout << "No folders defined in config file - aborting" << endl;
+					exit(0);
 				}
 			}
-			else
+			else  // processing files from argv[]
 			{
-				cout << "No folders defined in config file - aborting" << endl;
-				exit(0);
+				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
+				{
+					metasorter sorter(input_file[input_file_counter], pt[q]);
+					sorter.process_file();
+				}
 			}
 		}
 	}

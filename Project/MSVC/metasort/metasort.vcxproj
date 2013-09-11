@@ -108,6 +108,7 @@
     <LinkIncremental>
     </LinkIncremental>
     <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

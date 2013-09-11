@@ -151,6 +151,40 @@ int metasorter::traverse_directory(int _recurse)
 
 
 
+int metasorter::process_file()
+{
+	int err = 0;
+
+	asset* _asset = new asset;
+	boost::filesystem::path file_path = boost::filesystem::path(path);
+
+	strcpy(_asset->full_filename, file_path.string().c_str());
+	strcpy(_asset->filename, file_path.filename().string().c_str());
+	strcpy(_asset->path, file_path.parent_path().string().c_str());
+	strcpy(_asset->extension, file_path.filename().extension().string().c_str());
+
+	// filter extensions
+	int valid_extension = 0;
+
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
+	{
+		if(strcmp(_asset->extension, v.first.data()) == 0)
+		{
+			valid_extension = 1;
+		}
+	}
+
+	if(valid_extension == 1)
+	{
+		process_asset(_asset);
+	}
+
+	delete _asset;
+	return err;
+}
+
+
+
 int metasorter::process_asset(asset* _asset)
 {
 	int err = 0;
@@ -226,7 +260,7 @@ int metasorter::process_asset(asset* _asset)
 				MediaInfoDLL::stream_t stream_type;
 			#endif
 
-			if(stream.compare( "audio") == 0) stream_type = Stream_Audio;
+			if(stream.compare("audio") == 0) stream_type = Stream_Audio;
 			if(stream.compare("video") == 0) stream_type = Stream_Video;
 			if(stream.compare("general") == 0) stream_type = Stream_General;
 			if(stream.compare("text") == 0) stream_type = Stream_Text;

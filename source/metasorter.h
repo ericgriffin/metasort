@@ -56,6 +56,7 @@ public:
 
 	int process_asset(asset*);
 	int traverse_directory(int);
+	int process_file();
 	int process_rule(asset*, std::string, std::string);
 	bool string_replace(std::string&, const std::string&, const std::string&);
 	wchar_t* charToWChar(const char*);
