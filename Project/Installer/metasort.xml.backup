@@ -1,0 +1,159 @@
+<project>
+    <shortName>Metasort</shortName>
+    <fullName>Metasort</fullName>
+    <version>1.0</version>
+    <installerFilename>${product_shortname}-setup.${platform_exec_suffix}</installerFilename>
+    <leftImage>logo163.png</leftImage>
+    <logoImage>logo48.png</logoImage>
+    <splashImage>logo.png</splashImage>
+    <componentList>
+        <component>
+            <name>Metasort</name>
+            <description>Metasort</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfiles</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>../../Docs</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                    <shortcutList>
+                        <shortcut>
+                            <comment>Uninstall</comment>
+                            <exec>${installdir}/${uninstallerName}</exec>
+                            <icon></icon>
+                            <name>Uninstall ${product_fullname}</name>
+                            <path>${installdir}</path>
+                            <platforms>all</platforms>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon></windowsIcon>
+                            <windowsPath>${installdir}</windowsPath>
+                        </shortcut>
+                    </shortcutList>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileslinux</name>
+                    <platforms>linux</platforms>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileswindows</name>
+                    <platforms>windows</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>../../Release/Win32/*</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfilesosx</name>
+                    <platforms>osx</platforms>
+                </folder>
+            </folderList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${product_fullname}</comment>
+                    <name>Uninstall ${product_fullname}</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}/</windowsPath>
+                </startMenuShortcut>
+                <startMenuFileShortcut>
+                    <comment></comment>
+                    <filePath>${installdir}\Docs</filePath>
+                    <name>Documents</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsIcon></windowsIcon>
+                </startMenuFileShortcut>
+            </startMenuShortcutList>
+        </component>
+    </componentList>
+    <preInstallationActionList>
+        <actionGroup>
+            <actionList>
+                <showInfo>
+                    <text>An existing installation has been detected in ${installdir}.</text>
+                </showInfo>
+                <setInstallerVariable name="allowComponentSelection" value="0"/>
+                <setInstallerVariable name="installationType" value="upgrade"/>
+
+	<!-- it also is possible to enable/disable components here:
+                 <componentSelection select="customcomponentname"/>
+                 <componentSelection deselect="customcomponentname"/>
+                 or to perform additional actions related to the upgrade installer -->
+	            </actionList>
+
+	<!-- We assume an existing installation if ${installdir} directory exists -->
+	<ruleList>
+                <fileTest condition="exists" path="${installdir}"/>
+            </ruleList>
+        </actionGroup>
+    </preInstallationActionList>
+    <postInstallationActionList>
+        <addDirectoryToPath>
+            <insertAt>end</insertAt>
+            <path>${installdir}</path>
+        </addDirectoryToPath>
+        <addDirectoriesToUninstaller>
+            <addContents>1</addContents>
+            <files>${installdir}/rollbackBackupDirectory</files>
+            <matchHiddenFiles>1</matchHiddenFiles>
+        </addDirectoriesToUninstaller>
+    </postInstallationActionList>
+    <preUninstallationActionList>
+        <kill>
+            <name>metasort.exe</name>
+            <showMessageOnError>0</showMessageOnError>
+        </kill>
+    </preUninstallationActionList>
+    <postUninstallationActionList>
+        <removeDirectoryFromPath>
+            <path>${installdir}</path>
+        </removeDirectoryFromPath>
+    </postUninstallationActionList>
+    <enableRollback>1</enableRollback>
+    <enableTimestamp>1</enableTimestamp>
+    <outputDirectory>Release</outputDirectory>
+    <saveRelativePaths>1</saveRelativePaths>
+    <vendor>USA Studios</vendor>
+    <parameterList>
+        <directoryParameter>
+            <name>installdir</name>
+            <description>Installer.Parameter.installdir.description</description>
+            <explanation>Installer.Parameter.installdir.explanation</explanation>
+            <value></value>
+            <default>${platform_install_prefix}/${product_shortname}</default>
+            <allowEmptyValue>0</allowEmptyValue>
+            <cliOptionName>prefix</cliOptionName>
+            <mustBeWritable>1</mustBeWritable>
+            <mustExist>0</mustExist>
+            <width>40</width>
+        </directoryParameter>
+    </parameterList>
+    <platformOptionsList>
+        <platformOptions>
+            <platform>windows</platform>
+        </platformOptions>
+    </platformOptionsList>
+</project>
+
