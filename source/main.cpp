@@ -15,6 +15,9 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+	std::cout << "Version: Metasort 1.3.5 (x86)" << std::endl;
+	std::cout << "Copyright: Copyright (C) 2013 USA Studios" << std::endl << std::endl;
+
 	int err = 0;	
 	int ok_to_run = 0;
 	int required_flags = 0;
@@ -25,10 +28,16 @@ int main(int argc, char* argv[])
 	char config_file[255][255];
 	boost::property_tree::ptree pt[255];
 
-	if (argc > 2)
+	if (argc > 1)
 	{
 		for (int i = 1; i < argc; i++) 
 		{ 
+			if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "/h") == 0)
+			{
+				std::cout << "Usage: metasort -c <config file> [-i <filename>]" << std::endl;
+				exit(0);
+            }
+
 			if (i + 1 != argc)
 			{
                 if (strcmp(argv[i], "-c") == 0)
@@ -69,7 +78,7 @@ int main(int argc, char* argv[])
 					BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folders"))
 					{
 						int recurse = 0;
-						std::cout << std::endl << "Searching Root Folder: " << v.first.data() << std::endl;
+						std::cout << "Searching Root Folder: " << v.first.data() << std::endl;
 						if(strcmp(v.second.data().c_str(), "R") == 0)
 						{
 							recurse = 1;
@@ -77,10 +86,11 @@ int main(int argc, char* argv[])
 						metasorter sorter((char*)v.first.data(), pt[q]);
 						sorter.traverse_directory(recurse);
 					}
+					std::cout << "Finished." << std::endl;
 				}
 				else
 				{
-					cout << "No folders defined in config file - aborting" << endl;
+					cout << "No folders defined in config file - aborting" << std::endl;
 					exit(0);
 				}
 			}
@@ -91,12 +101,13 @@ int main(int argc, char* argv[])
 					metasorter sorter(input_file[input_file_counter], pt[q]);
 					sorter.process_file();
 				}
+				std::cout << "Finished." << std::endl;
 			}
 		}
 	}
 	else
 	{
-		std::cout << "Usage:  metasort -c <config file>" << std::endl;
+		std::cout << "Usage: metasort -c <config file> [-i <filename>]" << std::endl;
 	}
 	return err;
 }

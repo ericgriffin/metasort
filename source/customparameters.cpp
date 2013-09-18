@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 void m_itoa(int value, std::string& buf, int base){
 
 	int i = 30;
@@ -88,7 +89,7 @@ int proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
-	mbstowcs(tempstring3, _asset->filename, sizeof(_asset->filename) + 1);
+	mbstowcs(tempstring3, _asset->filename, strlen(_asset->filename) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;
@@ -99,7 +100,7 @@ int proc_file_extension(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
-	mbstowcs(tempstring3, _asset->extension, sizeof(_asset->extension) + 1);
+	mbstowcs(tempstring3, _asset->extension, strlen(_asset->extension) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;
@@ -110,7 +111,7 @@ int proc_file_path(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
-	mbstowcs(tempstring3, _asset->path, sizeof(_asset->path) + 1);
+	mbstowcs(tempstring3, _asset->path, strlen(_asset->path) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;
@@ -123,10 +124,9 @@ int proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	file_info_file.seekg( 0, std::ios::end );
 	std::string tempstring;
 	String tempstring2;
-
 	m_itoa((int)(file_info_file.tellg() / 1024), tempstring, 10);
 	wchar_t *tempstring3 = new wchar_t[255];
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
+	mbstowcs(tempstring3, tempstring.c_str(), strlen(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;
@@ -150,7 +150,7 @@ int proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset
 	file_modified_time = mktime(clock);
 
     m_itoa((int)(difftime(now, file_modified_time) / 60), tempstring, 10);
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
+	mbstowcs(tempstring3, tempstring.c_str(), strlen(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;
@@ -174,10 +174,11 @@ int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	file_create_time = mktime(clock);
 
     m_itoa((int)(difftime(now, file_create_time) / 60), tempstring, 10);
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
+	mbstowcs(tempstring3, tempstring.c_str(), strlen(tempstring.c_str()) + 1);
 	
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
+
 	delete[] tempstring3;
 	return 1;
 }
@@ -201,11 +202,12 @@ int proc_file_modified_date(MediaInfoLib::String &_asset_param_val, asset* _asse
 	strftime(buf, sizeof(buf), "%Y%m%d", struct_time);
 	tempstring = std::string(buf);
 
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
+	mbstowcs(tempstring3, tempstring.c_str(), strlen(tempstring.c_str()) + 1);
+
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
-	delete[] tempstring3;
 
+	delete[] tempstring3;
 	return 1;
 }
 
@@ -228,7 +230,7 @@ int proc_file_created_date(MediaInfoLib::String &_asset_param_val, asset* _asset
 	strftime(buf, sizeof(buf), "%Y%m%d", struct_time);
 	tempstring = std::string(buf);
 
-	mbstowcs(tempstring3, tempstring.c_str(), sizeof(tempstring.c_str()) + 1);
+	mbstowcs(tempstring3, tempstring.c_str(), strlen(tempstring.c_str()) + 1);
 	tempstring2.assign(tempstring3);
 	_asset_param_val.assign(tempstring2);
 	delete[] tempstring3;

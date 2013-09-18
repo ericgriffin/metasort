@@ -94,17 +94,8 @@ int metasorter::traverse_directory(int _recurse)
 				strcpy(_asset->extension, itr->path().filename().extension().string().c_str());
 
 				// filter extensions
-				int valid_extension = 0;
-
-				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
-				{
-					if(strcmp(_asset->extension, v.first.data()) == 0)
-					{
-						valid_extension = 1;
-					}
-				}
-
-				if(valid_extension == 1)
+							
+				if(process_extensions(_asset) == 1)
 				{
 					process_asset(_asset);
 				}
@@ -127,17 +118,9 @@ int metasorter::traverse_directory(int _recurse)
 				strcpy(_asset->extension, itr_r->path().filename().extension().string().c_str());
 
 				// filter extensions
-				int valid_extension = 0;
+				
 
-				BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
-				{
-					if(strcmp(_asset->extension, v.first.data()) == 0)
-					{
-						valid_extension = 1;
-					}
-				}
-
-				if(valid_extension == 1)
+				if(process_extensions(_asset) == 1)
 				{
 					process_asset(_asset);
 				}
@@ -164,17 +147,8 @@ int metasorter::process_file()
 	strcpy(_asset->extension, file_path.filename().extension().string().c_str());
 
 	// filter extensions
-	int valid_extension = 0;
 
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
-	{
-		if(strcmp(_asset->extension, v.first.data()) == 0)
-		{
-			valid_extension = 1;
-		}
-	}
-
-	if(valid_extension == 1)
+	if(process_extensions(_asset) == 1)
 	{
 		process_asset(_asset);
 	}
@@ -338,12 +312,13 @@ int metasorter::process_asset(asset* _asset)
 					// convert values to integers
 					char* asset_param_intval = new char[255];
 					char* configparam_intval = new char[255];
-					wcstombs(asset_param_intval, asset_param_val.c_str(), sizeof(asset_param_val.c_str()) + 1);
-					wcstombs(configparam_intval, parameter_val.c_str(), sizeof(parameter_val.c_str()) + 1);
+					wcstombs(asset_param_intval, asset_param_val.c_str(), wcslen(asset_param_val.c_str()) + 1);
+					wcstombs(configparam_intval, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
 
 					// handle less-than comparison
 					if(less_than == 1)
 					{
+						//cout << "Comparing Less than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
 						if(atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
 						{
 							if(exclude == 0) { }
@@ -359,6 +334,7 @@ int metasorter::process_asset(asset* _asset)
 					// handle greater-than comparison
 					if(greater_than == 1)
 					{
+						//cout << "Comparing Greater than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
 						if(atoi((const char*)asset_param_intval) > atoi((const char*)configparam_intval))
 						{
 							if(exclude == 0) { }
@@ -380,7 +356,7 @@ int metasorter::process_asset(asset* _asset)
 				{
 					// convert parameter_val to char*
 					char* pattern = new char[255];
-					wcstombs(pattern, parameter_val.c_str(), sizeof(parameter_val.c_str()) + 1);
+					wcstombs(pattern, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
 					boost::regex EXPR(pattern, boost::regex::basic);
 
 					// convert MediaInfo::String::asset_param_val to std::string
@@ -407,6 +383,8 @@ int metasorter::process_asset(asset* _asset)
 				// handle default comparison
 				if(greater_than == 0 && less_than == 0 && is_regex == 0)
 				{
+					//cout << "Comparing: " << asset_param_val << " TO " << parameter_val << endl;
+
 					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
 					{
 						if(exclude == 0) { }
@@ -495,6 +473,19 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 				}
 		}
 
+		if(t.compare("fastmove") == 0)
+		{
+			std::string newfile(second);
+			newfile.append(_asset->filename);
+			logstring.assign("Moving ");
+			logstring.append(_asset->full_filename);
+			logstring.append(" to ");
+			logstring.append(newfile);
+			logfile.write(logstring);
+			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
+			boost::filesystem::rename(_asset->full_filename, newfile.c_str());		
+		}
+
 		if(t.compare("copy") == 0)
 		{
 			std::string newfile(second);
@@ -541,6 +532,54 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	}
 
 	return err;
+}
+
+
+int metasorter::process_extensions(asset* _asset)
+{
+	int valid_extension = 0;
+
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
+	{
+		int ext_is_regex = 0;
+		String extension_prefix;
+		String extension_regex_suffix;
+		wchar_t* temp_str = charToWChar(v.first.data());
+		String full_extension = String(temp_str);
+		delete temp_str;
+		extension_prefix.assign(full_extension,0,7);
+		
+		if(extension_prefix.compare(L"[REGEX]") == 0)
+		{
+			ext_is_regex = 1;
+			extension_regex_suffix.assign(full_extension, 7, full_extension.length());
+			
+			// convert extension_regex_suffix to char*
+			char* pattern = new char[255];
+			wcstombs(pattern, extension_regex_suffix.c_str(), wcslen(extension_regex_suffix.c_str()) + 1);
+			boost::regex EXPR(pattern, boost::regex::basic);
+
+			// convert MediaInfo::String::asset_param_val to std::string
+			std::string asset_extension_str;			
+			asset_extension_str.assign(_asset->extension);
+
+			if(boost::regex_match(asset_extension_str, EXPR) == 1)
+			{
+				valid_extension = 1;
+			}
+
+			delete[] pattern;
+		}
+
+		else
+		{
+			if(strcmp(_asset->extension, v.first.data()) == 0)
+			{
+				valid_extension = 1;
+			}
+		}
+	}
+	return valid_extension;
 }
 
 
