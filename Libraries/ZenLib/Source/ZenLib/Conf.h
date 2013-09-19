@@ -160,9 +160,9 @@
 #include <limits.h>
 
 //---------------------------------------------------------------------------
-#if defined(ZENLIB_DEBUG) && (defined(DEBUG) || defined(_DEBUG))
+#if defined(ZENLIB_DEBUG)
     #include "ZenLib/MemoryDebug.h"
-#endif // defined(ZENLIB_DEBUG) && (defined(DEBUG) || defined(_DEBUG))
+#endif // defined(ZENLIB_DEBUG)
 
 //***************************************************************************
 // Compiler helpers

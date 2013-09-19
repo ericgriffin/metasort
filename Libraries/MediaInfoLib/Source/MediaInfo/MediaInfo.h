@@ -37,8 +37,6 @@
 #endif //!defined(_WIN32)
 //---------------------------------------------------------------------------
 
-
-
 /*64-bit int                                                               */
 #if defined(__MINGW32__) || defined(__CYGWIN32__) || defined(__UNIX__) || defined(__MACOSX__)
     #undef  MAXTYPE_INT

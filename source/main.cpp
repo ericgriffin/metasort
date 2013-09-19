@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Version: Metasort 1.3.5 (x86)" << std::endl;
+	std::cout << "Version: Metasort 1.3.6" << std::endl;
 	std::cout << "Copyright: Copyright (C) 2013 USA Studios" << std::endl << std::endl;
 
 	int err = 0;	
