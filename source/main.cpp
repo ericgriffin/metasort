@@ -86,11 +86,11 @@ int main(int argc, char* argv[])
 						metasorter sorter((char*)v.first.data(), pt[q]);
 						sorter.traverse_directory(recurse);
 					}
-					std::cout << "Finished." << std::endl;
+					std::cout << endl << "Finished." << std::endl;
 				}
 				else
 				{
-					cout << "No folders defined in config file - aborting" << std::endl;
+					cout << endl << "No folders defined in config file - aborting" << std::endl;
 					exit(0);
 				}
 			}
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 					metasorter sorter(input_file[input_file_counter], pt[q]);
 					sorter.process_file();
 				}
-				std::cout << "Finished." << std::endl;
+				std::cout << endl << "Finished." << std::endl;
 			}
 		}
 	}

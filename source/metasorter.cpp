@@ -503,6 +503,96 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			ofs.close();
 		}
 
+		if(t.compare("copyonce") == 0)
+		{
+			int file_in_history = 0;
+			int copy_file = 1;
+			std::string line;
+			boost::filesystem::path dest_file = boost::filesystem::path(second);
+			string histfile_name = std::string(dest_file.parent_path().string().c_str());
+			histfile_name.append("/metasort.history");
+			
+			std::ifstream histfile(histfile_name);
+			if(histfile.is_open())
+			{
+				while(histfile.good())
+				{
+					getline(histfile,line);
+					if(strcmp(line.c_str(), _asset->full_filename) == 0)
+					{
+						file_in_history = 1;
+						copy_file = 0;
+						logstring.assign(_asset->full_filename);
+						logstring.append(" exists in history file ");
+						logstring.append(histfile_name);
+						logstring.append(" - skipping");
+						logfile.write(logstring);
+						cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
+						continue;
+					}
+				}
+				
+				histfile.close();
+				
+				if(file_in_history == 0)
+				{
+					std::ofstream histfile_o(histfile_name, ios::out | ios::app);
+					if(histfile_o.is_open())
+					{
+						histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
+						histfile_o.write("\n", 1);
+					}
+					else
+					{
+						logstring.assign("Cannot open history file ");
+						logstring.append(histfile_name);
+						logfile.write(logstring);
+					}
+					
+					histfile_o.close();
+				}
+			}
+			else
+			{
+				logstring.assign("History file in ");
+				logstring.append(dest_file.parent_path().string().c_str());
+				logstring.append(" doesn't exist - creating it.");
+				logfile.write(logstring);
+				std::ofstream histfile_o(histfile_name);
+				if(histfile_o.is_open())
+				{
+					histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
+					histfile_o.write("\n", 1);
+					histfile_o.close();
+				}
+				else
+				{
+					logstring.assign("Cannot create history file ");
+					logstring.append(dest_file.parent_path().string().c_str());
+					logfile.write(logstring);
+					//std::cout << "Cannot create history file " << histfile_name << std::endl << std::endl;
+				}	
+			}
+
+			if(copy_file == 1)
+			{
+				// copy the file
+				std::string newfile(second);
+				newfile.append(_asset->filename);
+				logstring.assign("Copying ");
+				logstring.append(_asset->full_filename);
+				logstring.append(" to ");
+				logstring.append(newfile);
+				logfile.write(logstring);
+				std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
+				std::ifstream ifs(_asset->full_filename, std::ios::binary);
+				std::ofstream ofs(newfile.c_str(), std::ios::binary);
+				ofs << ifs.rdbuf();
+				ifs.close();
+				ofs.close();
+			}
+		}
+
 		if(t.compare("exec") == 0)
 		{
 			std::string execstring(second);
