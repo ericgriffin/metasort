@@ -87,6 +87,8 @@
 		<Unit filename="../../source/main.cpp" />
 		<Unit filename="../../source/metasorter.cpp" />
 		<Unit filename="../../source/metasorter.h" />
+		<Unit filename="../../source/util_functions.cpp" />
+		<Unit filename="../../source/util_functions.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
