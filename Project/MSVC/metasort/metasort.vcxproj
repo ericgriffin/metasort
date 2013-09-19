@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\Source\customparameters.h" />
     <ClInclude Include="..\..\..\Source\logfile.h" />
     <ClInclude Include="..\..\..\Source\metasorter.h" />
+    <ClInclude Include="..\..\..\source\util_functions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\asset.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="..\..\..\Source\logfile.cpp" />
     <ClCompile Include="..\..\..\Source\main.cpp" />
     <ClCompile Include="..\..\..\Source\metasorter.cpp" />
+    <ClCompile Include="..\..\..\source\util_functions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Libraries\MediaInfoLib\Project\MSVC2012\Library\MediaInfoLib.vcxproj">

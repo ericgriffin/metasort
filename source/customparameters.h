@@ -5,7 +5,6 @@
 #include "metasorter.h"
 #include "asset.h"
 
-
 int proc_audio_layout(MediaInfoLib::String &, MediaInfo &);
 int proc_file_name(MediaInfoLib::String &, asset *);
 int proc_file_extension(MediaInfoLib::String &, asset *);

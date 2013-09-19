@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <sstream>
 #include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>

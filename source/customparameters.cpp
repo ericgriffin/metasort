@@ -1,17 +1,11 @@
 #include "metasorter.h"
 #include "asset.h"
 #include "customparameters.h"
+#include "util_functions.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-
-void m_itoa(int value, std::string& buf, int base){
-
-	int i = 30;
-	buf = "";
-	for(; value && i ; --i, value /= base) buf = "0123456789abcdef"[value % base] + buf;
-}
 
 int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI, asset* _asset, MediaInfoLib::stream_t stream_type, int stream_number, MediaInfoLib::String parameter)
 {
