@@ -535,7 +535,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			std::string file_size_str;
 			m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
 
-			std::ifstream histfile(histfile_name);
+			std::ifstream histfile(histfile_name.c_str());
 			if(histfile.is_open())
 			{
 				while(histfile.good())
@@ -567,7 +567,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 				
 				if(file_in_history == 0)
 				{
-					std::ofstream histfile_o(histfile_name, ios::out | ios::app);
+					std::ofstream histfile_o(histfile_name.c_str(), ios::out | ios::app);
 					if(histfile_o.is_open())
 					{
 						histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
@@ -593,7 +593,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 				logstring.append(dest_file.parent_path().string().c_str());
 				logstring.append(" doesn't exist - creating it.");
 				logfile.write(logstring);
-				std::ofstream histfile_o(histfile_name);
+				std::ofstream histfile_o(histfile_name.c_str());
 				if(histfile_o.is_open())
 				{
 					histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));

@@ -27,6 +27,7 @@
 		07933E1D176CF97800D33B35 /* libmediainfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07933E1C176CF97800D33B35 /* libmediainfo.a */; };
 		07933E1F176CF98D00D33B35 /* libzen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07933E1E176CF98D00D33B35 /* libzen.a */; };
 		07933E21176CF9A100D33B35 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07933E20176CF9A100D33B35 /* libz.a */; };
+		07F0FEB517EB6E6B004A51A8 /* util_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07F0FEB417EB6E6B004A51A8 /* util_functions.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -68,6 +69,8 @@
 		07933E1C176CF97800D33B35 /* libmediainfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmediainfo.a; path = ../../Libraries/MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a; sourceTree = "<group>"; };
 		07933E1E176CF98D00D33B35 /* libzen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzen.a; path = ../../Libraries/ZenLib/Project/GNU/Library/.libs/libzen.a; sourceTree = "<group>"; };
 		07933E20176CF9A100D33B35 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../Libraries/zlib/libz.a; sourceTree = "<group>"; };
+		07F0FEB417EB6E6B004A51A8 /* util_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util_functions.cpp; path = ../../source/util_functions.cpp; sourceTree = "<group>"; };
+		07F0FEB617EB6E79004A51A8 /* util_functions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util_functions.h; path = ../../source/util_functions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +119,8 @@
 		07933E02176CF93500D33B35 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				07F0FEB617EB6E79004A51A8 /* util_functions.h */,
+				07F0FEB417EB6E6B004A51A8 /* util_functions.cpp */,
 				07933DF4176CF92300D33B35 /* asset.cpp */,
 				07933DF5176CF92300D33B35 /* asset.h */,
 				07933DF6176CF92300D33B35 /* customparameters.cpp */,
@@ -206,6 +211,7 @@
 				07933DFF176CF92300D33B35 /* logfile.cpp in Sources */,
 				07933E00176CF92300D33B35 /* main.cpp in Sources */,
 				07933E01176CF92300D33B35 /* metasorter.cpp in Sources */,
+				07F0FEB517EB6E6B004A51A8 /* util_functions.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
