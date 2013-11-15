@@ -403,7 +403,9 @@ int metasorter::process_asset(asset* _asset)
 		if(match == 1)
 		{
 			// rule matches - process rule
-			process_rule(_asset, v.first.data(), v.second.data());
+			boost::thread workerThread(&metasorter::process_rule, this, _asset, v.first.data(), v.second.data());
+			workerThread.join();
+			//process_rule(_asset, v.first.data(), v.second.data());
 
 			// don't continue processing remaining rules if file has been moved/deleted
 			const char delimiters[] = "_";
@@ -452,6 +454,14 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 
 		if(t.compare("move") == 0)
 		{
+			if(filesize_changing(_asset->full_filename) == 1)
+			{
+				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+				logstring.assign(_asset->full_filename);
+				logstring.append(" is changing in filesize - skipping ");
+				logfile.write(logstring);
+				return 1;
+			}
 			std::string newfile(second);
 			newfile.append(_asset->filename);
 			logstring.assign("Moving ");
@@ -476,6 +486,14 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 
 		if(t.compare("fastmove") == 0)
 		{
+			if(filesize_changing(_asset->full_filename) == 1)
+			{
+				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+				logstring.assign(_asset->full_filename);
+				logstring.append(" is changing in filesize - skipping ");
+				logfile.write(logstring);
+				return 1;
+			}
 			std::string newfile(second);
 			newfile.append(_asset->filename);
 			logstring.assign("Moving ");
@@ -489,6 +507,14 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 
 		if(t.compare("copy") == 0)
 		{
+			if(filesize_changing(_asset->full_filename) == 1)
+			{
+				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+				logstring.assign(_asset->full_filename);
+				logstring.append(" is changing in filesize - skipping ");
+				logfile.write(logstring);
+				return 1;
+			}
 			std::string newfile(second);
 			newfile.append(_asset->filename);
 			logstring.assign("Copying ");
@@ -506,6 +532,14 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 
 		if(t.compare("copyonce") == 0)
 		{
+			if(filesize_changing(_asset->full_filename) == 1)
+			{
+				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+				logstring.assign(_asset->full_filename);
+				logstring.append(" is changing in filesize - skipping ");
+				logfile.write(logstring);
+				return 1;
+			}
 			int file_in_history = 0;
 			int copy_file = 1;
 			std::string line;
