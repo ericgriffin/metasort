@@ -665,6 +665,143 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			}
 		}
 
+		if(t.compare("copyonceUC") == 0)
+		{
+			if(filesize_changing(_asset->full_filename) == 1)
+			{
+				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+				logstring.assign(_asset->full_filename);
+				logstring.append(" is changing in filesize - skipping ");
+				logfile.write(logstring);
+				return 1;
+			}
+			int file_in_history = 0;
+			int copy_file = 1;
+			std::string line;
+
+			// set history file name
+			boost::filesystem::path dest_file = boost::filesystem::path(second);
+			string histfile_name = std::string(dest_file.parent_path().string().c_str());
+			histfile_name.append("/.metasort.history");
+			
+			//determine file's modified time
+			char buf[9];
+			std::string file_modified_time_str;
+			std::time_t file_modified_time;
+			struct tm *struct_time;
+			struct tm* clock = new tm;
+			struct stat attrib;
+			stat(_asset->full_filename, &attrib);
+			clock = localtime(&(attrib.st_mtime));
+			file_modified_time = mktime(clock);
+			struct_time = localtime(&file_modified_time);
+			strftime(buf, sizeof(buf), "%Y%m%d", struct_time);
+			file_modified_time_str = std::string(buf);
+			
+			//determine file's size
+			std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
+			file_info_file.seekg( 0, std::ios::end );
+			std::string file_size_str;
+			m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
+
+			std::ifstream histfile(histfile_name.c_str());
+			if(histfile.is_open())
+			{
+				while(histfile.good())
+				{
+					getline(histfile, line);
+					if(strcmp(line.c_str(), _asset->full_filename) == 0)  //compare filename with history file
+					{
+						getline(histfile, line);
+						if(strcmp(line.c_str(), file_modified_time_str.c_str()) == 0)  //compare file modified time with history file
+						{
+							getline(histfile, line);
+							if(strcmp(line.c_str(), file_size_str.c_str()) == 0)  //compare file size with history file
+							{
+								file_in_history = 1;
+								copy_file = 0;
+								logstring.assign(_asset->full_filename);
+								logstring.append(" exists in history file ");
+								logstring.append(histfile_name);
+								logstring.append(" - skipping");
+								logfile.write(logstring);
+								cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
+								continue;
+							}
+						}
+					}
+				}
+				
+				histfile.close();
+				
+				if(file_in_history == 0)
+				{
+					std::ofstream histfile_o(histfile_name.c_str(), ios::out | ios::app);
+					if(histfile_o.is_open())
+					{
+						histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
+						histfile_o.write("\n", 1);
+						histfile_o.write(file_modified_time_str.c_str(), strlen(file_modified_time_str.c_str()));
+						histfile_o.write("\n", 1);
+						histfile_o.write(file_size_str.c_str(), strlen(file_size_str.c_str()));
+						histfile_o.write("\n", 1);
+					}
+					else
+					{
+						logstring.assign("Cannot open history file ");
+						logstring.append(histfile_name);
+						logfile.write(logstring);
+					}
+					
+					histfile_o.close();
+				}
+			}
+			else
+			{
+				logstring.assign("History file in ");
+				logstring.append(dest_file.parent_path().string().c_str());
+				logstring.append(" doesn't exist - creating it.");
+				logfile.write(logstring);
+				std::ofstream histfile_o(histfile_name.c_str());
+				if(histfile_o.is_open())
+				{
+					histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
+					histfile_o.write("\n", 1);
+					histfile_o.write(file_modified_time_str.c_str(), strlen(file_modified_time_str.c_str()));
+					histfile_o.write("\n", 1);
+					histfile_o.write(file_size_str.c_str(), strlen(file_size_str.c_str()));
+					histfile_o.write("\n", 1);
+					histfile_o.close();
+				}
+				else
+				{
+					logstring.assign("Cannot create history file ");
+					logstring.append(dest_file.parent_path().string().c_str());
+					logfile.write(logstring);
+				}	
+			}
+
+			if(copy_file == 1)
+			{
+				// copy the file
+				std::string newfile(second);
+				std::string tempfilename_uppercase(_asset->filename);
+				std::string filename_CAPS = boost::algorithm::to_upper_copy(tempfilename_uppercase);
+				newfile.append(filename_CAPS);
+				logstring.assign("Copying ");
+				logstring.append(_asset->full_filename);
+				logstring.append(" to ");
+				logstring.append(newfile);
+				logfile.write(logstring);
+				std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
+				std::ifstream ifs(_asset->full_filename, std::ios::binary);
+				std::ofstream ofs(newfile.c_str(), std::ios::binary);
+				ofs << ifs.rdbuf();
+				ifs.close();
+				ofs.close();
+			}
+		}
+
 		if(t.compare("exec") == 0)
 		{
 			std::string execstring(second);

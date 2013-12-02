@@ -20,6 +20,7 @@
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/thread.hpp>
+#include <boost/algorithm/string/case_conv.hpp> 
 
 #include "asset.h"
 #include "logfile.h"
