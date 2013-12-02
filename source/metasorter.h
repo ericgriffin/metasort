@@ -63,9 +63,20 @@ public:
 	int process_file();
 	int process_extensions(asset*);
 	int process_rule(asset*, std::string, std::string);
+	int call_MediaInfo(MediaInfo &, asset *);
 	bool string_replace(std::string&, const std::string&, const std::string&);
 	wchar_t* charToWChar(const char*);
-	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String);
+	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String, int &);
+
+	int proc_audio_layout(MediaInfoLib::String &, MediaInfo &, asset*, int &);
+	int proc_file_name(MediaInfoLib::String &, asset *);
+	int proc_file_extension(MediaInfoLib::String &, asset *);
+	int proc_file_path(MediaInfoLib::String &, asset *);
+	int proc_file_size(MediaInfoLib::String &, asset *);
+	int proc_file_modified_age(MediaInfoLib::String &, asset *);
+	int proc_file_created_age(MediaInfoLib::String&, asset *);
+	int proc_file_modified_date(MediaInfoLib::String &, asset *);
+	int proc_file_created_date(MediaInfoLib::String&, asset *);
 
 private:
 	static const int MAX_CHAR = 1024;

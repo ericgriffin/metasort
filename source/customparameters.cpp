@@ -7,14 +7,14 @@
 #include <stdlib.h>
 
 
-int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI, asset* _asset, MediaInfoLib::stream_t stream_type, int stream_number, MediaInfoLib::String parameter)
+int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI, asset* _asset, MediaInfoLib::stream_t stream_type, int stream_number, MediaInfoLib::String parameter, int &MI_fetched)
 {
 	int found = 0;
 	if(stream_type == Stream_General)
 	{
 		if(wcscmp(parameter.c_str(), L"audio_layout") == 0)
 		{
-			found = proc_audio_layout(_asset_param_val, _MI);
+			found = proc_audio_layout(_asset_param_val, _MI, _asset, MI_fetched);
 		}
 		if(wcscmp(parameter.c_str(), L"file_size") == 0)
 		{
@@ -53,7 +53,7 @@ int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaI
 }
 
 
-int proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
+int metasorter::proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI, asset* _asset, int &MI_fetched)
 {
 	MediaInfoLib::String audiostreamsstr;
 	MediaInfoLib::String streamchannelsstr;
@@ -61,6 +61,11 @@ int proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 	char* streamchannels = new char[255];
 	int audiostreams = 0;
 
+	if(MI_fetched == 0)
+	{
+		call_MediaInfo(_MI, _asset);
+		MI_fetched = 1;
+	}
 	audiostreamsstr.assign(_MI.Get(Stream_General, 0, L"AudioCount").c_str(), sizeof(audiostreamsstr));
 
 	wcstombs(audiostreamschar, audiostreamsstr.c_str(), audiostreamsstr.length() + 1);
@@ -79,7 +84,7 @@ int proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI)
 	return 1;
 }
 
-int proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
@@ -90,7 +95,7 @@ int proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	return 1;
 }
 
-int proc_file_extension(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_extension(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
@@ -101,7 +106,7 @@ int proc_file_extension(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	return 1;
 }
 
-int proc_file_path(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_path(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
@@ -112,7 +117,7 @@ int proc_file_path(MediaInfoLib::String &_asset_param_val, asset* _asset)
 	return 1;
 }
 
-int proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
 	file_info_file.seekg( 0, std::ios::end );
@@ -129,7 +134,7 @@ int proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _asset)
 
 
 
-int proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	std::string tempstring;
 	String tempstring2;
@@ -153,7 +158,7 @@ int proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset
 }
 
 
-int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	std::string tempstring;
 	String tempstring2;
@@ -178,7 +183,7 @@ int proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 }
 
 
-int proc_file_modified_date(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_modified_date(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	char buf[9];
 	std::string tempstring;
@@ -206,7 +211,7 @@ int proc_file_modified_date(MediaInfoLib::String &_asset_param_val, asset* _asse
 }
 
 
-int proc_file_created_date(MediaInfoLib::String &_asset_param_val, asset* _asset)
+int metasorter::proc_file_created_date(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	char buf[9];
 	std::string tempstring;

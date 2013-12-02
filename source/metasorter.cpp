@@ -159,14 +159,8 @@ int metasorter::process_file()
 }
 
 
-
-int metasorter::process_asset(asset* _asset)
+int metasorter::call_MediaInfo(MediaInfo &MI, asset* _asset)
 {
-	int err = 0;
-	String To_Display;
-
-	MediaInfo MI;
-
 	FILE* F = NULL;
 	F = fopen(_asset->full_filename, "rb");
 
@@ -205,8 +199,18 @@ int metasorter::process_asset(asset* _asset)
 	fclose(F);
 	MI.Open_Buffer_Finalize();
 	delete[] From_Buffer;
+	return true;
+}
 
 
+int metasorter::process_asset(asset* _asset)
+{
+	int err = 0;
+	String To_Display;
+
+	MediaInfo MI;
+	int MI_fetched = 0;
+	
 	// Process rules from config file
 	boost::property_tree::ptree pt1 = pt.get_child("rules");
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt1)
@@ -270,9 +274,14 @@ int metasorter::process_asset(asset* _asset)
 				//delete parameter_val1;
 
 				// assign asset parameter value
-				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter) == 1) { }
+				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter, MI_fetched) == 1) { }
 				else
 				{
+					if(MI_fetched == 0)
+					{
+						call_MediaInfo(MI, _asset);
+						MI_fetched = 1;
+					}
 					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
 					//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl;
 				}
