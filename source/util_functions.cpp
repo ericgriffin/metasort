@@ -5,18 +5,7 @@ using namespace std;
 
 bool Wait(const unsigned long &Time)
 {
-    clock_t Tick = clock_t(float(clock()) / float(CLOCKS_PER_SEC) * 1000.f);
-    if(Tick < 0) // if clock() fails, it returns -1
-        return 0;
-    clock_t Now = clock_t(float(clock()) / float(CLOCKS_PER_SEC) * 1000.f);
-    if(Now < 0)
-        return 0;
-    while( (Now - Tick) < Time )
-    {
-        Now = clock_t(float(clock()) / float(CLOCKS_PER_SEC) * 1000.f);
-        if(Now < 0)
-            return 0;
-    }
+	boost::this_thread::sleep(boost::posix_time::milliseconds(Time));
     return 1;
 }
 
@@ -36,12 +25,12 @@ int filesize_changing(char filename[255])
 	ofstream file;
 	file.open(filename, ios::app);
 	file.seekp(0, ifstream::end);
-    int filesize1 = file.tellp();
+    int filesize1 = (int)file.tellp();
 	file.close();
-	Wait(10000);
+	Wait(20000);
 	file.open(filename, ios::app);
 	file.seekp(0, std::ifstream::end);
-	int filesize2 = file.tellp();
+	int filesize2 = (int)file.tellp();
 	file.close();
 
 	if(filesize1 != filesize2)

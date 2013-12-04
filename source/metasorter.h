@@ -21,6 +21,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/thread.hpp>
 #include <boost/algorithm/string/case_conv.hpp> 
+#include <boost/threadpool.hpp>
 
 #include "asset.h"
 #include "logfile.h"
@@ -35,6 +36,7 @@
 
 using namespace MediaInfoNameSpace;
 using namespace boost;
+using namespace boost::threadpool;
 using namespace std;
 
 #ifdef __MINGW32__
@@ -57,7 +59,11 @@ public:
 	boost::property_tree::ptree pt;
 	std::string logstring;
 	LogFile logfile;
-
+	pool tp;
+	boost::mutex list_mtx_;
+	boost::mutex log_mtx_;
+	boost::mutex hist_mtx_;
+	
 	int process_asset(asset*);
 	int traverse_directory(int);
 	int process_file();

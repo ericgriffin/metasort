@@ -9,6 +9,7 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <boost/thread.hpp>
 
 bool Wait(const unsigned long &);
 void m_itoa(int, std::string&, int);

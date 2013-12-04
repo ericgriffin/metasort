@@ -10,6 +10,7 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 {
 	strcpy(path, _path);
 	pt = _pt;
+	tp.size_controller().resize(8);
 
 	optional<const boost::property_tree::ptree&> pt_check_existence;
 
@@ -74,9 +75,10 @@ metasorter::~metasorter()
 
 int metasorter::traverse_directory(int _recurse)
 {
+	
 	int err = 0;
 
-	asset* _asset = new asset;
+	
 	boost::filesystem::path dir_path = boost::filesystem::path(path);
 	boost::filesystem::directory_iterator itr(dir_path);
 	boost::filesystem::recursive_directory_iterator itr_r(dir_path);
@@ -89,6 +91,7 @@ int metasorter::traverse_directory(int _recurse)
 			// if it is a file
 			if(itr->status().type() != directory_file)
 			{
+				asset* _asset = new asset;
 				strcpy(_asset->full_filename, itr->path().string().c_str());
 				strcpy(_asset->filename, itr->path().filename().string().c_str());
 				strcpy(_asset->path, path);
@@ -98,7 +101,8 @@ int metasorter::traverse_directory(int _recurse)
 							
 				if(process_extensions(_asset) == 1)
 				{
-					process_asset(_asset);
+					tp.schedule(boost::bind(&metasorter::process_asset, this, _asset));  // multi-threaded
+					//process_asset(_asset);  // single-threaded
 				}
 			}
 			++itr;
@@ -113,6 +117,7 @@ int metasorter::traverse_directory(int _recurse)
 			// if it is a file
             if(itr_r->status().type() != directory_file)
 			{
+				asset* _asset = new asset;
 				strcpy(_asset->full_filename, itr_r->path().string().c_str());
 				strcpy(_asset->filename, itr_r->path().filename().string().c_str());
 				strcpy(_asset->path, path);
@@ -123,13 +128,15 @@ int metasorter::traverse_directory(int _recurse)
 
 				if(process_extensions(_asset) == 1)
 				{
-					process_asset(_asset);
+					tp.schedule(boost::bind(&metasorter::process_asset, this, _asset));  // multi-threaded
+					//process_asset(_asset);  // single-threded
 				}
 			}
 			++itr_r;
 		}
 	}
-	delete _asset;
+
+	//delete _asset;
 	return err;
 }
 
@@ -259,19 +266,11 @@ int metasorter::process_asset(asset* _asset)
 				wchar_t* parameter_char = charToWChar(y.first.c_str());
 				String parameter = String(parameter_char);
 				delete parameter_char;
-				//wchar_t *parameter1 = new wchar_t[255];
-				//mbstowcs(parameter1, y.first.c_str(), strlen(y.first.c_str()) + 1);
-				//String parameter = String(parameter1);
-				//delete[] parameter1;
 
 				// parameter value from config file
 				wchar_t* parameter_val_char = charToWChar(y.second.data().c_str());
 				String parameter_val = String(parameter_val_char);
 				delete parameter_val_char;
-				//wchar_t *parameter_val1 = new wchar_t[255];
-				//mbstowcs(parameter_val1, y.second.data().c_str(), strlen(y.second.data().c_str()) + 1);
-				//String parameter_val = String(parameter_val1);
-				//delete parameter_val1;
 
 				// assign asset parameter value
 				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter, MI_fetched) == 1) { }
@@ -283,7 +282,6 @@ int metasorter::process_asset(asset* _asset)
 						MI_fetched = 1;
 					}
 					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
-					//std::wcout << "Stream Type:" << stream.c_str() << " Stream #:" << stream_number << " Parameter:" << parameter.c_str() << " Value:" << asset_param_val.c_str() << std::endl;
 				}
 
 				// check for and strip exclusive character
@@ -394,7 +392,6 @@ int metasorter::process_asset(asset* _asset)
 				if(greater_than == 0 && less_than == 0 && is_regex == 0)
 				{
 					//cout << "Comparing: " << asset_param_val << " TO " << parameter_val << endl;
-
 					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
 					{
 						if(exclude == 0) { }
@@ -412,9 +409,7 @@ int metasorter::process_asset(asset* _asset)
 		if(match == 1)
 		{
 			// rule matches - process rule
-			boost::thread workerThread(&metasorter::process_rule, this, _asset, v.first.data(), v.second.data());
-			workerThread.join();
-			//process_rule(_asset, v.first.data(), v.second.data());
+			process_rule(_asset, v.first.data(), v.second.data());
 
 			// don't continue processing remaining rules if file has been moved/deleted
 			const char delimiters[] = "_";
@@ -433,6 +428,7 @@ int metasorter::process_asset(asset* _asset)
 			delete tok;
 		}
 	}
+	delete _asset;
 	return err;
 }
 
@@ -440,6 +436,8 @@ int metasorter::process_asset(asset* _asset)
 int metasorter::process_rule(asset* _asset, std::string first, std::string second)
 {
 	int err = 0;
+
+	log_mtx_.lock();
 	logstring.assign(_asset->full_filename);
 	logstring.append(" matches rule: ");
 	logstring.append(first);
@@ -447,6 +445,7 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	logstring.append(second);
 	logfile.write(logstring);
 	std::cout << std::endl << _asset->full_filename << " MATCHES RULE " << first << std::endl;
+	log_mtx_.unlock();
 
 	char_separator<char> sep("_");
 	tokenizer< char_separator<char> > tokens(first, sep);
@@ -455,30 +454,39 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 
 		if(t.compare("list") == 0)
 		{
+			list_mtx_.lock();
 			ofstream listfile;
 			listfile.open(second.c_str(), ios::app);
 			listfile << _asset->full_filename << endl;
 			listfile.close();
+			list_mtx_.unlock();
 		}
 
 		if(t.compare("move") == 0)
 		{
 			if(filesize_changing(_asset->full_filename) == 1)
 			{
+				log_mtx_.lock();
 				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
 				logstring.assign(_asset->full_filename);
 				logstring.append(" is changing in filesize - skipping ");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				return 1;
 			}
 			std::string newfile(second);
 			newfile.append(_asset->filename);
+
+			log_mtx_.lock();
 			logstring.assign("Moving ");
 			logstring.append(_asset->full_filename);
 			logstring.append(" to ");
 			logstring.append(newfile);
 			logfile.write(logstring);
 			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
+			log_mtx_.unlock();
+
 			std::ifstream ifs(_asset->full_filename, std::ios::binary);
 			std::ofstream ofs(newfile.c_str(), std::ios::binary);
 			ofs << ifs.rdbuf();
@@ -486,10 +494,12 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			ofs.close();
 				if( remove(_asset->full_filename) != 0 )
 				{
+					log_mtx_.lock();
 					std::cout << "Error deleting file" << _asset->full_filename << std::endl;
 					logstring.append("Error deleting file");
 					logstring.append(_asset->full_filename);
 					logfile.write(logstring);
+					log_mtx_.unlock();
 				}
 		}
 
@@ -497,20 +507,27 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 		{
 			if(filesize_changing(_asset->full_filename) == 1)
 			{
+				log_mtx_.lock();
 				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
 				logstring.assign(_asset->full_filename);
 				logstring.append(" is changing in filesize - skipping ");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				return 1;
 			}
 			std::string newfile(second);
 			newfile.append(_asset->filename);
+
+			log_mtx_.lock();
 			logstring.assign("Moving ");
 			logstring.append(_asset->full_filename);
 			logstring.append(" to ");
 			logstring.append(newfile);
 			logfile.write(logstring);
 			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
+			log_mtx_.unlock();
+
 			boost::filesystem::rename(_asset->full_filename, newfile.c_str());		
 		}
 
@@ -518,20 +535,27 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 		{
 			if(filesize_changing(_asset->full_filename) == 1)
 			{
+				log_mtx_.lock();
 				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
 				logstring.assign(_asset->full_filename);
 				logstring.append(" is changing in filesize - skipping ");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				return 1;
 			}
 			std::string newfile(second);
 			newfile.append(_asset->filename);
+
+			log_mtx_.lock();
 			logstring.assign("Copying ");
 			logstring.append(_asset->full_filename);
 			logstring.append(" to ");
 			logstring.append(newfile);
 			logfile.write(logstring);
 			std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
+			log_mtx_.unlock();
+
 			std::ifstream ifs(_asset->full_filename, std::ios::binary);
 			std::ofstream ofs(newfile.c_str(), std::ios::binary);
 			ofs << ifs.rdbuf();
@@ -543,10 +567,13 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 		{
 			if(filesize_changing(_asset->full_filename) == 1)
 			{
+				log_mtx_.lock();
 				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
 				logstring.assign(_asset->full_filename);
 				logstring.append(" is changing in filesize - skipping ");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				return 1;
 			}
 			int file_in_history = 0;
@@ -578,6 +605,8 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			std::string file_size_str;
 			m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
 
+			hist_mtx_.lock();
+
 			std::ifstream histfile(histfile_name.c_str());
 			if(histfile.is_open())
 			{
@@ -594,12 +623,16 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 							{
 								file_in_history = 1;
 								copy_file = 0;
+
+								log_mtx_.lock();
 								logstring.assign(_asset->full_filename);
 								logstring.append(" exists in history file ");
 								logstring.append(histfile_name);
 								logstring.append(" - skipping");
 								logfile.write(logstring);
 								cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
+								log_mtx_.unlock();
+
 								continue;
 							}
 						}
@@ -622,9 +655,11 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 					}
 					else
 					{
+						log_mtx_.lock();
 						logstring.assign("Cannot open history file ");
 						logstring.append(histfile_name);
 						logfile.write(logstring);
+						log_mtx_.unlock();
 					}
 					
 					histfile_o.close();
@@ -632,10 +667,13 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			}
 			else
 			{
+				log_mtx_.lock();
 				logstring.assign("History file in ");
 				logstring.append(dest_file.parent_path().string().c_str());
 				logstring.append(" doesn't exist - creating it.");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				std::ofstream histfile_o(histfile_name.c_str());
 				if(histfile_o.is_open())
 				{
@@ -649,23 +687,31 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 				}
 				else
 				{
+					log_mtx_.lock();
 					logstring.assign("Cannot create history file ");
 					logstring.append(dest_file.parent_path().string().c_str());
 					logfile.write(logstring);
+					log_mtx_.unlock();
 				}	
 			}
+
+			hist_mtx_.unlock();
 
 			if(copy_file == 1)
 			{
 				// copy the file
 				std::string newfile(second);
 				newfile.append(_asset->filename);
+
+				log_mtx_.lock();
 				logstring.assign("Copying ");
 				logstring.append(_asset->full_filename);
 				logstring.append(" to ");
 				logstring.append(newfile);
 				logfile.write(logstring);
 				std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
+				log_mtx_.unlock();
+
 				std::ifstream ifs(_asset->full_filename, std::ios::binary);
 				std::ofstream ofs(newfile.c_str(), std::ios::binary);
 				ofs << ifs.rdbuf();
@@ -678,10 +724,13 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 		{
 			if(filesize_changing(_asset->full_filename) == 1)
 			{
+				log_mtx_.lock();
 				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
 				logstring.assign(_asset->full_filename);
 				logstring.append(" is changing in filesize - skipping ");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				return 1;
 			}
 			int file_in_history = 0;
@@ -713,6 +762,8 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			std::string file_size_str;
 			m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
 
+			hist_mtx_.lock();
+
 			std::ifstream histfile(histfile_name.c_str());
 			if(histfile.is_open())
 			{
@@ -729,12 +780,16 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 							{
 								file_in_history = 1;
 								copy_file = 0;
+
+								log_mtx_.lock();
 								logstring.assign(_asset->full_filename);
 								logstring.append(" exists in history file ");
 								logstring.append(histfile_name);
 								logstring.append(" - skipping");
 								logfile.write(logstring);
 								cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
+								log_mtx_.unlock();
+
 								continue;
 							}
 						}
@@ -757,9 +812,11 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 					}
 					else
 					{
+						log_mtx_.lock();
 						logstring.assign("Cannot open history file ");
 						logstring.append(histfile_name);
 						logfile.write(logstring);
+						log_mtx_.unlock();
 					}
 					
 					histfile_o.close();
@@ -767,10 +824,13 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			}
 			else
 			{
+				log_mtx_.lock();
 				logstring.assign("History file in ");
 				logstring.append(dest_file.parent_path().string().c_str());
 				logstring.append(" doesn't exist - creating it.");
 				logfile.write(logstring);
+				log_mtx_.unlock();
+
 				std::ofstream histfile_o(histfile_name.c_str());
 				if(histfile_o.is_open())
 				{
@@ -784,11 +844,15 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 				}
 				else
 				{
+					log_mtx_.lock();
 					logstring.assign("Cannot create history file ");
 					logstring.append(dest_file.parent_path().string().c_str());
 					logfile.write(logstring);
+					log_mtx_.unlock();
 				}	
 			}
+
+			hist_mtx_.unlock();
 
 			if(copy_file == 1)
 			{
@@ -797,12 +861,16 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 				std::string tempfilename_uppercase(_asset->filename);
 				std::string filename_CAPS = boost::algorithm::to_upper_copy(tempfilename_uppercase);
 				newfile.append(filename_CAPS);
+				
+				log_mtx_.lock();
 				logstring.assign("Copying ");
 				logstring.append(_asset->full_filename);
 				logstring.append(" to ");
 				logstring.append(newfile);
 				logfile.write(logstring);
 				std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
+				log_mtx_.unlock();
+
 				std::ifstream ifs(_asset->full_filename, std::ios::binary);
 				std::ofstream ofs(newfile.c_str(), std::ios::binary);
 				ofs << ifs.rdbuf();
@@ -817,10 +885,14 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			execstring.append(" ");
 			string_replace(execstring, "%s", _asset->full_filename);
 			while(string_replace(execstring, "/", "\\"));
+			
+			log_mtx_.lock();
 			logstring.assign("Executing: ");
 			logstring.append(execstring);
 			logfile.write(logstring);
 			std::cout << "Executing: " << execstring << std::endl;
+			log_mtx_.unlock();
+
 			std::system(execstring.c_str());
 		}
 
@@ -830,10 +902,12 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			{
 				if( remove(_asset->full_filename) != 0 )
 				{
+					log_mtx_.lock();
 					std::cout << "Error deleting file" << _asset->full_filename << std::endl;
 					logstring.append("Error deleting file");
 					logstring.append(_asset->full_filename);
 					logfile.write(logstring);
+					log_mtx_.unlock();
 				}
 			}
 		}

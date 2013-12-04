@@ -4,9 +4,10 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-# include <cstdlib>
-# include <iomanip>
-# include <ctime>
+#include <cstdlib>
+#include <iomanip>
+#include <ctime>
+#include <boost/thread.hpp>
 
 using namespace std;
 
@@ -18,6 +19,8 @@ public:
 
 	LogFile();
 	~LogFile();
+
+	boost::mutex mtx_;
 
 	ofstream logfile;
 	double cpu_time();
