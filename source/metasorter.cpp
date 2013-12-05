@@ -11,31 +11,36 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 	strcpy(path, _path);
 	pt = _pt;
 	tp.size_controller().resize(8);
-
+	file_inspection_time = 20000;
+	logging = 0;
 	optional<const boost::property_tree::ptree&> pt_check_existence;
 
-	// check logging
-	pt_check_existence = pt.get_child_optional("logging");
+	pt_check_existence = pt.get_child_optional("config");
 	if(pt_check_existence)
 	{
-		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("logging"))
+		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("config"))
 		{
 			if(strcmp(v.first.c_str(), "logfile") == 0)
 			{
 				logging = 1;
 				logfile.open(v.second.data().c_str());
 			}
-			else
+			
+
+			if(strcmp(v.first.c_str(), "file_inspection_time") == 0)
 			{
-				cout << "No logging defined in config file - aborting" << endl;
-				exit(0);
+				file_inspection_time = atoi(v.second.data().c_str());
 			}
 		}
 	}
 	else
 	{
+		//cout << "Using default configuration values" << endl;
+	}
+
+	if(logging == 0)
+	{
 		cout << "No logging defined in config file - aborting" << endl;
-		logfile.close();
 		exit(0);
 	}
 
@@ -449,466 +454,49 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 
 	char_separator<char> sep("_");
 	tokenizer< char_separator<char> > tokens(first, sep);
+	int second_token = 0;  //keeps track of which token (before or after the '_') is being evaluated
 	BOOST_FOREACH (const std::string& t, tokens)
 	{
+		if (second_token == 0)
+			second_token = 1;
 
-		if(t.compare("list") == 0)
+		else if(second_token == 1)  //only evaluate the token after the '_'
 		{
-			list_mtx_.lock();
-			ofstream listfile;
-			listfile.open(second.c_str(), ios::app);
-			listfile << _asset->full_filename << endl;
-			listfile.close();
-			list_mtx_.unlock();
-		}
+			second_token = 0;
 
-		if(t.compare("move") == 0)
-		{
-			if(filesize_changing(_asset->full_filename) == 1)
+			if(t.compare("list") == 0)
+				action_list(_asset, first, second);
+
+			else if(t.compare("move") == 0)
+				action_move(_asset, first, second);
+
+			else if(t.compare("fastmove") == 0)
+				action_fastmove(_asset, first, second);
+
+			else if(t.compare("copy") == 0)
+				action_copy(_asset, first, second);
+
+			else if(t.compare("copyonce") == 0)
+				action_copyonce(_asset, first, second);
+
+			else if(t.compare("exec") == 0)
+				action_exec(_asset, first, second);
+
+			else if(t.compare("delete") == 0)
+				action_delete(_asset, first, second);
+
+			else if(t.compare("copyonceCUSTOM1") == 0)
+				action_copyonceCUSTOM1(_asset, first, second);
+
+			else 
 			{
 				log_mtx_.lock();
-				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
-				logstring.assign(_asset->full_filename);
-				logstring.append(" is changing in filesize - skipping ");
+				logstring.assign("**ERROR** rule action: ");
+				logstring.append(first);
+				logstring.append(" is undefined");
 				logfile.write(logstring);
+				std::cout << std::endl << "**ERROR** rule action: " << first << " is undefined" << std::endl;
 				log_mtx_.unlock();
-
-				return 1;
-			}
-			std::string newfile(second);
-			newfile.append(_asset->filename);
-
-			log_mtx_.lock();
-			logstring.assign("Moving ");
-			logstring.append(_asset->full_filename);
-			logstring.append(" to ");
-			logstring.append(newfile);
-			logfile.write(logstring);
-			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
-			log_mtx_.unlock();
-
-			std::ifstream ifs(_asset->full_filename, std::ios::binary);
-			std::ofstream ofs(newfile.c_str(), std::ios::binary);
-			ofs << ifs.rdbuf();
-			ifs.close();
-			ofs.close();
-				if( remove(_asset->full_filename) != 0 )
-				{
-					log_mtx_.lock();
-					std::cout << "Error deleting file" << _asset->full_filename << std::endl;
-					logstring.append("Error deleting file");
-					logstring.append(_asset->full_filename);
-					logfile.write(logstring);
-					log_mtx_.unlock();
-				}
-		}
-
-		if(t.compare("fastmove") == 0)
-		{
-			if(filesize_changing(_asset->full_filename) == 1)
-			{
-				log_mtx_.lock();
-				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
-				logstring.assign(_asset->full_filename);
-				logstring.append(" is changing in filesize - skipping ");
-				logfile.write(logstring);
-				log_mtx_.unlock();
-
-				return 1;
-			}
-			std::string newfile(second);
-			newfile.append(_asset->filename);
-
-			log_mtx_.lock();
-			logstring.assign("Moving ");
-			logstring.append(_asset->full_filename);
-			logstring.append(" to ");
-			logstring.append(newfile);
-			logfile.write(logstring);
-			std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
-			log_mtx_.unlock();
-
-			boost::filesystem::rename(_asset->full_filename, newfile.c_str());		
-		}
-
-		if(t.compare("copy") == 0)
-		{
-			if(filesize_changing(_asset->full_filename) == 1)
-			{
-				log_mtx_.lock();
-				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
-				logstring.assign(_asset->full_filename);
-				logstring.append(" is changing in filesize - skipping ");
-				logfile.write(logstring);
-				log_mtx_.unlock();
-
-				return 1;
-			}
-			std::string newfile(second);
-			newfile.append(_asset->filename);
-
-			log_mtx_.lock();
-			logstring.assign("Copying ");
-			logstring.append(_asset->full_filename);
-			logstring.append(" to ");
-			logstring.append(newfile);
-			logfile.write(logstring);
-			std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
-			log_mtx_.unlock();
-
-			std::ifstream ifs(_asset->full_filename, std::ios::binary);
-			std::ofstream ofs(newfile.c_str(), std::ios::binary);
-			ofs << ifs.rdbuf();
-			ifs.close();
-			ofs.close();
-		}
-
-		if(t.compare("copyonce") == 0)
-		{
-			if(filesize_changing(_asset->full_filename) == 1)
-			{
-				log_mtx_.lock();
-				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
-				logstring.assign(_asset->full_filename);
-				logstring.append(" is changing in filesize - skipping ");
-				logfile.write(logstring);
-				log_mtx_.unlock();
-
-				return 1;
-			}
-			int file_in_history = 0;
-			int copy_file = 1;
-			std::string line;
-
-			// set history file name
-			boost::filesystem::path dest_file = boost::filesystem::path(second);
-			string histfile_name = std::string(dest_file.parent_path().string().c_str());
-			histfile_name.append("/.metasort.history");
-			
-			//determine file's modified time
-			char buf[9];
-			std::string file_modified_time_str;
-			std::time_t file_modified_time;
-			struct tm *struct_time;
-			struct tm* clock = new tm;
-			struct stat attrib;
-			stat(_asset->full_filename, &attrib);
-			clock = localtime(&(attrib.st_mtime));
-			file_modified_time = mktime(clock);
-			struct_time = localtime(&file_modified_time);
-			strftime(buf, sizeof(buf), "%Y%m%d", struct_time);
-			file_modified_time_str = std::string(buf);
-			
-			//determine file's size
-			std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
-			file_info_file.seekg( 0, std::ios::end );
-			std::string file_size_str;
-			m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
-
-			hist_mtx_.lock();
-
-			std::ifstream histfile(histfile_name.c_str());
-			if(histfile.is_open())
-			{
-				while(histfile.good())
-				{
-					getline(histfile, line);
-					if(strcmp(line.c_str(), _asset->full_filename) == 0)  //compare filename with history file
-					{
-						getline(histfile, line);
-						if(strcmp(line.c_str(), file_modified_time_str.c_str()) == 0)  //compare file modified time with history file
-						{
-							getline(histfile, line);
-							if(strcmp(line.c_str(), file_size_str.c_str()) == 0)  //compare file size with history file
-							{
-								file_in_history = 1;
-								copy_file = 0;
-
-								log_mtx_.lock();
-								logstring.assign(_asset->full_filename);
-								logstring.append(" exists in history file ");
-								logstring.append(histfile_name);
-								logstring.append(" - skipping");
-								logfile.write(logstring);
-								cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
-								log_mtx_.unlock();
-
-								continue;
-							}
-						}
-					}
-				}
-				
-				histfile.close();
-				
-				if(file_in_history == 0)
-				{
-					std::ofstream histfile_o(histfile_name.c_str(), ios::out | ios::app);
-					if(histfile_o.is_open())
-					{
-						histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
-						histfile_o.write("\n", 1);
-						histfile_o.write(file_modified_time_str.c_str(), strlen(file_modified_time_str.c_str()));
-						histfile_o.write("\n", 1);
-						histfile_o.write(file_size_str.c_str(), strlen(file_size_str.c_str()));
-						histfile_o.write("\n", 1);
-					}
-					else
-					{
-						log_mtx_.lock();
-						logstring.assign("Cannot open history file ");
-						logstring.append(histfile_name);
-						logfile.write(logstring);
-						log_mtx_.unlock();
-					}
-					
-					histfile_o.close();
-				}
-			}
-			else
-			{
-				log_mtx_.lock();
-				logstring.assign("History file in ");
-				logstring.append(dest_file.parent_path().string().c_str());
-				logstring.append(" doesn't exist - creating it.");
-				logfile.write(logstring);
-				log_mtx_.unlock();
-
-				std::ofstream histfile_o(histfile_name.c_str());
-				if(histfile_o.is_open())
-				{
-					histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
-					histfile_o.write("\n", 1);
-					histfile_o.write(file_modified_time_str.c_str(), strlen(file_modified_time_str.c_str()));
-					histfile_o.write("\n", 1);
-					histfile_o.write(file_size_str.c_str(), strlen(file_size_str.c_str()));
-					histfile_o.write("\n", 1);
-					histfile_o.close();
-				}
-				else
-				{
-					log_mtx_.lock();
-					logstring.assign("Cannot create history file ");
-					logstring.append(dest_file.parent_path().string().c_str());
-					logfile.write(logstring);
-					log_mtx_.unlock();
-				}	
-			}
-
-			hist_mtx_.unlock();
-
-			if(copy_file == 1)
-			{
-				// copy the file
-				std::string newfile(second);
-				newfile.append(_asset->filename);
-
-				log_mtx_.lock();
-				logstring.assign("Copying ");
-				logstring.append(_asset->full_filename);
-				logstring.append(" to ");
-				logstring.append(newfile);
-				logfile.write(logstring);
-				std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
-				log_mtx_.unlock();
-
-				std::ifstream ifs(_asset->full_filename, std::ios::binary);
-				std::ofstream ofs(newfile.c_str(), std::ios::binary);
-				ofs << ifs.rdbuf();
-				ifs.close();
-				ofs.close();
-			}
-		}
-
-		if(t.compare("copyonceUC") == 0)
-		{
-			if(filesize_changing(_asset->full_filename) == 1)
-			{
-				log_mtx_.lock();
-				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
-				logstring.assign(_asset->full_filename);
-				logstring.append(" is changing in filesize - skipping ");
-				logfile.write(logstring);
-				log_mtx_.unlock();
-
-				return 1;
-			}
-			int file_in_history = 0;
-			int copy_file = 1;
-			std::string line;
-
-			// set history file name
-			boost::filesystem::path dest_file = boost::filesystem::path(second);
-			string histfile_name = std::string(dest_file.parent_path().string().c_str());
-			histfile_name.append("/.metasort.history");
-			
-			//determine file's modified time
-			char buf[9];
-			std::string file_modified_time_str;
-			std::time_t file_modified_time;
-			struct tm *struct_time;
-			struct tm* clock = new tm;
-			struct stat attrib;
-			stat(_asset->full_filename, &attrib);
-			clock = localtime(&(attrib.st_mtime));
-			file_modified_time = mktime(clock);
-			struct_time = localtime(&file_modified_time);
-			strftime(buf, sizeof(buf), "%Y%m%d", struct_time);
-			file_modified_time_str = std::string(buf);
-			
-			//determine file's size
-			std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
-			file_info_file.seekg( 0, std::ios::end );
-			std::string file_size_str;
-			m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
-
-			hist_mtx_.lock();
-
-			std::ifstream histfile(histfile_name.c_str());
-			if(histfile.is_open())
-			{
-				while(histfile.good())
-				{
-					getline(histfile, line);
-					if(strcmp(line.c_str(), _asset->full_filename) == 0)  //compare filename with history file
-					{
-						getline(histfile, line);
-						if(strcmp(line.c_str(), file_modified_time_str.c_str()) == 0)  //compare file modified time with history file
-						{
-							getline(histfile, line);
-							if(strcmp(line.c_str(), file_size_str.c_str()) == 0)  //compare file size with history file
-							{
-								file_in_history = 1;
-								copy_file = 0;
-
-								log_mtx_.lock();
-								logstring.assign(_asset->full_filename);
-								logstring.append(" exists in history file ");
-								logstring.append(histfile_name);
-								logstring.append(" - skipping");
-								logfile.write(logstring);
-								cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
-								log_mtx_.unlock();
-
-								continue;
-							}
-						}
-					}
-				}
-				
-				histfile.close();
-				
-				if(file_in_history == 0)
-				{
-					std::ofstream histfile_o(histfile_name.c_str(), ios::out | ios::app);
-					if(histfile_o.is_open())
-					{
-						histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
-						histfile_o.write("\n", 1);
-						histfile_o.write(file_modified_time_str.c_str(), strlen(file_modified_time_str.c_str()));
-						histfile_o.write("\n", 1);
-						histfile_o.write(file_size_str.c_str(), strlen(file_size_str.c_str()));
-						histfile_o.write("\n", 1);
-					}
-					else
-					{
-						log_mtx_.lock();
-						logstring.assign("Cannot open history file ");
-						logstring.append(histfile_name);
-						logfile.write(logstring);
-						log_mtx_.unlock();
-					}
-					
-					histfile_o.close();
-				}
-			}
-			else
-			{
-				log_mtx_.lock();
-				logstring.assign("History file in ");
-				logstring.append(dest_file.parent_path().string().c_str());
-				logstring.append(" doesn't exist - creating it.");
-				logfile.write(logstring);
-				log_mtx_.unlock();
-
-				std::ofstream histfile_o(histfile_name.c_str());
-				if(histfile_o.is_open())
-				{
-					histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
-					histfile_o.write("\n", 1);
-					histfile_o.write(file_modified_time_str.c_str(), strlen(file_modified_time_str.c_str()));
-					histfile_o.write("\n", 1);
-					histfile_o.write(file_size_str.c_str(), strlen(file_size_str.c_str()));
-					histfile_o.write("\n", 1);
-					histfile_o.close();
-				}
-				else
-				{
-					log_mtx_.lock();
-					logstring.assign("Cannot create history file ");
-					logstring.append(dest_file.parent_path().string().c_str());
-					logfile.write(logstring);
-					log_mtx_.unlock();
-				}	
-			}
-
-			hist_mtx_.unlock();
-
-			if(copy_file == 1)
-			{
-				// copy the file
-				std::string newfile(second);
-				std::string tempfilename_uppercase(_asset->filename);
-				std::string filename_CAPS = boost::algorithm::to_upper_copy(tempfilename_uppercase);
-				newfile.append(filename_CAPS);
-				
-				log_mtx_.lock();
-				logstring.assign("Copying ");
-				logstring.append(_asset->full_filename);
-				logstring.append(" to ");
-				logstring.append(newfile);
-				logfile.write(logstring);
-				std::cout << "Copying " << _asset->full_filename << " to " << newfile << std::endl;
-				log_mtx_.unlock();
-
-				std::ifstream ifs(_asset->full_filename, std::ios::binary);
-				std::ofstream ofs(newfile.c_str(), std::ios::binary);
-				ofs << ifs.rdbuf();
-				ifs.close();
-				ofs.close();
-			}
-		}
-
-		if(t.compare("exec") == 0)
-		{
-			std::string execstring(second);
-			execstring.append(" ");
-			string_replace(execstring, "%s", _asset->full_filename);
-			while(string_replace(execstring, "/", "\\"));
-			
-			log_mtx_.lock();
-			logstring.assign("Executing: ");
-			logstring.append(execstring);
-			logfile.write(logstring);
-			std::cout << "Executing: " << execstring << std::endl;
-			log_mtx_.unlock();
-
-			std::system(execstring.c_str());
-		}
-
-		if(t.compare("delete") == 0)
-		{
-			if(second.compare("IAMSURE") == 0)
-			{
-				if( remove(_asset->full_filename) != 0 )
-				{
-					log_mtx_.lock();
-					std::cout << "Error deleting file" << _asset->full_filename << std::endl;
-					logstring.append("Error deleting file");
-					logstring.append(_asset->full_filename);
-					logfile.write(logstring);
-					log_mtx_.unlock();
-				}
 			}
 		}
 	}
@@ -965,22 +553,6 @@ int metasorter::process_extensions(asset* _asset)
 }
 
 
-bool metasorter::string_replace(std::string& str, const std::string& from, const std::string& to)
-{
-	size_t start_pos = str.find(from);
-	if(start_pos == std::string::npos)
-		return false;
-	str.replace(start_pos, from.length(), to);
-	return true;
-}
 
-
-wchar_t* metasorter::charToWChar(const char* text)
-{
-    size_t size = strlen(text) + 1;
-    wchar_t* wa = new wchar_t[size];
-    mbstowcs(wa,text,size);
-    return wa;
-}
 
 

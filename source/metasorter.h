@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <iomanip>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sstream>
 #include <time.h>
 #include <sys/stat.h>
@@ -25,6 +26,8 @@
 
 #include "asset.h"
 #include "logfile.h"
+#include "util_functions.h"
+
 
 #ifdef MEDIAINFO_LIBRARY
     #include "MediaInfo/MediaInfo.h" //Staticly-loaded library (.lib or .a or .so)
@@ -60,9 +63,7 @@ public:
 	std::string logstring;
 	LogFile logfile;
 	pool tp;
-	boost::mutex list_mtx_;
-	boost::mutex log_mtx_;
-	boost::mutex hist_mtx_;
+	int file_inspection_time;
 	
 	int process_asset(asset*);
 	int traverse_directory(int);
@@ -70,10 +71,9 @@ public:
 	int process_extensions(asset*);
 	int process_rule(asset*, std::string, std::string);
 	int call_MediaInfo(MediaInfo &, asset *);
-	bool string_replace(std::string&, const std::string&, const std::string&);
-	wchar_t* charToWChar(const char*);
 	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String, int &);
 
+	//custom parameter functions
 	int proc_audio_layout(MediaInfoLib::String &, MediaInfo &, asset*, int &);
 	int proc_file_name(MediaInfoLib::String &, asset *);
 	int proc_file_extension(MediaInfoLib::String &, asset *);
@@ -84,11 +84,25 @@ public:
 	int proc_file_modified_date(MediaInfoLib::String &, asset *);
 	int proc_file_created_date(MediaInfoLib::String&, asset *);
 
+	//rule action functions
+	int action_list(asset*, std::string, std::string);
+	int action_move(asset*, std::string, std::string);
+	int action_fastmove(asset*, std::string, std::string);
+	int action_copy(asset*, std::string, std::string);
+	int action_copyonce(asset*, std::string, std::string);
+	int action_exec(asset*, std::string, std::string);
+	int action_delete(asset*, std::string, std::string);
+	int action_copyonceCUSTOM1(asset*, std::string, std::string);
+
 private:
 	static const int MAX_CHAR = 1024;
 	int find_matches_ids[1024];
 	int find_matches_count;
 	int logging;
+	boost::mutex list_mtx_;
+	boost::mutex log_mtx_;
+	boost::mutex hist_mtx_;
+
 };
 	
 

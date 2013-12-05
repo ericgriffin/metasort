@@ -1,0 +1,274 @@
+
+
+A valid metasort configuration file contains these four sections:
+
+folders
+{
+...
+}
+
+extensions
+{
+...
+}
+
+config
+{
+...
+}
+
+rules
+{
+...
+}
+
+
+SECTION DESCRIPTIONS
+
+folders
+
+	The folders section specifies one or more paths which should be searched by metasort. 
+	Each path should be on its own line.
+	All backslashes (\) should be entered as forward-slashes (/), and there should be a forward slash at the end of each folder path. 
+	Paths with spaces should be enclosed in quotation marks ("").
+	SAMBA/CIFS/UNC paths should have "//" before the server name.
+	An 'R' after a folder path designates that the path should be searched recursively.
+	
+	Example:
+
+		Metasort will search the following 3 folders. The last two UNC paths will be searched recursively:
+
+		folders
+		{
+			c:/folder/
+			//smbserver/folder/subfolder/ R
+			"//smbserver/folder a/sub folder/" R
+		}
+
+
+
+extensions
+
+	The extensions section specifies which file extensions should be scanned by metasort.
+	Any file extension which is not specified in this section will be ignored by metasort.
+	Each extension should be on its own line.
+	Each extension should include a '.' before the characters.
+	Regular expressions can be used by prefixing the extension pattern with '[REGEX]'.
+
+	Examples:
+
+		Metasort will only search files with a .mpg or .mpeg extension:
+
+		extensions
+		{
+			.mpg
+			.mpeg
+		}
+
+
+		Metasort will search files with any extension:
+
+		extensions
+		{
+			[REGEX].*
+		}
+
+		Metasort will search files with any extension beginning with 'm':
+
+		extensions
+		{
+			[REGEX].m*
+		}
+
+
+
+config
+
+	The config section contains configuration parameters that are used by metasort.
+	If optional parameters are omitted then the default system value is used.
+	Each parameter should be on its own line.
+	All backslashes (\) should be entered as forward-slashes (/).
+	Paths with spaces should be enclosed in quotation marks ("").
+
+	Required parameters:
+
+		logfile [path_to_logfile]
+
+			- specifies the file used for logging.
+
+	Optional parameters:
+
+		file_inspection_time [time_in_milliseconds]
+
+			- specifies the period of time each file is examined for changes before performing an action on the file.
+			- default value is 20000 (20 seconds).
+
+
+	Examples:
+
+		Metasort will log to the following file:
+
+		config
+		{
+			logfile c:/metasort/metasort.log 
+		}
+
+
+		Metasort will log to the specified file on the network, and examine each file for changes for 30 seconds before performing an action:
+
+		config
+		{
+			logfile "//smbserver/log files/metasort.log"
+			file_inspection_time 30000
+		}
+
+
+rules
+
+	The rules section contains one or more rules which specify an action to perform on a file when a set of conditions is met.
+
+	This is the general syntax for a rule:
+
+		rulename_action actionparameter
+	 	{
+			streamtype_streamnumber
+			{
+				parameter parametervalue
+				...
+			}
+			...
+		}
+
+
+	rulename
+		rulename is used to identify and describe a rule.
+		This can be any combination of alphanumeric characters.
+		No spaces or underscores allowed.
+		Each rulename must be unique in the configuration file.
+		
+
+	action 
+		This is the action to perform when the conditions of the rule are met.
+		The action can be one of the following:
+
+			list
+				- writes the filename to a new line in the text file specified by the actionparameter.
+				- actionparameter is a destination file.
+
+			move
+				- moves a file safely by first copying to the destination path specified by the actionparameter and then deleting the source.
+				- actionparameter is a destination path.
+			
+			fastmove
+				- moves a file to the destination path specified by the actionparameter quickly using the rename system call.
+				- actionparameter is a destination path.
+
+			copy
+				- copies a file to the destination path specified by the actionparameter.
+				- actionparameter is a destination path.
+
+			copyonce
+				- copies a file to the destination path specified by the actionparameter.
+				- a history of the copy transaction is kept, and any subsequent files in the same source folder with the same name and size will not be copied. If a file with the same name subsequently appears in the source folder, but is deemed to be a different file via size or contents, then that new file will be copied and its history recorded.
+				- actionparameter is a destination path.
+
+			exec
+				- executes a system command specified by the actionparameter. The variable %s represents the filename matching the rule conditions and can be used as a command-line parameter.
+				- actionparameter is a command-line command.
+
+			delete
+				- deletes a file. As a safety precaution the actionparameter must be set to "IAMSURE" for this action to be enabled.
+				- actionparameter is "IAMSURE".
+
+			copyonceCUSTOM1
+				- same as copyonce, but capitalizes all characters in the destination filename and removes all spaces, dashes and underscores from the destination filename.
+				- actionparameter is a destination path.
+
+
+		Examples:
+
+			Metasort will move the files to c:/destination/:
+
+			Rule1_move "c:/destination/"
+			{...}
+
+			Metasort will open the file with the VLC executable
+
+			Rule2_exec "\"C:/Program Files (x86)/VideoLAN/VLC/vlc.exe\" %s"
+			{...}
+
+
+	actionparameter
+		This value is used by the action and its format/value is specific to each type of action. See the description of an action to determine what the value of actionparameter should be.
+		All backslashes (\) should be entered as forward-slashes (/).
+		If the value is a path (used in list, move, copy, etc.), then there should be a forward slash at the end of each path (/).
+		Values with spaces (paths or system commands) should be enclosed in quotation marks ("").
+
+
+	streamtype
+		streamtype specifies what type of metadata is to be evaluated by the parameters within the streamtype_streamnumber section. In other words, what type of stream is going to be evaluated. If streamtype_streamnumber is 'video_1', then the parameters within that section will be evaluated against the first video stream in the file. If streamtype_streamnumber is 'audio_4', then the parameters within that section will be evaluated against the 4th audio stream in the file.
+		streamtype 'general' is used for filesystem metadata and multimedia parameters which are not particular to an individual stream (ex. audio_layout).
+		
+		Possible values for streamtype are:
+			general
+			audio
+			video
+			text
+			other
+			image
+			menu
+
+
+	streamnumber
+		streamnumber specifies the stream number to be evaluated by the parameters within the streamtype_streamnumber section.
+		It is a single numeric value (1, 2, 3, ...).
+		For streamtype general, streamnumber '0' is the only valid option.
+
+
+	parameter
+		parameter is a file attribute or metadata attribute which is evaluated for a particular file. If a file's value for a specified parameter matches the conditions in parametervalue, then the parameter is said to have "matched" for the given file. If all parameters in a rule match for a particular file, then the rule's action is executed.
+
+		parameter can be any MediaInfo parameter. See "MediaInfo Parameters" folder for a complete list.
+		
+		parameter can also be any of these parameters in the general_0 stream:
+
+			audio_layout [layout]
+				- Each digit in layout represents an audio stream, the lowest stream being the left-most digit. The value of each digit is the number of channels in the stream.
+				- For example, "audio_layout 22" would catch any files which had 2 channels in the first stream, and 2 channels in the second stream. 'audio_layout 11111111' would catch any files which had 1 channel in all 8 streams.
+				
+			file_size [size in KB]
+				- catches files whose size is represented by the field in Kilobytes.
+				
+				
+			file_create_age [minutes]
+				- catches files where the difference between the current time and the file's created time matches the field specified in minutes.
+				
+			file_modified_age [minutes]
+				- catches files where the difference between the current time and the file's modified date matches the field specified in minutes.
+
+			file_create_date [YYYYMMDD]
+				- catches files whose created date matches the field specifying a date in ISO format.
+				
+			file_modified_date [YYYYMMDD]
+				- catches files whose modified date matches the field specifying a date in ISO format.
+					
+			file_name [filename]
+				- catches files whose filename matches the name specified in the field.
+
+			file_extension [.extension]
+				- catches files whose extension matches the extension specified in the field.
+
+			file_path [path]
+				- catches files whose file path matches the path specified in the field. This path does not include the acutal file name, just the pathe before it.
+
+		All parameter values can be expressed as regular expressions by prefixing them with '[REGEX]'. Ex. 'audio_layout [REGEX]2...'' or 'file_name [REGEX].*HD.*'
+
+
+	parametervalue
+		- parametervalue is a value against which the file's value for a given parameter is compared.
+		- the value/format of parametervalue is unique to each type of parameter. See the description of each parameter to determine what parametervalue should be. 
+		- parametervalue's can be prefixed with these conditional operators where applicable:
+			'!' sets parameter as an exclusion.
+			'<' signifies less-than.
+			'>' signifies greater-than.
+			'[REGEX]' signifies a regular expression.

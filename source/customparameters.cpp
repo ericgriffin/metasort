@@ -1,11 +1,4 @@
 #include "metasorter.h"
-#include "asset.h"
-#include "customparameters.h"
-#include "util_functions.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
 
 int metasorter::custom_parameters(MediaInfoLib::String &_asset_param_val, MediaInfo &_MI, asset* _asset, MediaInfoLib::stream_t stream_type, int stream_number, MediaInfoLib::String parameter, int &MI_fetched)
 {

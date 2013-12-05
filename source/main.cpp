@@ -14,14 +14,9 @@
 using namespace std;
 
 
-void test(int i)
-{
-	cout << i << endl;
-}
-
 int main(int argc, char* argv[])
 {
-	std::cout << "Metasort 1.4.1" << std::endl;
+	std::cout << "Metasort 1.4.2" << std::endl;
 	std::cout << "Copyright (C) 2013 USA Studios" << std::endl << std::endl;
 
 	int err = 0;	

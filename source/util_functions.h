@@ -13,4 +13,7 @@
 
 bool Wait(const unsigned long &);
 void m_itoa(int, std::string&, int);
-int filesize_changing(char[255]);
+bool string_replace(std::string&, const std::string&, const std::string&);
+wchar_t* charToWChar(const char*);
+bool is_number(const std::string&);
+int filesize_changing(char[255], int);
