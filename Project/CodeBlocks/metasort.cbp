@@ -66,6 +66,7 @@
 			<Add directory="../../Libraries/zlib" />
 		</Compiler>
 		<Linker>
+			<Add option="-lrt" />
 			<Add library="libmediainfo.a" />
 			<Add library="../../Libraries/boost/stage/lib/libboost_filesystem.a" />
 			<Add library="../../Libraries/boost/stage/lib/libboost_regex.a" />
@@ -73,6 +74,8 @@
 			<Add library="libzen.a" />
 			<Add library="libpthread.a" />
 			<Add library="libz.a" />
+			<Add library="../../Libraries/boost/stage/lib/libboost_thread.a" />
+			<Add library="../../Libraries/boost/stage/lib/libboost_date_time.a" />
 			<Add directory="../../Libraries/boost/stage/lib" />
 			<Add directory="../../Libraries/MediaInfoLib/Project/GNU/Library/.libs" />
 			<Add directory="../../Libraries/ZenLib/Project/GNU/Library/.libs" />
@@ -81,12 +84,12 @@
 		<Unit filename="../../source/asset.cpp" />
 		<Unit filename="../../source/asset.h" />
 		<Unit filename="../../source/customparameters.cpp" />
-		<Unit filename="../../source/customparameters.h" />
 		<Unit filename="../../source/logfile.cpp" />
 		<Unit filename="../../source/logfile.h" />
 		<Unit filename="../../source/main.cpp" />
 		<Unit filename="../../source/metasorter.cpp" />
 		<Unit filename="../../source/metasorter.h" />
+		<Unit filename="../../source/rule_actions.cpp" />
 		<Unit filename="../../source/util_functions.cpp" />
 		<Unit filename="../../source/util_functions.h" />
 		<Extensions>
