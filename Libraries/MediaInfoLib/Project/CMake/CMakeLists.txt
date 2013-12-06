@@ -105,13 +105,19 @@ set(mediainfo_SRCS
 	MediaInfo/Multiple/File_Ancillary.cpp
 	MediaInfo/Multiple/File_Bdav.cpp
 	MediaInfo/Multiple/File_Cdxa.cpp
-	MediaInfo/Multiple/File_Dcp.cpp
+	MediaInfo/Multiple/File_DashMpd.cpp
+	MediaInfo/Multiple/File_DcpAm.cpp
+	MediaInfo/Multiple/File_DcpCpl.cpp
+	MediaInfo/Multiple/File_DcpPkl.cpp
 	MediaInfo/Multiple/File_Dpg.cpp
 	MediaInfo/Multiple/File_DvDif.cpp
 	MediaInfo/Multiple/File_DvDif_Analysis.cpp
 	MediaInfo/Multiple/File_Dvdv.cpp
 	MediaInfo/Multiple/File_Dxw.cpp
 	MediaInfo/Multiple/File_Flv.cpp
+	MediaInfo/Multiple/File_Gxf.cpp
+	MediaInfo/Multiple/File_HdsF4m.cpp
+	MediaInfo/Multiple/File_Hls.cpp
 	MediaInfo/Multiple/File_Gxf.cpp
 	MediaInfo/Multiple/File_Gxf_TimeCode.cpp
 	MediaInfo/Multiple/File_Ibi.cpp

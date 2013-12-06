@@ -8,8 +8,8 @@ apch;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;High;;YUV;
 apcn;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;YUV;4:2:2
 apcs;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;LT;;YUV;4:2:2
 apco;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;Proxy;;YUV;4:2:2
-ap4c;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;YUV;4:4:4
-ap4h;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;YUV;4:4:4
+ap4c;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;;4:4:4
+ap4h;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;;4:4:4
 ai12;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;;
 ai15;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;;
 ai1q;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;;
@@ -31,6 +31,9 @@ blit;RGBA;;;;;;RGBA;16:16:16:16
 blnd;Alpha Compositor;;;;;;;
 blur;Blur;;;;;;CMYK;
 CFHD;CineForm;;CineForm High-Definition (HD) wavelet codec;http://www.cineform.com/;;;;
+CHQX;Canopus HQX;;;;;;;
+CLLC;Canopus Lossless;;;;;;;
+CUVC;Canopus HQ;;;;;;;
 cmyk;CMYK;;;;;;;
 cvid;Cinepack;;;http://www.apple.com/quicktime/download/standalone.html;;;;
 drac;Dirac;;Dirac Video Coder;http://www.bbc.co.uk/rd/projects/dirac/index.shtml;;;;
@@ -108,7 +111,7 @@ PIM1;MPEG Video;;;;;;YUV;
 PIM2;MPEG Video;;;;;;YUV;
 PNTG;MacPaint;;Apple MacPaint image format;http://www.apple.com/quicktime/download/standalone.html;;;;
 raw ;RGB;;;http://www.apple.com/quicktime/download/standalone.html;;;RGB;
-rle ;RLE;;;http://www.apple.com/quicktime/download/standalone.html;;;;
+rle ;RLE;;;http://www.apple.com/quicktime/download/standalone.html;;;RGB;
 rpza;Road Pizza;;;http://www.apple.com/quicktime/download/standalone.html;;;;
 s263;H.263;;;http://www.apple.com/quicktime/download/standalone.html;;;;
 Shr0;SheerVideo;;Generic SheerVideo codec;http://www.bitjazz.com/;;;;

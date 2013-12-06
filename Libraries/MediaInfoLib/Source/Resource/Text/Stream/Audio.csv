@@ -1,8 +1,8 @@
 Count;;;N NI;;;Count of objects available in this stream
 Status;;;N NI;;;bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)
 StreamCount;;;N NI;;;Count of streams of that kind available
-StreamKind;Audio;;N NI;;;Stream type name;;
-StreamKind/String;;;N NI;;;Stream type name
+StreamKind;Audio;;N NT;;;Stream type name;;
+StreamKind/String;;;N NT;;;Stream type name
 StreamKindID;;;N NI;;;Number of the stream (base=0)
 StreamKindPos;;;N NI;;;When multiple streams, number of the stream (base=1)
 StreamOrder;;;N YI;;;Stream order in the file, whatever is the kind of stream (base=0)
@@ -104,9 +104,9 @@ BitRate_Maximum;; bps;N YF;;;Maximum Bit rate in bps;;
 BitRate_Maximum/String;;;Y NT;;;Maximum Bit rate (with measurement);;
 BitRate_Encoded;; bps;N YF;;;Encoded (with forced padding) bit rate in bps, if some container padding is present
 BitRate_Encoded/String;;;Y NT;;;Encoded (with forced padding) bit rate (with measurement), if some container padding is present
-Channel(s);; channel;N YF;;;Number of channels;;
+Channel(s);; channel;N YI;;;Number of channels;;
 Channel(s)/String;;;Y NT;;;Number of channels (with measurement);;
-Channel(s)_Original;; channel;N YF;;;Number of channels;;
+Channel(s)_Original;; channel;N YI;;;Number of channels;;
 Channel(s)_Original/String;;;Y NT;;;Number of channels (with measurement);;
 ChannelPositions;;;Y YT;;;Position of channels;;
 ChannelPositions/String2;;;N NT;;;Position of channels (x/y.z format);;

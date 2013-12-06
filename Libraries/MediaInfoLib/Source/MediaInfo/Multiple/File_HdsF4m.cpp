@@ -17,17 +17,17 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_DCP_YES)
+#if defined(MEDIAINFO_HDSF4M_YES)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/Multiple/File_Dcp.h"
-#include "MediaInfo/MediaInfo.h"
-#include "MediaInfo/MediaInfo_Internal.h"
+#include "MediaInfo/Multiple/File_HdsF4m.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
-#include "ZenLib/Dir.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "ZenLib/FileName.h"
+#include "ZenLib/File.h"
 #include "tinyxml2.h"
+using namespace ZenLib;
 using namespace tinyxml2;
 //---------------------------------------------------------------------------
 
@@ -39,23 +39,20 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-File_Dcp::File_Dcp()
+File_HdsF4m::File_HdsF4m()
 :File__Analyze()
 {
     #if MEDIAINFO_EVENTS
-        ParserIDs[0]=MediaInfo_Parser_None; //TODO
-        StreamIDs_Width[0]=sizeof(size_t)*2;
+        ParserIDs[0]=MediaInfo_Parser_HdsF4m;
+        StreamIDs_Width[0]=16;
     #endif //MEDIAINFO_EVENTS
-    #if MEDIAINFO_DEMUX
-        Demux_EventWasSent_Accept_Specific=true;
-    #endif //MEDIAINFO_DEMUX
 
     //Temp
     ReferenceFiles=NULL;
 }
 
 //---------------------------------------------------------------------------
-File_Dcp::~File_Dcp()
+File_HdsF4m::~File_HdsF4m()
 {
     delete ReferenceFiles; //ReferenceFiles=NULL;
 }
@@ -65,7 +62,7 @@ File_Dcp::~File_Dcp()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void File_Dcp::Streams_Finish()
+void File_HdsF4m::Streams_Finish()
 {
     if (ReferenceFiles==NULL)
         return;
@@ -79,7 +76,7 @@ void File_Dcp::Streams_Finish()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_SEEK
-size_t File_Dcp::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
+size_t File_HdsF4m::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 {
     if (ReferenceFiles==NULL)
         return 0;
@@ -93,68 +90,60 @@ size_t File_Dcp::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool File_Dcp::FileHeader_Begin()
+bool File_HdsF4m::FileHeader_Begin()
 {
     XMLDocument document;
     if (!FileHeader_Begin_XML(document))
        return false;
 
     {
-        std::string NameSpace;
-        XMLElement* AssetMap=document.FirstChildElement("AssetMap");
-        if (AssetMap==NULL)
+        XMLElement* Root=document.FirstChildElement("manifest");
+        if (Root)
         {
-            NameSpace="am:";
-            AssetMap=document.FirstChildElement((NameSpace+"AssetMap").c_str());
-        }
-        if (AssetMap)
-        {
-            Accept("Dcp");
-            Fill(Stream_General, 0, General_Format, "DCP");
-            Fill(Stream_General, 0, General_Format_Version, NameSpace=="am:"?"SMPTE":"Interop");
+            const char* Attribute=Root->Attribute("xmlns");
+            if (Attribute==NULL || Ztring().From_UTF8(Attribute)!=__T("http://ns.adobe.com/f4m/1.0"))
+            {
+                Reject("HdsF4m");
+                return false;
+            }
+
+            Accept("HdsF4m");
+            Fill(Stream_General, 0, General_Format, "HDS F4M");
+            Config->File_ID_OnlyRoot_Set(false);
 
             ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
 
-            XMLElement* IssueDate=AssetMap->FirstChildElement((NameSpace+"IssueDate").c_str());
-            if (IssueDate)
-                Fill(Stream_General, 0, General_Encoded_Date, IssueDate->GetText());
-            XMLElement* Issuer=AssetMap->FirstChildElement((NameSpace+"Issuer").c_str());
-            if (Issuer)
-                Fill(Stream_General, 0, General_EncodedBy, Issuer->GetText());
-            XMLElement* Creator=AssetMap->FirstChildElement((NameSpace+"Creator").c_str());
-            if (Creator)
-                Fill(Stream_General, 0, General_Encoded_Library, Creator->GetText());
+            //Parsing main elements
+            Ztring BaseURL;
 
-            XMLElement* AssetList=AssetMap->FirstChildElement((NameSpace+"AssetList").c_str());
-            if (AssetList)
+            for (XMLElement* Root_Item=Root->FirstChildElement(); Root_Item; Root_Item=Root_Item->NextSiblingElement())
             {
-                XMLElement* Asset=AssetList->FirstChildElement((NameSpace+"Asset").c_str());
-                while (Asset)
+                //Common information
+                if (string(Root_Item->Value())=="BaseURL")
                 {
-                    XMLElement* ChunkList=Asset->FirstChildElement((NameSpace+"ChunkList").c_str());
-                    if (ChunkList)
-                    {
-                        XMLElement* Chunk=ChunkList->FirstChildElement((NameSpace+"Chunk").c_str());
-                        if (Chunk)
-                        {
-                            XMLElement* Path=Chunk->FirstChildElement((NameSpace+"Path").c_str());
-                            if (Path)
-                            {
-                                File__ReferenceFilesHelper::reference ReferenceFile;
-                                ReferenceFile.FileNames.push_back(Path->GetText());
-                                ReferenceFile.StreamID=ReferenceFiles->References.size()+1;
-                                ReferenceFiles->References.push_back(ReferenceFile);
-                            }
-                        }
-                    }
+                    if (BaseURL.empty()) //Using the first one
+                        BaseURL=Root_Item->GetText();
+                }
 
-                    Asset=Asset->NextSiblingElement();
+                //Period
+                if (string(Root_Item->Value())=="media")
+                {
+                    File__ReferenceFilesHelper::reference ReferenceFile;
+                    const char* Attribute;
+
+                    //Attributes - mineType
+                    Attribute=Root_Item->Attribute("url");
+                    if (Attribute)
+                        ReferenceFile.FileNames.push_back(Ztring().From_UTF8(Attribute)+__T("Seg1.f4f"));
+
+                    ReferenceFile.StreamID=ReferenceFiles->References.size()+1;
+                    ReferenceFiles->References.push_back(ReferenceFile);
                 }
             }
         }
         else
         {
-            Reject("Dcp");
+            Reject("HdsF4m");
             return false;
         }
     }
@@ -167,5 +156,5 @@ bool File_Dcp::FileHeader_Begin()
 
 } //NameSpace
 
-#endif //MEDIAINFO_P2_YES
+#endif //MEDIAINFO_HDSF4M_YES
 

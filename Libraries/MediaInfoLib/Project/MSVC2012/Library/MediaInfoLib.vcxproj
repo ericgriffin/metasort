@@ -82,7 +82,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -99,6 +99,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
+    <WindowsAppContainer>true</WindowsAppContainer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseA|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -207,8 +208,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -220,17 +220,16 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../Source/ThirdParty/md5;../../../Source/ThirdParty/base64;../../../../ZenLib/Source;../../../../ZLib;../../../../curl/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;MEDIAINFO_TRACE_NO;MEDIAINFO_EVENTS_NO;MEDIAINFO_DEMUX_NO;MEDIAINFO_DVDIF_ANALYZE_NO;MEDIAINFO_MPEGTS_DUPLICATE_NO;MEDIAINFO_NEXTPACKET_NO;MEDIAINFO_SEEK_NO;MEDIAINFO_IBI_NO;MEDIAINFO_LIBCURL_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MEDIAINFO_LIBCURL_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
@@ -244,8 +243,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -260,7 +258,7 @@
       <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../Source/ThirdParty/md5;../../../Source/ThirdParty/base64;../../../../ZenLib/Source;../../../../ZLib;../../../../curl/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;NDEBUG;MEDIAINFO_DVDIF_ANALYZE_NO;MEDIAINFO_MPEGTS_DUPLICATE_NO;MEDIAINFO_TRACE_NO;MEDIAINFO_LIBMMS_NO;MEDIAINFO_LIBCURL_DLL_RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -278,7 +276,7 @@
       <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../Source/ThirdParty/md5;../../../Source/ThirdParty/base64;../../../../ZenLib/Source;../../../../ZLib;../../../../curl/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;NDEBUG;MEDIAINFO_DVDIF_ANALYZE_NO;MEDIAINFO_MPEGTS_DUPLICATE_NO;MEDIAINFO_TRACE_NO;MEDIAINFO_LIBMMS_NO;MEDIAINFO_LIBCURL_DLL_RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -297,7 +295,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;MEDIAINFO_TRACE_NO;MEDIAINFO_EVENTS_NO;MEDIAINFO_DEMUX_NO;MEDIAINFO_DVDIF_ANALYZE_NO;MEDIAINFO_MPEGTS_DUPLICATE_NO;MEDIAINFO_SEEK_NO;MEDIAINFO_NEXTPACKET_NO;MEDIAINFO_IBI_NO;MEDIAINFO_LIBCURL_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -315,8 +313,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -333,8 +330,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -349,7 +345,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -365,7 +361,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;MEDIAINFO_TRACE_NO;MEDIAINFO_LIBCURL_NO;MEDIAINFO_LIBMMS_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -381,7 +377,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;MEDIAINFO_TRACE_NO;MEDIAINFO_LIBCURL_NO;MEDIAINFO_LIBMMS_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -394,7 +390,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/tinyxml2;../../../Source/ThirdParty/base64;../../../../ZenLib/Source;../../../../ZLib;../../../../curl/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4100;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -483,12 +479,16 @@
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_Vorbis.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_Wvpk.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ancillary.cpp" />
-    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Dcp.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_DashMpd.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_DcpAm.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_DcpPkl.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Dxw.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Gxf_TimeCode.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_HdsF4m.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Hls.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ibi.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ibi_Creation.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_DcpCpl.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ism.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ivf.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Lxf.cpp" />
@@ -604,13 +604,13 @@
     <ClCompile Include="..\..\..\Source\MediaInfo\Video\File_Y4m.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\md5\md5.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugA|ARM'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseA|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugA|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugA|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseA|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseA|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugA|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseA|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -664,12 +664,16 @@
     <ClInclude Include="..\..\..\Source\MediaInfo\MediaInfoList.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\MediaInfoList_Internal.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ancillary.h" />
-    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Dcp.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_DashMpd.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_DcpAm.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_DcpPkl.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Dxw.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Gxf_TimeCode.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_HdsF4m.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Hls.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ibi.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ibi_Creation.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_DcpCpl.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ism.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ivf.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Lxf.h" />
@@ -810,7 +814,7 @@
     <ProjectReference Include="..\..\..\..\ZenLib\Project\MSVC2012\Library\ZenLib.vcxproj">
       <Project>{0da1da7d-f393-4e7c-a7ce-cb5c6a67bc94}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\zlib\projects\MSVC2012\zlib.vcxproj">
+    <ProjectReference Include="..\..\..\..\zlib\projects\MSVC2010\zlib.vcxproj">
       <Project>{fd328ae2-5136-460f-a622-12cfd4d4c131}</Project>
     </ProjectReference>
   </ItemGroup>

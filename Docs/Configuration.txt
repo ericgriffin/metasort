@@ -103,7 +103,10 @@ config
 			- specifies the period of time each file is examined for changes before performing an action on the file.
 			- default value is 20000 (20 seconds).
 
+		threadpool_size [number of threads]
 
+			- specifies the number of threads used in scanning files and performing actions. Larger number of threads can greatly speed up processing, particularly if using a large file_inspection_time. However, if say, 16 threads are used then potentially 16 files could be copied at the same time and would all compete for disk or network bandwidth.
+			- default value is 4.
 	Examples:
 
 		Metasort will log to the following file:
@@ -114,12 +117,13 @@ config
 		}
 
 
-		Metasort will log to the specified file on the network, and examine each file for changes for 30 seconds before performing an action:
+		Metasort will log to the specified file on the network, and examine each file for changes for 30 seconds before performing an action. Metasort will also use 8 threads:
 
 		config
 		{
 			logfile "//smbserver/log files/metasort.log"
 			file_inspection_time 30000
+			threadpool_size 8
 		}
 
 

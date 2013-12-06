@@ -25,18 +25,11 @@ ZenLib is a C++ utility library. It includes classes for handling strings,
 configuration, bit streams, threading, translation, and cross-platform
 operating system functions.
 
-%package -n %{name}0
-Summary:		C++ utility library -- runtime
-Group:			System/Libraries
-Requires:		glibc
-
-%description -n %{name}0
-ZenLib is a C++ utility library. It includes classes for handling strings,
-configuration, bit streams, threading, translation, and cross-platform
-operating system functions.
-
 This package contains the headers required for compiling applications/libraries
 which use this library.
+
+
+
 
 %package        doc
 Summary:        C++ utility library -- documentation
@@ -49,6 +42,9 @@ configuration, bit streams, threading, translation, and cross-platform
 operating system functions.
 
 This package contains the documentation
+
+
+
 
 %package        devel
 Summary:        C++ utility library -- development
@@ -118,11 +114,11 @@ install -m 644 Project/GNU/Library/%{name}.pc \
     %{buildroot}%{_libdir}/pkgconfig
 
 
-%post -n %{name}0 -p /sbin/ldconfig
+%post -n %{name} -p /sbin/ldconfig
 
-%postun -n %{name}0 -p /sbin/ldconfig
+%postun -n %{name} -p /sbin/ldconfig
 
-%files -n %{name}0
+%files -n %{name}
 %defattr(-,root,root,-)
 %doc History.txt License.txt ReadMe.txt
 %{_libdir}/%{name}.so.*
@@ -141,6 +137,8 @@ install -m 644 Project/GNU/Library/%{name}.pc \
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Oct 25 2013 Kelsie Flynn <kelsie@elmythos.org> - 0.4.29-1
+- Changed the RPM name layout, removed "0" from ${NAME} and extra sections.
 * Tue Jan 01 2009 MediaArea.net SARL <info@mediaarea.net> - 0.4.29-0
 - See History.txt for more info and real dates
 - Previous packages made by Toni Graffy <toni@links2linux.de>

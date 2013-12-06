@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about DCP files
+// Information about DCP/IMF Composition Playlist files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_DcpH
-#define MediaInfo_File_DcpH
+#ifndef MediaInfo_File_DcpCplH
+#define MediaInfo_File_DcpCplH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -26,15 +26,15 @@ namespace MediaInfoLib
 class File__ReferenceFilesHelper;
 
 //***************************************************************************
-// Class File_Dcp
+// Class File_DcpCpl
 //***************************************************************************
 
-class File_Dcp : public File__Analyze
+class File_DcpCpl : public File__Analyze
 {
 public :
     //Constructor/Destructor
-    File_Dcp();
-    ~File_Dcp();
+    File_DcpCpl();
+    ~File_DcpCpl();
 
 private :
     //Streams management
@@ -50,6 +50,8 @@ private :
 
     //Temp
     File__ReferenceFilesHelper*     ReferenceFiles;
+    friend class File_DcpAm;    //Theses classes need access to internal structure for optimization. There is recursivity with theses formats
+    friend class File_DcpPkl;   //Theses classes need access to internal structure for optimization. There is recursivity with theses formats
 };
 
 } //NameSpace

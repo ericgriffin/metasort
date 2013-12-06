@@ -10,7 +10,7 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 {
 	strcpy(path, _path);
 	pt = _pt;
-	tp.size_controller().resize(8);
+	tp.size_controller().resize(4);
 	file_inspection_time = 20000;
 	logging = 0;
 	optional<const boost::property_tree::ptree&> pt_check_existence;
@@ -26,16 +26,16 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 				logfile.open(v.second.data().c_str());
 			}
 			
-
 			if(strcmp(v.first.c_str(), "file_inspection_time") == 0)
 			{
 				file_inspection_time = atoi(v.second.data().c_str());
 			}
+
+			if(strcmp(v.first.c_str(), "threadpool_size") == 0)
+			{
+				tp.size_controller().resize(atoi(v.second.data().c_str()));
+			}
 		}
-	}
-	else
-	{
-		//cout << "Using default configuration values" << endl;
 	}
 
 	if(logging == 0)

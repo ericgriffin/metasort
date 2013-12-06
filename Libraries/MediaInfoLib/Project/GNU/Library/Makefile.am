@@ -97,7 +97,10 @@ lib@MediaInfoLib_LibName@_la_SOURCES = \
                        ../../../Source/MediaInfo/Multiple/File_Ancillary.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Bdmv.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Cdxa.cpp \
-                       ../../../Source/MediaInfo/Multiple/File_Dcp.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_DashMpd.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_DcpAm.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_DcpCpl.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_DcpPkl.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Dpg.cpp \
                        ../../../Source/MediaInfo/Multiple/File_DvDif.cpp \
                        ../../../Source/MediaInfo/Multiple/File_DvDif_Analysis.cpp \
@@ -106,6 +109,7 @@ lib@MediaInfoLib_LibName@_la_SOURCES = \
                        ../../../Source/MediaInfo/Multiple/File_Flv.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Gxf.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Gxf_TimeCode.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_HdsF4m.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Hls.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Ibi.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Ibi_Creation.cpp \

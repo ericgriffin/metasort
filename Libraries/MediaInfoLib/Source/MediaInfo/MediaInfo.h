@@ -50,7 +50,7 @@
     #pragma message This machine has no 64-bit integer type?
 #endif
 
-
+//---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
