@@ -110,7 +110,7 @@
     <LinkIncremental>
     </LinkIncremental>
     <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
-    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -121,6 +121,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Libraries\ZenLib\Source;$(ProjectDir)\..\..\..\Libraries\MediaInfoLib\Source;$(ProjectDir)\..\..\..\Libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +131,7 @@
     </Link>
     <Bscmake>
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
+      <PreserveSbr>true</PreserveSbr>
     </Bscmake>
     <PreBuildEvent>
       <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost.bat</Command>
