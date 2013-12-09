@@ -16,7 +16,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Metasort 1.4.2" << std::endl;
+	std::cout << "Metasort 1.4.3" << std::endl;
 	std::cout << "Copyright (C) 2013 USA Studios" << std::endl << std::endl;
 
 	int err = 0;	
