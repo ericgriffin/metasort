@@ -14,7 +14,22 @@ x64/
 build/
 [Bb]in/
 [Oo]bj/
+.deps/
+autom4te.cache
 
+Project/GNU/Makefile
+Project/GNU/Makefile.in
+Project/GNU/missing
+Project/GNU/install-sh
+Project/GNU/ltmain.sh
+Project/GNU/libtool
+Project/GNU/depcomp
+Project/GNU/configure
+Project/GNU/config.sub
+Project/GNU/config.status
+Project/GNU/config.guess
+Project/GNU/aclocal.m4
+Project/GNU/stamp-h1
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
