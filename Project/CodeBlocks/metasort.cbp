@@ -7,21 +7,23 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug x64">
-				<Option output="../../Debug/x64/metasort" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../Debug/x64" />
+				<Option output="./Debug/x64/metasort" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./Debug/x64" />
 				<Option external_deps=";;;" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-ansi" />
 					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
 				</Compiler>
+				<ExtraCommands>
+					<Add before="../build_scripts/build_libraries64.sh" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Release x64">
-				<Option output="../../Release/x64/metasort" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../Release/x64" />
+				<Option output="./Release/x64/metasort" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./Release/x64" />
 				<Option external_deps=";;;" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -30,10 +32,13 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
 				</Compiler>
+				<ExtraCommands>
+					<Add before="../build_scripts/build_libraries64.sh" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Release x86">
-				<Option output="../../Release/x86/metasort" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../Release/x86" />
+				<Option output="./Release/x86/metasort" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./Release/x86" />
 				<Option external_deps=";;;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -43,10 +48,13 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
 				</Compiler>
+				<ExtraCommands>
+					<Add before="../build_scripts/build_libraries32.sh" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Debug x86">
-				<Option output="../../Debug/x86/metasort" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../Debug/x86" />
+				<Option output="./Debug/x86/metasort" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./Debug/x86" />
 				<Option external_deps=";;;" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -55,10 +63,12 @@
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
 				</Compiler>
+				<ExtraCommands>
+					<Add before="../build_scripts/build_libraries32.sh" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-std=c++0x" />
 			<Add option="-DUNICODE" />
 			<Add directory="../../Libraries/boost" />
 			<Add directory="../../Libraries/ZenLib/Source" />
