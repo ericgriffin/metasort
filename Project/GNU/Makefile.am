@@ -25,16 +25,5 @@ metasort_LDFLAGS = \
 			-L../../Libraries/ZenLib/Project/GNU/Library/.libs \
 			-L../../Libraries/zlib
 
-metasort_LDADD = \
-			-lrt \
-			-lmediainfo \
-			-lzen \
-			-lpthread \
-			-lz \
-			../../Libraries/boost/stage/lib/libboost_filesystem.a \
-			../../Libraries/boost/stage/lib/libboost_regex.a \
-			../../Libraries/boost/stage/lib/libboost_system.a \
-			../../Libraries/boost/stage/lib/libboost_thread.a \
-			../../Libraries/boost/stage/lib/libboost_date_time.a
 			
 			

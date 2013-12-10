@@ -14,6 +14,7 @@ AM_INIT_AUTOMAKE([foreign -Wall])
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_CPP
 AC_DISABLE_SHARED
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
@@ -38,6 +39,16 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_MKTIME
+
+AC_CHECK_FUNCS(clock_gettime, [], [
+  AC_CHECK_LIB(rt, clock_gettime, [
+    AC_DEFINE(HAVE_CLOCK_GETTIME, 1)
+    LDFLAGS="$LDFLAGS -lrt"
+    OMITTED_FLAGS="$OMITTED_FLAGS -lrt"
+  ])
+])
+
+LDFLAGS="-lmediainfo -lzen -lpthread -lz ../../Libraries/boost/stage/lib/libboost_filesystem.a ../../Libraries/boost/stage/lib/libboost_regex.a ../../Libraries/boost/stage/lib/libboost_system.a ../../Libraries/boost/stage/lib/libboost_thread.a ../../Libraries/boost/stage/lib/libboost_date_time.a $LDFLAGS"
 
 AC_CONFIG_FILES([Makefile])
 
