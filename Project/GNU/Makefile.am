@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 AM_CPPFLAGS = \
--DUNICODE -D_CRT_SECURE_NO_WARNINGS -DNDEBUG -D_CONSOLE -Wall \
+-DUNICODE -D_CRT_SECURE_NO_WARNINGS -DNDEBUG -D_CONSOLE -O3 \
 -I../../Libraries/boost \
 -I../../Libraries/MediaInfoLib/Source \
 -I../../Libraries/ZenLib/Source \
