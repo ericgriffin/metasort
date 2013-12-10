@@ -55,7 +55,7 @@
                     <distributionFileList>
                         <distributionFile>
                             <allowWildcards>1</allowWildcards>
-                            <origin>../../Release/Win32/*</origin>
+                            <origin>../MSVC/Release/Win32/*</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>

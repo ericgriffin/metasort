@@ -94,22 +94,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir>..\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir>..\$(Configuration)\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir>..\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>
     </LinkIncremental>
-    <OutDir>..\..\..\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir>..\$(Configuration)\$(Platform)\</OutDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -134,7 +134,7 @@
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
     <PreBuildEvent>
-      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost.bat</Command>
+      <Command>$(ProjectDir)..\..\build_scripts\build_boost32.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -165,7 +165,7 @@
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PreBuildEvent>
-      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost64.bat</Command>
+      <Command>$(ProjectDir)..\..\build_scripts\build_boost64.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -200,7 +200,7 @@
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PreBuildEvent>
-      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost.bat</Command>
+      <Command>$(ProjectDir)..\..\build_scripts\build_boost32.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -244,7 +244,7 @@
       <OutputFile>$(Platform)\$(Configuration)\$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PreBuildEvent>
-      <Command>$(ProjectDir)..\..\..\Libraries\boost\build_boost64.bat</Command>
+      <Command>$(ProjectDir)..\..\build_scripts\build_boost64.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

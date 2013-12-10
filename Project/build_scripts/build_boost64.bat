@@ -1,4 +1,4 @@
-cd /d %~dp0
+cd /d %~dp0/../../Libraries/boost/
 del .\stage\lib\* /Q /F
 call bootstrap.bat
 bjam.exe link=static threading=multi address-model=64 runtime-link=static release stage
