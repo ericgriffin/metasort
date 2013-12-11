@@ -7,13 +7,18 @@
 *.sln.docstates
 
 # Build results
-
 *.exe
 
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
 [Bb]in/
 [Oo]bj/
 .deps/
 autom4te.cache
+
+!Libraries/boost/tools/build/
 
 Libraries/boost/stage/lib/
 Libraries/boost/bin.v2/
