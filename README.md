@@ -1,4 +1,4 @@
-metasort
+Metasort
 ========
 
 Multimedia file metadata processor.
