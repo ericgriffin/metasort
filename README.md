@@ -1,4 +1,4 @@
-Metasort
+metasort
 ========
 
 Cross-platform file metadata processor.
