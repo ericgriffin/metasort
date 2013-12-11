@@ -1,4 +1,4 @@
 metasort
 ========
 
-File metadata processor
+Multimedia file metadata processor.
