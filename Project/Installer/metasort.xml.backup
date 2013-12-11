@@ -135,7 +135,7 @@
     <enableTimestamp>1</enableTimestamp>
     <outputDirectory>Release</outputDirectory>
     <saveRelativePaths>1</saveRelativePaths>
-    <vendor>USA Studios</vendor>
+    <vendor>Eric Griffin</vendor>
     <parameterList>
         <directoryParameter>
             <name>installdir</name>
