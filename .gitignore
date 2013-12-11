@@ -11,12 +11,14 @@
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
+
 [Bb]in/
 [Oo]bj/
 .deps/
 autom4te.cache
 
+Libraries/boost/stage/lib/
+Libraries/boost/bin.v2/
 Project/GNU/Makefile
 Project/GNU/Makefile.in
 Project/GNU/missing
