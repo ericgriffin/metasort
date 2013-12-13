@@ -11,7 +11,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 
+void generate_skeleton_config();
+
 using namespace std;
+using namespace boost::filesystem;
 
 
 int main(int argc, char* argv[])
@@ -33,9 +36,18 @@ int main(int argc, char* argv[])
 	{
 		for (int i = 1; i < argc; i++) 
 		{ 
+			if (strcmp(argv[i], "-g") == 0 )
+			{
+				generate_skeleton_config();
+				exit(0);
+            }
+
 			if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "/h") == 0)
 			{
-				std::cout << "Usage: metasort -c <config file> [-i <filename>]" << std::endl;
+				std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
+				std::cout << "-c <config file>  --  specify configuration file to run" << std::endl;
+				std::cout << "-i <filename>  --  specify a single file to process (requires -c)" << std::endl;
+				std::cout << "-g  --  create a skeleton configuration file in the current directory" << std::endl;
 				exit(0);
             }
 
@@ -109,7 +121,42 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << "Usage: metasort -c <config file> [-i <filename>]" << std::endl;
+		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
 	}
 	return err;
+}
+
+
+void generate_skeleton_config()
+{
+	boost::filesystem::path working_path_raw(boost::filesystem::current_path());
+	std::string *config = new std::string();
+	std::string *working_path = new std::string(working_path_raw.string().c_str());
+	
+	//change back-slashes to forward-slashes
+	std::replace(working_path->begin(), working_path->end(), '\\', '/');
+
+	config->append("folders\n{\n\t;\"");
+	config->append(working_path->c_str());
+	config->append("/\" R\n}\n\nextensions\n{\n");
+	config->append("\t[REGEX].*");
+	config->append("\n}\n\nconfig\n{\n");
+	config->append("\tlogfile \"");
+	config->append(working_path->c_str());
+	config->append("/metasort.log\"");
+	config->append("\n}\n\nrules\n{\n");
+	config->append("\tRule1_list \"");
+	config->append(working_path->c_str());
+	config->append("/metasort_list.txt\"\n\t{\n");
+	config->append("\t\tGeneral_0\n\t\t{\n");
+	config->append("\t\t\tfile_size > 50\n\t\t}\n");
+	config->append("\n\t}\n}\n");
+
+	std::ofstream f;
+	std::string *skeleton_config_file = new std::string(working_path_raw.string().c_str());
+	skeleton_config_file->append("\\metasort_config.ini");
+	std::cout << "Generating skeleton config file: " << skeleton_config_file->c_str() << std::endl;
+    f.open(skeleton_config_file->c_str(), std::ios::out);
+	f << config->c_str();
+	f.close();
 }
