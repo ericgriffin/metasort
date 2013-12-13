@@ -92,6 +92,7 @@ public:
 	int action_copyonce(asset*, std::string, std::string);
 	int action_exec(asset*, std::string, std::string);
 	int action_delete(asset*, std::string, std::string);
+	int action_md5file(asset*, std::string, std::string);
 	int action_copyonceCUSTOM1(asset*, std::string, std::string);
 
 private:

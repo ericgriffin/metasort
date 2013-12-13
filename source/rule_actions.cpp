@@ -488,3 +488,13 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 	}
 	return true;
 }
+
+
+int metasorter::action_md5file(asset* _asset, std::string first, std::string second)
+{
+	int md5_exists = 0;
+	int base_exists = 0;
+
+
+	return true;
+}

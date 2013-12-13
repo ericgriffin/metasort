@@ -488,6 +488,9 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 			else if(t.compare("copyonceCUSTOM1") == 0)
 				action_copyonceCUSTOM1(_asset, first, second);
 
+			else if(t.compare("md5file") == 0)
+				action_md5file(_asset, first, second);
+
 			else 
 			{
 				log_mtx_.lock();
