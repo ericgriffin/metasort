@@ -42,19 +42,14 @@ string get_file_extension(const string& s)
 int compare_file_modified_time(std::string file1, std::string file2)
 {
 	int result = 0;
+	time_t file_modified_time1;
+	time_t file_modified_time2;
 
-	std::time_t file_modified_time1;
-	std::time_t file_modified_time2;
-	struct tm* clock1 = new tm;
-	struct tm* clock2 = new tm;
-	struct stat attrib1;
-	struct stat attrib2;
-	stat(file1.c_str(), &attrib1);
-	stat(file2.c_str(), &attrib2);
-	clock1 = localtime(&(attrib1.st_mtime));
-	clock2 = localtime(&(attrib2.st_mtime));
-	file_modified_time1 = mktime(clock1);
-	file_modified_time2 = mktime(clock2);
+	file_modified_time1 = file_modified_time(file1);
+	file_modified_time2 = file_modified_time(file2);
+
+	std::cout << file_modified_time1 << " : " << file_modified_time2 << endl;
+	
 	if(difftime(file_modified_time1, file_modified_time2) == 0)
 		result = 0;
 	if(difftime(file_modified_time1, file_modified_time2) > 0)
@@ -63,6 +58,20 @@ int compare_file_modified_time(std::string file1, std::string file2)
 		result = -1;
 
 	return result;
+}
+
+
+time_t file_modified_time(std::string file)
+{
+	std::time_t file_modified_time1;
+	struct tm* clock1 = new tm;
+	struct stat attrib1;
+	stat(file.c_str(), &attrib1);
+	clock1 = localtime(&(attrib1.st_mtime));
+
+	file_modified_time1 = mktime(clock1);
+
+	return file_modified_time1;
 }
 
 

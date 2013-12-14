@@ -498,6 +498,8 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 {
 	
 	int base_exists = 0;
+	std::string asset_full_filename(_asset->full_filename);
+	std::replace(asset_full_filename.begin(), asset_full_filename.end(), '\\', '/');
 
 	//strip quotation marks around string if they exist
 	if(second[0] == '"')
@@ -533,16 +535,17 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 			if(itr->status().type() != directory_file)
 			{
 				md5_search_filename = itr->path().string();
-				
-				std::cout << "comparing" << md5_filename.c_str() << " : " << md5_search_filename.c_str() << std::endl;
+				std::replace(md5_search_filename.begin(), md5_search_filename.end(), '\\', '/');
 
 				//if an md5 file already exists make sure it is up to date
 				if(md5_filename.compare(md5_search_filename) == 0)
 				{
-					std::cout << "existing md5 found" << std::endl;
-
 					md5_exists = 1;
-					if(compare_file_modified_time(md5_filename, md5_search_filename) > 0)
+
+					//std::cout << "MODTIMECOMPARE: " << compare_file_modified_time(asset_full_filename, md5_search_filename) << std::endl;
+					std::cout << asset_full_filename.c_str() << " : " << md5_search_filename << std::endl;
+
+					if(compare_file_modified_time(asset_full_filename, md5_search_filename) > 0)
 					{
 						std::cout << "compare matched" << std::endl;
 
@@ -573,7 +576,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 			++itr;
 		}
 
-		if(md5_exists == 0)  //create and MD5 file
+		if(md5_exists == 0)  //create an MD5 file
 		{	
 			log_mtx_.lock();
 			std::cout << "Creating MD5 file " << md5_filename.c_str() << std::endl;

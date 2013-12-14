@@ -20,3 +20,4 @@ bool is_number(const std::string&);
 int filesize_changing(char[255], int);
 std::string get_file_extension(const std::string&);
 int compare_file_modified_time(std::string, std::string);
+time_t file_modified_time(std::string);
