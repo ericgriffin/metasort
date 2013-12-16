@@ -496,10 +496,20 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 
 int metasorter::action_md5file(asset* _asset, std::string first, std::string second)
 {
-	
 	int base_exists = 0;
+	char* md5_hash;
+
 	std::string asset_full_filename(_asset->full_filename);
 	std::replace(asset_full_filename.begin(), asset_full_filename.end(), '\\', '/');
+
+	std::string md5_filename(second);
+	std::string md5_search_filename;
+	boost::filesystem::path md5_file_fullpath(md5_filename);
+	boost::filesystem::path md5_dir_path = md5_file_fullpath.parent_path();  //used for directory searching for pre-existing md5 file
+	std::string action_param_filename(md5_file_fullpath.filename().string().c_str());  //used for determining if md5 should be generated for for a file
+
+	string_replace(action_param_filename, "%s", _asset->filename);
+	string_replace(md5_filename, "%s", _asset->filename);
 
 	//strip quotation marks around string if they exist
 	if(second[0] == '"')
@@ -514,21 +524,28 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 	//determine file extension of 'second' parameter
 	std::string action_param_extension(".");
 	action_param_extension.append(get_file_extension(second));
+	std::string asset_filename;
+	asset_filename.assign(_asset->filename);
+	
+	//if asset filename doesn't match md5's filename - generate md5
+	if(action_param_filename.compare(asset_filename) == 0)
+	{
+		//filename matches - don't generate md5 for this file
+		log_mtx_.lock();
+		logstring.assign("MD5 filename conflicts with existing non-md5 filename ");
+		logstring.append(_asset->full_filename);
+		logstring.append(" - skipping");
+		logfile.write(logstring);
+		std::cout << "MD5 filename conflicts with existing non-md5 filename " << _asset->full_filename << " - skipping" << std::endl;
+		log_mtx_.unlock();
+	}
 
-	//if file extension is not same as the md5 file's extension
-	if(action_param_extension.compare(_asset->extension) != 0)
+	else  //md5 filename doesn't match asset filename - generate md5
 	{
 		int md5_exists = 0;
-		std::string md5_filename(second);
-		std::string md5_search_filename;
-
-		string_replace(md5_filename, "%s", _asset->filename);
-
-		boost::filesystem::path md5_file_fullpath(md5_filename);
-		boost::filesystem::path md5_dir_path = md5_file_fullpath.parent_path();
 		boost::filesystem::directory_iterator itr(md5_dir_path);
 		
-		//search for an existing md5 file for this file
+		//search for a pre-existing md5 file for this file
 		while (itr != boost::filesystem::directory_iterator())
 		{
 			// if it is a file
@@ -542,13 +559,8 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 				{
 					md5_exists = 1;
 
-					//std::cout << "MODTIMECOMPARE: " << compare_file_modified_time(asset_full_filename, md5_search_filename) << std::endl;
-					std::cout << asset_full_filename.c_str() << " : " << md5_search_filename << std::endl;
-
 					if(compare_file_modified_time(asset_full_filename, md5_search_filename) > 0)
 					{
-						std::cout << "compare matched" << std::endl;
-
 						md5_exists = 0;
 
 						log_mtx_.lock();
@@ -558,10 +570,11 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 						logstring.append(_asset->full_filename);
 						logstring.append(" - recreating MD5 file.");
 						logfile.write(logstring);
-						log_mtx_.unlock();
 						std::cout << "MD5 file" << md5_search_filename.c_str() << " is older than " << _asset->full_filename;
 						std::cout << " - recreating MD5 file." << std::endl;
+						log_mtx_.unlock();
 
+						list_mtx_.lock();
 						if(remove(md5_search_filename.c_str()) != 0)
 						{
 							log_mtx_.lock();
@@ -570,6 +583,17 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 							std::cout << "Error deleting " << md5_search_filename.c_str() << std::endl;
 							md5_exists = 1;
 						}
+						list_mtx_.unlock();
+					}
+					else
+					{
+						log_mtx_.lock();
+						logstring.assign("Valid MD5 file for ");
+						logstring.append(_asset->full_filename);
+						logstring.append(" exists - skipping");
+						logfile.write(logstring);
+						std::cout << "Valid MD5 file for " << _asset->full_filename << " already exists - skipping" << std::endl;
+						log_mtx_.unlock();
 					}
 				}
 			}
@@ -578,17 +602,40 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 
 		if(md5_exists == 0)  //create an MD5 file
 		{	
-			log_mtx_.lock();
-			std::cout << "Creating MD5 file " << md5_filename.c_str() << std::endl;
-			log_mtx_.unlock();
 			MD5 md5;
 
+			if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+			{
+				log_mtx_.lock();
+				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+				logstring.assign(_asset->full_filename);
+				logstring.append(" is changing in filesize - skipping ");
+				logfile.write(logstring);
+				log_mtx_.unlock();
+				return 1;
+			}
+
+			md5_hash = md5.digestFile(_asset->full_filename);
+			if(md5_hash != NULL)
+			{
+				list_mtx_.lock();
+				ofstream fout(md5_filename);
+				fout << md5_hash;
+				fout << endl;
+				fout << flush;
+				fout.close();
+				list_mtx_.unlock();
+			}
+
+			log_mtx_.lock();
+			std::cout << "Created MD5 file " << md5_filename << " for " << _asset->full_filename << std::endl;
+			logstring.assign("Creating MD5 file ");
+			logstring.assign(md5_filename.c_str());
+			logstring.assign(" for ");
+			logstring.assign(_asset->full_filename);
+			logfile.write(logstring);
+			log_mtx_.unlock();
 		}
-	}
-
-	else  // file is an MD5 file - has same extension as specified in config file
-	{
-
 	}
 
 	return true;

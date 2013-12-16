@@ -47,8 +47,6 @@ int compare_file_modified_time(std::string file1, std::string file2)
 
 	file_modified_time1 = file_modified_time(file1);
 	file_modified_time2 = file_modified_time(file2);
-
-	std::cout << file_modified_time1 << " : " << file_modified_time2 << endl;
 	
 	if(difftime(file_modified_time1, file_modified_time2) == 0)
 		result = 0;
