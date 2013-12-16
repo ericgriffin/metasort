@@ -1,7 +1,7 @@
 <project>
     <shortName>Metasort</shortName>
     <fullName>Metasort</fullName>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
     <installerFilename>${product_shortname}-setup.${platform_exec_suffix}</installerFilename>
     <leftImage>logo163.png</leftImage>
     <logoImage>logo48.png</logoImage>
@@ -131,6 +131,7 @@
             <path>${installdir}</path>
         </removeDirectoryFromPath>
     </postUninstallationActionList>
+    <disableSplashScreen>1</disableSplashScreen>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <outputDirectory>Release</outputDirectory>

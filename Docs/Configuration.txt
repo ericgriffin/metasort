@@ -184,6 +184,10 @@ rules
 				- deletes a file. As a safety precaution the actionparameter must be set to "IAMSURE" for this action to be enabled.
 				- actionparameter is "IAMSURE".
 
+			md5file
+				- generates a file containing the md5 hash of each file's contents.
+				- actionparameter is the location and name of the md5 files to create. The variable %s represents the filename matching the rule conditions.
+
 			copyonceCUSTOM1
 				- same as copyonce, but capitalizes all characters in the destination filename and removes all spaces, dashes and underscores from the destination filename.
 				- actionparameter is a destination path.

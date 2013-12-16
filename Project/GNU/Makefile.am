@@ -16,6 +16,7 @@ metasort_SOURCES = \
 			../../source/logfile.cpp \
 			../../source/util_functions.cpp \
 			../../source/rule_actions.cpp \
+			../../source/md5.cpp \
 			../../source/metasorter.cpp \
 			../../source/main.cpp
 

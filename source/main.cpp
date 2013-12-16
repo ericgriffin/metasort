@@ -19,7 +19,7 @@ using namespace boost::filesystem;
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Metasort 1.4.4" << std::endl << std::endl;
+	std::cout << "Metasort 1.4.5" << std::endl << std::endl;
 	//std::cout << "Copyright 2013 Eric Griffin" << std::endl << std::endl;
 
 	int err = 0;	
