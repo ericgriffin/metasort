@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	int input_file_num = 0;
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
 	char* config_file = (char*)malloc(sizeof(char[255][255]));
-	boost::property_tree::ptree pt[255];
+	boost::property_tree::ptree* pt = new boost::property_tree::ptree[255];
 
 	if (argc > 1)
 	{
@@ -124,8 +124,9 @@ int main(int argc, char* argv[])
 		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl << std::endl;
 	}
 
-	delete input_file;
-	delete config_file;
+	delete[] pt;
+	delete[] input_file;
+	delete[] config_file;
 	return err;
 }
 
