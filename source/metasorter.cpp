@@ -23,7 +23,9 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 			if(strcmp(v.first.c_str(), "logfile") == 0)
 			{
 				logging = 1;
+				log_mtx_.lock();
 				logfile.open(v.second.data().c_str());
+				log_mtx_.unlock();
 			}
 			
 			if(strcmp(v.first.c_str(), "file_inspection_time") == 0)
@@ -40,7 +42,9 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 
 	if(logging == 0)
 	{
+		log_mtx_.lock();
 		cout << "No logging defined in config file - aborting" << endl;
+		log_mtx_.unlock();
 		exit(0);
 	}
 
@@ -48,8 +52,10 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 	pt_check_existence = pt.get_child_optional("extensions");
 	if(!pt_check_existence)
 	{
+		log_mtx_.lock();
 		cout << "No extensions defined in config file - aborting" << endl;
 		logfile.close();
+		log_mtx_.unlock();
 		exit(0);
 	}
 
@@ -57,24 +63,30 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 	pt_check_existence = pt.get_child_optional("rules");
 	if(!pt_check_existence)
 	{
+		log_mtx_.lock();
 		cout << "No rules defined in config file - aborting" << endl;
 		logfile.close();
+		log_mtx_.unlock();
 		exit(0);
 	}
 
+	log_mtx_.lock();
 	logstring.assign("Entering folder ");
 	logstring.append(path);
 	logfile.write(logstring);
+	log_mtx_.unlock();
 
 }
 
 
 metasorter::~metasorter()
 {
+	log_mtx_.lock();
 	logstring.assign("Leaving folder ");
 	logstring.append(path);
 	logfile.write(logstring);
 	logfile.close();
+	log_mtx_.unlock();
 }
 
 
@@ -141,7 +153,6 @@ int metasorter::traverse_directory(int _recurse)
 		}
 	}
 
-	//delete _asset;
 	return err;
 }
 
@@ -178,11 +189,13 @@ int metasorter::call_MediaInfo(MediaInfo &MI, asset* _asset)
 
 	if (F == 0)
 	{
+		log_mtx_.lock();
 		logstring.assign("Can't open file ");
 		logstring.append(_asset->full_filename);
 		logstring.append(" for processing");
 		logfile.write(logstring);
 		std::cout << "Can't open file: " << _asset->full_filename << " for processing" << std::endl;
+		log_mtx_.unlock();
 		return 1;
 	}
 	unsigned char* From_Buffer = new unsigned char[7 * 188];	//prepare a memory buffer for reading
