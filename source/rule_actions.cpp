@@ -636,7 +636,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 			if(md5_hash != NULL)
 			{
 				list_mtx_.lock();
-				std::ofstream fout(md5_filename, std::ios::binary);
+				std::ofstream fout(md5_filename.c_str(), std::ios::binary);
 				fout << md5_hash;
 				fout << endl;
 				fout << flush;
