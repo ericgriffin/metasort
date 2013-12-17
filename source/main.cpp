@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 				std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
 				std::cout << "-c <config file>  --  specify configuration file to run" << std::endl;
 				std::cout << "-i <filename>  --  specify a single file to process (requires -c)" << std::endl;
-				std::cout << "-g  --  create a skeleton configuration file in the current directory" << std::endl;
+				std::cout << "-g  --  create a skeleton configuration file in the current directory" << std::endl << std::endl;
 				exit(0);
             }
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
+		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl << std::endl;
 	}
 	return err;
 }
@@ -154,8 +154,8 @@ void generate_skeleton_config()
 
 	std::ofstream f;
 	std::string *skeleton_config_file = new std::string(working_path_raw.string().c_str());
-	skeleton_config_file->append("\\metasort_config.ini");
-	std::cout << "Generating skeleton config file: " << skeleton_config_file->c_str() << std::endl;
+	skeleton_config_file->append("/metasort_config.ini");
+	std::cout << "Generating skeleton config file: " << skeleton_config_file->c_str() << std::endl << std::endl;
     f.open(skeleton_config_file->c_str(), std::ios::out);
 	f << config->c_str();
 	f.close();
