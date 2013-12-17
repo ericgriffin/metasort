@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
 	int config_num = 0;
 	int input_file_process = 0;
 	int input_file_num = 0;
-	char input_file[255][255];
-	char config_file[255][255];
+	char* input_file = (char*)malloc(sizeof(char[255][255]));
+	char* config_file = (char*)malloc(sizeof(char[255][255]));
 	boost::property_tree::ptree pt[255];
 
 	if (argc > 1)
@@ -55,14 +55,14 @@ int main(int argc, char* argv[])
 			{
                 if (strcmp(argv[i], "-c") == 0)
 				{
-                    strcpy(config_file[config_num], argv[i + 1]);
+                    strcpy(&config_file[config_num], argv[i + 1]);
 					config_num++;
 					required_flags++;
                 }
 				if (strcmp(argv[i], "-i") == 0)
 				{
 					input_file_process = 1;
-                    strcpy(input_file[input_file_num], argv[i + 1]);
+                    strcpy(&input_file[input_file_num], argv[i + 1]);
 					input_file_num++;
                 }
 			}
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	{		
 		for(int q = 0; q < config_num; q++)
 		{
-			boost::property_tree::info_parser::read_info(config_file[q], pt[q]);
+			boost::property_tree::info_parser::read_info(&config_file[q], pt[q]);
 		
 			// check for folders entry
 			optional<const boost::property_tree::ptree&> pt_check_existence;
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 			{
 				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
 				{
-					metasorter sorter(input_file[input_file_counter], pt[q]);
+					metasorter sorter(&input_file[input_file_counter], pt[q]);
 					sorter.process_file();
 				}
 				std::cout << endl << "Finished." << std::endl;
@@ -123,6 +123,9 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl << std::endl;
 	}
+
+	delete input_file;
+	delete config_file;
 	return err;
 }
 
