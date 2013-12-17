@@ -77,10 +77,10 @@ char* MD5::digestFile(char* filename)
     int len;
     unsigned char buffer[524288];
 
-    if(fopen_s(&file, filename, "rb"))
+	file = fopen(filename, "rb");
+	if (file == NULL)
 	{
-		cout << filename << " can't be opened" << endl;
-		//printf("%s can't be opened\n", filename);
+		std::cout << filename << " can't be opened" << endl;
 		return NULL;
 	}
 	else
@@ -115,7 +115,7 @@ void MD5::writeToString()
 	int pos;
     for(pos = 0; pos < 16; pos++)
 	{
-		sprintf_s(digestChars + (pos * 2), sizeof(digestChars + (pos * 2)), "%02x", digestRaw[pos]);
+		sprintf(digestChars + (pos * 2),"%02x", digestRaw[pos]);
 	}
 }
 
