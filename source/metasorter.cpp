@@ -177,7 +177,6 @@ int metasorter::process_file()
 		process_asset(_asset);
 	}
 
-	delete _asset;
 	return err;
 }
 

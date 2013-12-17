@@ -598,6 +598,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 							logstring.assign("Error deleting ");
 							logstring.append(md5_search_filename);
 							std::cout << "Error deleting " << md5_search_filename.c_str() << std::endl;
+							log_mtx_.unlock();
 							md5_exists = 1;
 						}
 						list_mtx_.unlock();
