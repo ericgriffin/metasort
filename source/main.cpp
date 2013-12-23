@@ -10,6 +10,7 @@
 #include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 void generate_skeleton_config();
 
@@ -77,7 +78,8 @@ int main(int argc, char* argv[])
 	{		
 		for(int q = 0; q < config_num; q++)
 		{
-			boost::property_tree::info_parser::read_info(&config_file[q], pt[q]);
+			//boost::property_tree::info_parser::read_info(&config_file[q], pt[q]);
+			boost::property_tree::xml_parser::read_xml(&config_file[q], pt[q]);
 		
 			// check for folders entry
 			optional<const boost::property_tree::ptree&> pt_check_existence;
