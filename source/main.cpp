@@ -10,7 +10,7 @@
 #include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
-#include <mediainfo/../ThirdParty/tinyxml2/tinyxml2.h>
+#include <boost/property_tree/xml_parser.hpp>
 
 void generate_skeleton_config();
 
@@ -32,8 +32,6 @@ int main(int argc, char* argv[])
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
 	char* config_file = (char*)malloc(sizeof(char[255][255]));
 	boost::property_tree::ptree* pt = new boost::property_tree::ptree[255];
-	tinyxml2::XMLDocument config = new tinyxml2::XMLDocument[255];
-
 
 	if (argc > 1)
 	{
@@ -80,18 +78,19 @@ int main(int argc, char* argv[])
 	{		
 		for(int q = 0; q < config_num; q++)
 		{
-			boost::property_tree::info_parser::read_info(&config_file[q], pt[q]);
+			//boost::property_tree::info_parser::read_info(&config_file[q], pt[q]);
+			boost::property_tree::xml_parser::read_xml(&config_file[q], pt[q]);
 		
 			// check for folders entry
 			optional<const boost::property_tree::ptree&> pt_check_existence;
-			pt_check_existence = pt[q].get_child_optional("folder");
+			pt_check_existence = pt[q].get_child_optional("folders");
 			
 			
 			if(input_file_process == 0)  // if processing folders from config
 			{
 				if(pt_check_existence)
 				{
-					BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folder"))
+					BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folders"))
 					{
 						int recurse = 0;
 						std::cout << "Searching Root Folder: " << v.first.data() << std::endl;
