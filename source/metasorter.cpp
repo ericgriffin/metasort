@@ -4,6 +4,8 @@
 #include "asset.h"
 #include "util_functions.h"
 
+asdfasdfaslkjasd;flkjasdf
+
 using namespace boost::filesystem;
 
 metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
