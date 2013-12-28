@@ -61,7 +61,6 @@ public:
 	~metasorter();
 	
 	char path[255];
-	//boost::property_tree::ptree pt;  //remove this
 	tinyxml2::XMLDocument* config;
 	std::string logstring;
 	LogFile logfile;
