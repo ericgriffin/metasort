@@ -24,6 +24,8 @@
 #include <boost/algorithm/string/case_conv.hpp> 
 #include <boost/threadpool.hpp>
 
+#include <mediainfo/../ThirdParty/tinyxml2/tinyxml2.h>
+
 #include "asset.h"
 #include "logfile.h"
 #include "util_functions.h"
@@ -55,11 +57,12 @@ class metasorter
 {
 		
 public:
-	metasorter(char*, boost::property_tree::ptree pt);
+	metasorter(char*, tinyxml2::XMLDocument* config);
 	~metasorter();
 	
 	char path[255];
-	boost::property_tree::ptree pt;
+	boost::property_tree::ptree pt;  //remove this
+	tinyxml2::XMLDocument* config;
 	std::string logstring;
 	LogFile logfile;
 	pool tp;
@@ -100,6 +103,8 @@ private:
 	int find_matches_ids[1024];
 	int find_matches_count;
 	int logging;
+	int extensions;
+	int rules;
 	boost::mutex list_mtx_;
 	boost::mutex log_mtx_;
 	boost::mutex hist_mtx_;

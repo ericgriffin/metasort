@@ -6,65 +6,84 @@
 
 using namespace boost::filesystem;
 
-metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
+metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 {
+	config = _config;
 	strcpy(path, _path);
-	pt = _pt;
 	tp.size_controller().resize(4);
 	file_inspection_time = 20000;
 	logging = 0;
-	optional<const boost::property_tree::ptree&> pt_check_existence;
-
-	pt_check_existence = pt.get_child_optional("config");
-	if(pt_check_existence)
+	extensions = 0;
+	rules = 0;
+	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
+	
+	// check logging entry in config file
+	if(xmlroot->FirstChildElement("logfile"))
 	{
-		BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("config"))
+		if(xmlroot->FirstChildElement("logfile")->Attribute("path"))
 		{
-			if(strcmp(v.first.c_str(), "logfile") == 0)
-			{
-				logging = 1;
-				log_mtx_.lock();
-				logfile.open(v.second.data().c_str());
-				log_mtx_.unlock();
-			}
-			
-			if(strcmp(v.first.c_str(), "file_inspection_time") == 0)
-			{
-				file_inspection_time = atoi(v.second.data().c_str());
-			}
-
-			if(strcmp(v.first.c_str(), "threadpool_size") == 0)
-			{
-				tp.size_controller().resize(atoi(v.second.data().c_str()));
-			}
+			logging = 1;
+			log_mtx_.lock();
+			logfile.open(xmlroot->FirstChildElement("logfile")->Attribute("path"));
+			log_mtx_.unlock();
 		}
 	}
 
 	if(logging == 0)
 	{
 		log_mtx_.lock();
-		cout << "No logging defined in config file - aborting" << endl;
+		std::cout << std::endl << "ERROR - No logging defined. Expecting <logfile path=[path]/> - aborting." << std::endl;
+		std::cout << "Finished." << std::endl;
 		log_mtx_.unlock();
 		exit(0);
 	}
+		
+	// check optional parameters in config file
+	if(xmlroot->FirstChildElement("file_inspection_time"))
+	{
+		if(xmlroot->FirstChildElement("file_inspection_time")->Attribute("value"))
+			file_inspection_time = atoi(xmlroot->FirstChildElement("file_inspection_time")->Attribute("value"));
+		else
+			std::cout << "WARNING - file_inspection_time override exists but no value is set." << endl;
+	}
 
-	// check extensions
-	pt_check_existence = pt.get_child_optional("extensions");
-	if(!pt_check_existence)
+	if(xmlroot->FirstChildElement("threadpool_size"))
+	{
+		if(xmlroot->FirstChildElement("threadpool_size")->Attribute("value"))
+			tp.size_controller().resize(atoi(xmlroot->FirstChildElement("threadpool_size")->Attribute("value")));
+		else
+			std::cout << "WARNING - threadpool_size override exists but no value is set." << endl;
+	}
+
+	// check extensions entries in config file
+	if(xmlroot->FirstChildElement("extension"))
+	{
+		if(xmlroot->FirstChildElement("extension")->Attribute("value"))
+			extensions = 1;
+	}
+	if(extensions == 0)
 	{
 		log_mtx_.lock();
-		cout << "No extensions defined in config file - aborting" << endl;
+		std::cout << "ERROR - No extensions defined. Expecting <extension value=[value]/> - aborting" << std::endl;
+		std::cout << "Finished." << std::endl;
 		logfile.close();
 		log_mtx_.unlock();
 		exit(0);
 	}
 
-	// check rules
-	pt_check_existence = pt.get_child_optional("rules");
-	if(!pt_check_existence)
+	// check rule entries in config file
+	if(xmlroot->FirstChildElement("rule"))
+	{
+		if(xmlroot->FirstChildElement("rule")->FirstChildElement("action"))
+		{
+			rules = 1;
+		}	
+	}
+	if (rules == 0)
 	{
 		log_mtx_.lock();
-		cout << "No rules defined in config file - aborting" << endl;
+		std::cout << "ERROR - No rules defined - aborting" << std::endl;
+		std::cout << "Finished." << std::endl;
 		logfile.close();
 		log_mtx_.unlock();
 		exit(0);
@@ -75,7 +94,6 @@ metasorter::metasorter(char* _path, boost::property_tree::ptree _pt)
 	logstring.append(path);
 	logfile.write(logstring);
 	log_mtx_.unlock();
-
 }
 
 
