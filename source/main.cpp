@@ -5,21 +5,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <mediainfo/../ThirdParty/tinyxml2/tinyxml2.h>
+
 #include "metasorter.h"
 
-#include <boost/foreach.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
 
 void generate_skeleton_config();
 
 using namespace std;
 using namespace boost::filesystem;
 
+std::string metasort_version("1.4.5");
+std::string config_version("1.x");
+
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Metasort 1.4.5" << std::endl << std::endl;
+	std::cout << "Metasort " << metasort_version << std::endl << std::endl;
 	//std::cout << "Copyright 2013 Eric Griffin" << std::endl << std::endl;
 
 	int err = 0;	
@@ -30,7 +32,7 @@ int main(int argc, char* argv[])
 	int input_file_num = 0;
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
 	char* config_file = (char*)malloc(sizeof(char[255][255]));
-	boost::property_tree::ptree* pt = new boost::property_tree::ptree[255];
+	tinyxml2::XMLDocument* config = new tinyxml2::XMLDocument[255];
 
 	if (argc > 1)
 	{
@@ -76,44 +78,66 @@ int main(int argc, char* argv[])
 	if(ok_to_run)
 	{		
 		for(int q = 0; q < config_num; q++)
-		{
-			boost::property_tree::info_parser::read_info(&config_file[q], pt[q]);
-		
-			// check for folders entry
-			optional<const boost::property_tree::ptree&> pt_check_existence;
-			pt_check_existence = pt[q].get_child_optional("folders");
+		{			
+			// parse the xml config file
+			if(config[q].LoadFile(&config_file[q]) != 0)
+			{
+				cout << endl << "ERROR - Could not load config file " << &config_file[q] << " - skipping" << std::endl;
+				config[q].Clear();
+				continue;
+			}
+
+			tinyxml2::XMLElement* xmlroot = config[q].FirstChildElement("metasort");
 			
+			// check config file version
+			if(config_version.compare(xmlroot->Attribute("version")) != 0)
+			{
+				std::cout << "ERROR - Wrong config version for " << &config_file[q] << ". ";
+				std::cout << "Expecting <metasort version=\"" << config_version << "\">" << std::endl;
+				config[q].Clear();
+				continue;
+			}
+
+			// check for folders entry in config
+			if(!xmlroot->FirstChildElement("folder"))
+			{
+				cout << "ERROR - No search folders defined in config file " << &config_file[q] << endl;
+				config[q].Clear();
+				continue;
+			}		
 			
 			if(input_file_process == 0)  // if processing folders from config
 			{
-				if(pt_check_existence)
+				for(tinyxml2::XMLElement *e = xmlroot->FirstChildElement("folder"); e != NULL; e = e->NextSiblingElement("folder"))
 				{
-					BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt[q].get_child("folders"))
+					std::cout << "Processing root folder " << e->Attribute("path");
+					
+					//check if folder should be searched recursively
+					int recurse = 0;
+					if(e->Attribute("recursive"))
 					{
-						int recurse = 0;
-						std::cout << "Searching Root Folder: " << v.first.data() << std::endl;
-						if(strcmp(v.second.data().c_str(), "R") == 0)
+						if(std::string("yes").compare(e->Attribute("recursive")) == 0 || std::string("1").compare(e->Attribute("recursive")) == 0 || std::string("true").compare(e->Attribute("recursive")) == 0)
 						{
 							recurse = 1;
+							std::cout << " recursively";
 						}
-						metasorter sorter((char*)v.first.data(), pt[q]);
-						sorter.traverse_directory(recurse);
-						sorter.tp.wait();
 					}
-					std::cout << endl << "Finished." << std::endl;
+
+					std::cout << endl;
+
+					metasorter sorter((char*)e->Attribute("path"), &config[q]);
+					sorter.traverse_directory(recurse);
+					sorter.tp.wait();
 				}
-				else
-				{
-					cout << endl << "No folders defined in config file - aborting" << std::endl;
-					exit(0);
-				}
+
+				std::cout << endl << "Finished." << std::endl;
 			}
-			else  // processing files from argv[]
+			else  // if processing files from argv[]
 			{
 				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
 				{
-					metasorter sorter(&input_file[input_file_counter], pt[q]);
-					sorter.process_file();
+					metasorter sorter(&input_file[input_file_counter], &config[q]);
+					//sorter.process_file();
 				}
 				std::cout << endl << "Finished." << std::endl;
 			}
@@ -124,9 +148,9 @@ int main(int argc, char* argv[])
 		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl << std::endl;
 	}
 
-	delete[] pt;
-	delete[] input_file;
-	delete[] config_file;
+	delete[] config;
+	free(input_file);
+	free(config_file);
 	return err;
 }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<metasort version="1.x">
+
+	<folder recurse="1" path="d:/temp/"/>
+	<folder recurse="0" path="d:/temp2/"/>
+
+	<extension value="[REGEX].*"/>
+	<extension value=".mpg"/>
+
+	<config>
+		<logfile path="./metasort.log"/>
+		<file_inspection_time time="1000"/>
+	</config>
+
+	<rules>
+		<rule name="copy large files">
+			<action type="copy" parameter="d:/temp3/"/>
+			<stream type="general" number="0">
+				<parameter name="file_modified_age" value=">4"/>
+				<parameter name="file_size" value=">10000"/>
+			</stream>
+			<stream type="video" number="1">
+				<parameter name="height" value=">640"/>
+				<parameter name="width" value=">480"/>
+			</stream>
+		</rule>
+
+		<rule name="md5 all files">
+			<action type="md5file" parameter="d:/temp/%s.md5"/>
+			<stream type="general" number="0">
+				<parameter name="file_modified_age" value=">-1"/>
+			</stream>
+		</rule>
+
+</metasort>
