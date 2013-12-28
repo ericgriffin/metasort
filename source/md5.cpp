@@ -75,7 +75,7 @@ char* MD5::digestFile(char* filename)
 
     FILE *file;
     int len;
-    unsigned char buffer[524288];
+    unsigned char* buffer = new unsigned char[524288];
 
 	file = fopen(filename, "rb");
 	if (file == NULL)
@@ -92,6 +92,8 @@ char* MD5::digestFile(char* filename)
 		Final();
 		fclose(file);
     }
+
+	delete[] buffer;
     return digestChars;
 }
 

@@ -126,8 +126,8 @@ int main(int argc, char* argv[])
 					std::cout << endl;
 
 					metasorter sorter((char*)e->Attribute("path"), &config[q]);
-					//sorter.traverse_directory(recurse);
-					//sorter.tp.wait();
+					sorter.traverse_directory(recurse);
+					sorter.tp.wait();
 				}
 
 				std::cout << endl << "Finished." << std::endl;
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 			{
 				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
 				{
-					//metasorter sorter(&input_file[input_file_counter], pt[q]);
+					metasorter sorter(&input_file[input_file_counter], &config[q]);
 					//sorter.process_file();
 				}
 				std::cout << endl << "Finished." << std::endl;
@@ -149,8 +149,8 @@ int main(int argc, char* argv[])
 	}
 
 	delete[] config;
-	delete[] input_file;
-	delete[] config_file;
+	free(input_file);
+	free(config_file);
 	return err;
 }
 

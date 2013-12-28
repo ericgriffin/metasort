@@ -61,7 +61,7 @@ public:
 	~metasorter();
 	
 	char path[255];
-	boost::property_tree::ptree pt;  //remove this
+	//boost::property_tree::ptree pt;  //remove this
 	tinyxml2::XMLDocument* config;
 	std::string logstring;
 	LogFile logfile;
@@ -72,7 +72,7 @@ public:
 	int traverse_directory(int);
 	int process_file();
 	int process_extensions(asset*);
-	int process_rule(asset*, std::string, std::string);
+	int process_rule(asset*, std::string, std::string, std::string);
 	int call_MediaInfo(MediaInfo &, asset *);
 	int custom_parameters(MediaInfoLib::String &, MediaInfo &, asset *, MediaInfoLib::stream_t, int, MediaInfoLib::String, int &);
 

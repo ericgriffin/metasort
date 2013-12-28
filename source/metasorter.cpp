@@ -39,20 +39,20 @@ metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 	}
 		
 	// check optional parameters in config file
-	if(xmlroot->FirstChildElement("file_inspection_time"))
+	if(xmlroot->FirstChildElement("file_inspection"))
 	{
-		if(xmlroot->FirstChildElement("file_inspection_time")->Attribute("value"))
-			file_inspection_time = atoi(xmlroot->FirstChildElement("file_inspection_time")->Attribute("value"));
+		if(xmlroot->FirstChildElement("file_inspection")->Attribute("time"))
+			file_inspection_time = atoi(xmlroot->FirstChildElement("file_inspection")->Attribute("time"));
 		else
-			std::cout << "WARNING - file_inspection_time override exists but no value is set." << endl;
+			std::cout << "WARNING - file_inspection time override exists but no value is set." << endl;
 	}
 
-	if(xmlroot->FirstChildElement("threadpool_size"))
+	if(xmlroot->FirstChildElement("threadpool"))
 	{
-		if(xmlroot->FirstChildElement("threadpool_size")->Attribute("value"))
-			tp.size_controller().resize(atoi(xmlroot->FirstChildElement("threadpool_size")->Attribute("value")));
+		if(xmlroot->FirstChildElement("threadpool")->Attribute("size"))
+			tp.size_controller().resize(atoi(xmlroot->FirstChildElement("threadpool")->Attribute("size")));
 		else
-			std::cout << "WARNING - threadpool_size override exists but no value is set." << endl;
+			std::cout << "WARNING - threadpool size override exists but no value is set." << endl;
 	}
 
 	// check extensions entries in config file
@@ -159,7 +159,6 @@ int metasorter::traverse_directory(int _recurse)
 				strcpy(_asset->extension, itr_r->path().filename().extension().string().c_str());
 
 				// filter extensions
-				
 
 				if(process_extensions(_asset) == 1)
 				{
@@ -254,26 +253,18 @@ int metasorter::process_asset(asset* _asset)
 	int MI_fetched = 0;
 	
 	// Process rules from config file
-	boost::property_tree::ptree pt1 = pt.get_child("rules");
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt1)
+	
+	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
+	
+	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("rule"); v != NULL; v = v->NextSiblingElement("rule"))
 	{
 		int match = 1;
-		BOOST_FOREACH(boost::property_tree::ptree::value_type &u, pt1.get_child(v.first.data()))
+
+		for (tinyxml2::XMLElement *u = v->FirstChildElement("stream"); u != NULL; u = u->NextSiblingElement("stream"))
 		{
-			//separate stream from stream number
-			std::string stream;
-			int stream_number = 0;
-			std::string s = u.first.data();
-			std::string delimiter = "_";
-			size_t pos = 0;
-			std::string token;
-			while ((pos = s.find(delimiter)) != std::string::npos)
-			{
-				token = s.substr(0, pos);
-				stream.assign(token);
-				s.erase(0, pos + delimiter.length());
-			}
-			stream_number = atoi(s.c_str());
+			//determine stream and stream number
+			std::string stream(u->Attribute("type"));
+			int stream_number = atoi(u->Attribute("number"));
 
 			#ifdef MEDIAINFO_LIBRARY
 				MediaInfoLib::stream_t stream_type = Stream_General;
@@ -289,7 +280,8 @@ int metasorter::process_asset(asset* _asset)
 			if(stream.compare("image") == 0) stream_type = Stream_Image;
 			if(stream.compare("menu") == 0) stream_type = Stream_Menu;
 
-			BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
+			//BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
+			for (tinyxml2::XMLElement *y = u->FirstChildElement("parameter"); y != NULL; y = y->NextSiblingElement("parameter"))
 			{
 				int exclude = 0;
 				int greater_than = 0;
@@ -298,12 +290,12 @@ int metasorter::process_asset(asset* _asset)
 				String asset_param_val;
 
 				// parameter name from config file
-				wchar_t* parameter_char = charToWChar(y.first.c_str());
+				wchar_t* parameter_char = charToWChar(y->Attribute("name"));
 				String parameter = String(parameter_char);
 				delete parameter_char;
 
 				// parameter value from config file
-				wchar_t* parameter_val_char = charToWChar(y.second.data().c_str());
+				wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
 				String parameter_val = String(parameter_val_char);
 				delete parameter_val_char;
 
@@ -390,8 +382,8 @@ int metasorter::process_asset(asset* _asset)
 						}
 					}
 
-					delete asset_param_intval;
-					delete configparam_intval;
+					delete[] asset_param_intval;
+					delete[] configparam_intval;
 				}
 
 				// handle regex comparison
@@ -444,23 +436,16 @@ int metasorter::process_asset(asset* _asset)
 		if(match == 1)
 		{
 			// rule matches - process rule
-			process_rule(_asset, v.first.data(), v.second.data());
+			std::string rule_type(v->FirstChildElement("action")->Attribute("type"));
+			std::string rule_parameter(v->FirstChildElement("action")->Attribute("parameter"));
+			std::string rule_name(v->Attribute("name"));
+			process_rule(_asset, rule_name, rule_type, rule_parameter);
 
 			// don't continue processing remaining rules if file has been moved/deleted
-			const char delimiters[] = "_";
-			char *tok;
-			std::string rulename = std::string((char*)v.first.data());
-			tok = strtok((char*)rulename.c_str(), delimiters);
-
-			while (tok != 0)
+			if (strcmp(v->FirstChildElement("action")->Attribute("type"), "move") == 0 || strcmp(v->FirstChildElement("action")->Attribute("type"), "delete") == 0)
 			{
-				if(strcmp(tok, "move") == 0 || strcmp(tok, "delete") == 0)
-				{
-					return 1;
-				}
-				tok = strtok(NULL, delimiters);
+				return 1;
 			}
-			delete tok;
 		}
 	}
 	delete _asset;
@@ -468,7 +453,7 @@ int metasorter::process_asset(asset* _asset)
 }
 
 
-int metasorter::process_rule(asset* _asset, std::string first, std::string second)
+int metasorter::process_rule(asset* _asset, std::string rule_name, ::string first, std::string second)
 {
 	int err = 0;
 
@@ -479,59 +464,45 @@ int metasorter::process_rule(asset* _asset, std::string first, std::string secon
 	logstring.append(":");
 	logstring.append(second);
 	logfile.write(logstring);
-	std::cout << std::endl << _asset->full_filename << " MATCHES RULE " << first << std::endl;
+	std::cout << std::endl << _asset->full_filename << " MATCHES RULE \"" << rule_name << "\"" << std::endl;
 	log_mtx_.unlock();
 
-	char_separator<char> sep("_");
-	tokenizer< char_separator<char> > tokens(first, sep);
-	int second_token = 0;  //keeps track of which token (before or after the '_') is being evaluated
-	BOOST_FOREACH (const std::string& t, tokens)
+	if (first.compare("list") == 0)
+		action_list(_asset, rule_name, second);
+
+	else if (first.compare("move") == 0)
+		action_move(_asset, rule_name, second);
+
+	else if (first.compare("fastmove") == 0)
+		action_fastmove(_asset, rule_name, second);
+
+	else if (first.compare("copy") == 0)
+		action_copy(_asset, rule_name, second);
+
+	else if (first.compare("copyonce") == 0)
+		action_copyonce(_asset, rule_name, second);
+
+	else if (first.compare("exec") == 0)
+		action_exec(_asset, rule_name, second);
+
+	else if (first.compare("delete") == 0)
+		action_delete(_asset, rule_name, second);
+
+	else if (first.compare("copyonceCUSTOM1") == 0)
+		action_copyonceCUSTOM1(_asset, rule_name, second);
+
+	else if (first.compare("md5file") == 0)
+		action_md5file(_asset, rule_name, second);
+
+	else 
 	{
-		if (second_token == 0)
-			second_token = 1;
-
-		else if(second_token == 1)  //only evaluate the token after the '_'
-		{
-			second_token = 0;
-
-			if(t.compare("list") == 0)
-				action_list(_asset, first, second);
-
-			else if(t.compare("move") == 0)
-				action_move(_asset, first, second);
-
-			else if(t.compare("fastmove") == 0)
-				action_fastmove(_asset, first, second);
-
-			else if(t.compare("copy") == 0)
-				action_copy(_asset, first, second);
-
-			else if(t.compare("copyonce") == 0)
-				action_copyonce(_asset, first, second);
-
-			else if(t.compare("exec") == 0)
-				action_exec(_asset, first, second);
-
-			else if(t.compare("delete") == 0)
-				action_delete(_asset, first, second);
-
-			else if(t.compare("copyonceCUSTOM1") == 0)
-				action_copyonceCUSTOM1(_asset, first, second);
-
-			else if(t.compare("md5file") == 0)
-				action_md5file(_asset, first, second);
-
-			else 
-			{
-				log_mtx_.lock();
-				logstring.assign("**ERROR** rule action: ");
-				logstring.append(first);
-				logstring.append(" is undefined");
-				logfile.write(logstring);
-				std::cout << std::endl << "**ERROR** rule action: " << first << " is undefined" << std::endl;
-				log_mtx_.unlock();
-			}
-		}
+		log_mtx_.lock();
+		logstring.assign("**ERROR** rule action: ");
+		logstring.append(first);
+		logstring.append(" is undefined");
+		logfile.write(logstring);
+		std::cout << std::endl << "**ERROR** rule action: " << first << " is undefined" << std::endl;
+		log_mtx_.unlock();
 	}
 
 	return err;
@@ -542,12 +513,14 @@ int metasorter::process_extensions(asset* _asset)
 {
 	int valid_extension = 0;
 
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("extensions"))
+	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
+
+	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("extension"); v != NULL; v = v->NextSiblingElement("extension"))
 	{
 		int ext_is_regex = 0;
 		String extension_prefix;
 		String extension_regex_suffix;
-		wchar_t* temp_str = charToWChar(v.first.data());
+		wchar_t* temp_str = charToWChar(v->Attribute("value"));
 		String full_extension = String(temp_str);
 		delete temp_str;
 		extension_prefix.assign(full_extension,0,7);
@@ -576,7 +549,7 @@ int metasorter::process_extensions(asset* _asset)
 
 		else
 		{
-			if(strcmp(_asset->extension, v.first.data()) == 0)
+			if(strcmp(_asset->extension, v->Attribute("value")) == 0)
 			{
 				valid_extension = 1;
 			}
