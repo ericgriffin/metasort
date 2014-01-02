@@ -24,7 +24,7 @@
 #include <boost/algorithm/string/case_conv.hpp> 
 #include <boost/threadpool.hpp>
 
-#include <mediainfo/../ThirdParty/tinyxml2/tinyxml2.h>
+#include <ThirdParty/tinyxml2/tinyxml2.h>
 
 #include "asset.h"
 #include "logfile.h"

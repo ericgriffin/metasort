@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mediainfo/../ThirdParty/tinyxml2/tinyxml2.h>
-
 #include "metasorter.h"
 
 
@@ -15,7 +13,7 @@ void generate_skeleton_config();
 using namespace std;
 using namespace boost::filesystem;
 
-std::string metasort_version("1.4.5");
+std::string metasort_version("1.4.6");
 std::string config_version("1.x");
 
 
