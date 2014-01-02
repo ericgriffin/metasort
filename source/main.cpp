@@ -164,21 +164,23 @@ void generate_skeleton_config()
 	//change back-slashes to forward-slashes
 	std::replace(working_path->begin(), working_path->end(), '\\', '/');
 
-	config->append("folders\n{\n\t;\"");
+	config->append("<metasort version=\"1.x\">\n");
+	config->append("\t<folder path=\"");
 	config->append(working_path->c_str());
-	config->append("/\" R\n}\n\nextensions\n{\n");
-	config->append("\t[REGEX].*");
-	config->append("\n}\n\nconfig\n{\n");
-	config->append("\tlogfile \"");
+	config->append("\" recursive=\"yes\" />\n\n");
+	config->append("\t<extension value=\"[REGEX].*\" />\n\n");
+	config->append("\t<logging path=\"");
 	config->append(working_path->c_str());
-	config->append("/metasort.log\"");
-	config->append("\n}\n\nrules\n{\n");
-	config->append("\tRule1_list \"");
+	config->append("/metasort.log\" />\n\n");
+	config->append("\t<rule name=\"Rule1\">\n");
+	config->append("\t\t<action type=\"list\" parameter=\"");
 	config->append(working_path->c_str());
-	config->append("/metasort_list.txt\"\n\t{\n");
-	config->append("\t\tGeneral_0\n\t\t{\n");
-	config->append("\t\t\tfile_size > 50\n\t\t}\n");
-	config->append("\n\t}\n}\n");
+	config->append("/metasort_list.txt\" />\n");
+	config->append("\t\t<stream type=\"general\" number=\"0\">\n");
+	config->append("\t\t\t<parameter name=\"file_size\" value=\">50\" />\n");
+	config->append("\t\t</stream>\n");
+	config->append("\t</rule>\n");
+	config->append("</metasort>\n");
 
 	std::ofstream f;
 	std::string *skeleton_config_file = new std::string(working_path_raw.string().c_str());

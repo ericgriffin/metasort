@@ -1,154 +1,112 @@
+Metasort XML Configuration
 
 
-A valid metasort configuration file contains these four sections:
-
-folders
-{
-...
-}
-
-extensions
-{
-...
-}
-
-config
-{
-...
-}
-
-rules
-{
-...
-}
+ELEMENT DESCRIPTIONS
 
 
-SECTION DESCRIPTIONS
+Folder Elements
 
-folders
+	<folder path="[path]" recurse="[boolean]" />
 
-	The folders section specifies one or more paths which should be searched by metasort. 
-	Each path should be on its own line.
+	The folder element is an empty-element tag which defines a path that should be searched by metasort, specified by the "path" attribute. 
 	All backslashes (\) should be entered as forward-slashes (/), and there should be a forward slash at the end of each folder path. 
-	Paths with spaces should be enclosed in quotation marks ("").
 	SAMBA/CIFS/UNC paths should have "//" before the server name.
-	An 'R' after a folder path designates that the path should be searched recursively.
+	The "recurse" attribute with values of "1", "true", or "yes" will cause metasort to recursively search the path. Values of "0", "false", "no", or the lack of a recurse attribute will cause metasort to search the specified path non-recursively.
 	
 	Example:
 
 		Metasort will search the following 3 folders. The last two UNC paths will be searched recursively:
 
-		folders
-		{
-			c:/folder/
-			//smbserver/folder/subfolder/ R
-			"//smbserver/folder a/sub folder/" R
-		}
+		<folder path="c:/folder/" />
+		<folder path="//smbserver/folder/subfolder/" recurse="yes"  />
+		<folder path="//smbserver/folder a/sub folder/" recurse="1" />
 
 
+Extension Elements
 
-extensions
+	<extension value="[value]" />
 
-	The extensions section specifies which file extensions should be scanned by metasort.
-	Any file extension which is not specified in this section will be ignored by metasort.
-	Each extension should be on its own line.
-	Each extension should include a '.' before the characters.
+	The extension element is an empty-element tag which defines a file extension which should be scanned by metasort.
+	Any file extension which is not defined by an extension element will be ignored by metasort.
+	The "value" attribute specified the characters matching the file extension.
+	Each extension's value attribute should include a '.' before the characters.
 	Regular expressions can be used by prefixing the extension pattern with '[REGEX]'.
 
 	Examples:
 
 		Metasort will only search files with a .mpg or .mpeg extension:
 
-		extensions
-		{
-			.mpg
-			.mpeg
-		}
+		<extension value=".mpg" />
+		<extension value=".mpeg" />
 
 
 		Metasort will search files with any extension:
 
-		extensions
-		{
-			[REGEX].*
-		}
+		<extension value="[REGEX].*" />
+
 
 		Metasort will search files with any extension beginning with 'm':
 
-		extensions
-		{
-			[REGEX].m*
-		}
+		<extension value="[REGEX].m*" />
 
 
+Configuration Elements
 
-config
-
-	The config section contains configuration parameters that are used by metasort.
-	If optional parameters are omitted then the default system value is used.
-	Each parameter should be on its own line.
+	Configuration elements define configuration values that are used by metasort.
+	If optional elements are omitted then the default system value is used.
 	All backslashes (\) should be entered as forward-slashes (/).
-	Paths with spaces should be enclosed in quotation marks ("").
 
-	Required parameters:
+	Required elements:
 
-		logfile [path_to_logfile]
+		<logging path="[path_to_logfile]" />
 
 			- specifies the file used for logging.
 
-	Optional parameters:
+	Optional elements:
 
-		file_inspection_time [time_in_milliseconds]
+		<file_inspection time="[time_in_milliseconds]" />
 
 			- specifies the period of time each file is examined for changes before performing an action on the file.
 			- default value is 20000 (20 seconds).
 
-		threadpool_size [number of threads]
+		<threadpool size="[number of threads]" />
 
 			- specifies the number of threads used in scanning files and performing actions. Larger number of threads can greatly speed up processing, particularly if using a large file_inspection_time. However, if say, 16 threads are used then potentially 16 files could be copied at the same time and would all compete for disk or network bandwidth.
 			- default value is 4.
+
 	Examples:
 
 		Metasort will log to the following file:
 
-		config
-		{
-			logfile c:/metasort/metasort.log 
-		}
+		<logging path="c:/metasort/metasort.log" /> 
 
 
 		Metasort will log to the specified file on the network, and examine each file for changes for 30 seconds before performing an action. Metasort will also use 8 threads:
 
-		config
-		{
-			logfile "//smbserver/log files/metasort.log"
-			file_inspection_time 30000
-			threadpool_size 8
-		}
+		<logging path="//smbserver/log files/metasort.log" />
+		<file_inspection time="30000" />
+		<threadpool size="8" />
 
 
-rules
+Rule Elements
 
-	The rules section contains one or more rules which specify an action to perform on a file when a set of conditions is met.
+	A rule element defines one or more actions to perform on a file when a set of conditions is met.
 
-	This is the general syntax for a rule:
+	This is the general schema for a rule:
 
-		rulename_action actionparameter
-	 	{
-			streamtype_streamnumber
-			{
-				parameter parametervalue
+		<rule name="[rulename]">
+	 		<action type="[action]" mode="[mode]" parameter="[actionparameter]" />
+	 		<stream type="[streamtype]" number="[streamnumber]"
+				<parameter name="[parameter]" value="[parametervalue]" />
 				...
-			}
+			</stream>
 			...
-		}
+		</rule>
 
 
 	rulename
 		rulename is used to identify and describe a rule.
 		This can be any combination of alphanumeric characters.
-		No spaces or underscores allowed.
-		Each rulename must be unique in the configuration file.
 		
 
 	action 
@@ -197,24 +155,28 @@ rules
 
 			Metasort will move the files to c:/destination/:
 
-			Rule1_move "c:/destination/"
-			{...}
+			<rule name="Rule 1">
+				<action type="move" parameter="c:/destination/" />
+				...
+			</rule>
+
 
 			Metasort will open the file with the VLC executable
 
-			Rule2_exec "\"C:/Program Files (x86)/VideoLAN/VLC/vlc.exe\" %s"
-			{...}
+			<rule name="Rule 2">
+				<action type="exec" parameter="\"C:/Program Files (x86)/VideoLAN/VLC/vlc.exe\" %s"
+				...
+			</rule>
 
 
 	actionparameter
 		This value is used by the action and its format/value is specific to each type of action. See the description of an action to determine what the value of actionparameter should be.
 		All backslashes (\) should be entered as forward-slashes (/).
 		If the value is a path (used in list, move, copy, etc.), then there should be a forward slash at the end of each path (/).
-		Values with spaces (paths or system commands) should be enclosed in quotation marks ("").
 
 
 	streamtype
-		streamtype specifies what type of metadata is to be evaluated by the parameters within the streamtype_streamnumber section. In other words, what type of stream is going to be evaluated. If streamtype_streamnumber is 'video_1', then the parameters within that section will be evaluated against the first video stream in the file. If streamtype_streamnumber is 'audio_4', then the parameters within that section will be evaluated against the 4th audio stream in the file.
+		streamtype specifies what type of metadata is to be evaluated by the parameters within the streamtype_streamnumber section. In other words, what type of stream is going to be evaluated. If streamtype is "video" and streamnumber is "1", then the parameters within that section will be evaluated against the first video stream in the file. If streamtype is "audio" and streamnumber is "4", then the parameters within that section will be evaluated against the 4th audio stream in the file.
 		streamtype 'general' is used for filesystem metadata and multimedia parameters which are not particular to an individual stream (ex. audio_layout).
 		
 		Possible values for streamtype are:
@@ -230,7 +192,7 @@ rules
 	streamnumber
 		streamnumber specifies the stream number to be evaluated by the parameters within the streamtype_streamnumber section.
 		It is a single numeric value (1, 2, 3, ...).
-		For streamtype general, streamnumber '0' is the only valid option.
+		For streamtype "general", streamnumber '0' is the only valid option.
 
 
 	parameter

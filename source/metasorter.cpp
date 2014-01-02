@@ -18,13 +18,13 @@ metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
 	
 	// check logging entry in config file
-	if(xmlroot->FirstChildElement("logfile"))
+	if(xmlroot->FirstChildElement("logging"))
 	{
-		if(xmlroot->FirstChildElement("logfile")->Attribute("path"))
+		if(xmlroot->FirstChildElement("logging")->Attribute("path"))
 		{
 			logging = 1;
 			log_mtx_.lock();
-			logfile.open(xmlroot->FirstChildElement("logfile")->Attribute("path"));
+			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
 			log_mtx_.unlock();
 		}
 	}
@@ -32,7 +32,7 @@ metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 	if(logging == 0)
 	{
 		log_mtx_.lock();
-		std::cout << std::endl << "ERROR - No logging defined. Expecting <logfile path=[path]/> - aborting." << std::endl;
+		std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
 		std::cout << "Finished." << std::endl;
 		log_mtx_.unlock();
 		exit(0);
@@ -135,7 +135,7 @@ int metasorter::traverse_directory(int _recurse)
 				if(process_extensions(_asset) == 1)
 				{
 					tp.schedule(boost::bind(&metasorter::process_asset, this, _asset));  // multi-threaded
-					//process_asset(_asset);  // single-threaded
+					/*process_asset(_asset);*/  // single-threaded
 				}
 			}
 			++itr;
@@ -161,7 +161,7 @@ int metasorter::traverse_directory(int _recurse)
 				if(process_extensions(_asset) == 1)
 				{
 					tp.schedule(boost::bind(&metasorter::process_asset, this, _asset));  // multi-threaded
-					//process_asset(_asset);  // single-threded
+					/*process_asset(_asset);*/  // single-threded
 				}
 			}
 			++itr_r;
