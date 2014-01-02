@@ -110,10 +110,8 @@ metasorter::~metasorter()
 
 int metasorter::traverse_directory(int _recurse)
 {
-	
 	int err = 0;
 
-	
 	boost::filesystem::path dir_path = boost::filesystem::path(path);
 	boost::filesystem::directory_iterator itr(dir_path);
 	boost::filesystem::recursive_directory_iterator itr_r(dir_path);

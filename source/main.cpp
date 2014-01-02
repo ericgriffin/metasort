@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
 				{
 					metasorter sorter(&input_file[input_file_counter], &config[q]);
-					//sorter.process_file();
+					sorter.process_file();
 				}
 				std::cout << endl << "Finished." << std::endl;
 			}
