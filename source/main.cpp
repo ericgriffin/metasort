@@ -19,7 +19,17 @@ std::string config_version("1.x");
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Metasort " << metasort_version << std::endl << std::endl;
+	std::cout << "Metasort " << metasort_version << std::endl;
+	std::cout << "Compiled " << timestring();
+	
+#if defined(_M_X64) || defined(__amd64__) || defined(_LP64) || defined(_WIN64)
+	std::cout << " for x86-64";
+#else
+	std::cout << " for x86";
+#endif
+
+	std::cout << std::endl << std::endl;
+
 	//std::cout << "Copyright 2013 Eric Griffin" << std::endl << std::endl;
 
 	int err = 0;	

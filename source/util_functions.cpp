@@ -165,3 +165,23 @@ int filesize_changing(char filename[255], int wait_time)
 	file.close();
 	return changing;
 }
+
+
+char * timestring()
+{
+# define TIME_SIZE 40
+
+	const struct std::tm *tm_ptr;
+	size_t len;
+	std::time_t now;
+	char *s;
+
+	now = std::time(NULL);
+	tm_ptr = std::localtime(&now);
+
+	s = new char[TIME_SIZE];
+
+	len = std::strftime(s, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr);
+	return s;
+# undef TIME_SIZE
+}
