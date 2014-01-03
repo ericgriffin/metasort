@@ -7,7 +7,7 @@
 
 #include "metasorter.h"
 
-
+void usage();
 void generate_skeleton_config();
 
 using namespace std;
@@ -28,6 +28,8 @@ int main(int argc, char* argv[])
 	int config_num = 0;
 	int input_file_process = 0;
 	int input_file_num = 0;
+	int files_examined = 0;
+	int rule_matches = 0;
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
 	char* config_file = (char*)malloc(sizeof(char[255][255]));
 	tinyxml2::XMLDocument* config = new tinyxml2::XMLDocument[255];
@@ -44,10 +46,7 @@ int main(int argc, char* argv[])
 
 			if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "/h") == 0)
 			{
-				std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
-				std::cout << "-c <config file>  --  specify configuration file to run" << std::endl;
-				std::cout << "-i <filename>  --  specify a single file to process (requires -c)" << std::endl;
-				std::cout << "-g  --  create a skeleton configuration file in the current directory" << std::endl << std::endl;
+				usage();
 				exit(0);
             }
 
@@ -77,18 +76,24 @@ int main(int argc, char* argv[])
 	{		
 		for(int q = 0; q < config_num; q++)
 		{			
+			// see if config file exists
+			if (!file_exists(std::string(&config_file[q])))
+			{
+				std::cout << endl << "ERROR - Config file " << &config_file[q] << " does not exist - skipping" << std::endl;
+				continue;
+			}
+
 			// parse the xml config file
 			if(config[q].LoadFile(&config_file[q]) != 0)
 			{
-				cout << endl << "ERROR - Could not load config file " << &config_file[q] << " - skipping" << std::endl;
-				config[q].Clear();
+				std::cout << endl << "ERROR - XML not valid in config file " << &config_file[q] << " - skipping" << std::endl;
 				continue;
 			}
 
 			tinyxml2::XMLElement* xmlroot = config[q].FirstChildElement("metasort");
 			
 			// check config file version
-			if(config_version.compare(xmlroot->Attribute("version")) != 0)
+			if(!xmlroot->Attribute("version") || config_version.compare(xmlroot->Attribute("version")) != 0)
 			{
 				std::cout << "ERROR - Wrong config version for " << &config_file[q] << ". ";
 				std::cout << "Expecting <metasort version=\"" << config_version << "\">" << std::endl;
@@ -97,38 +102,45 @@ int main(int argc, char* argv[])
 			}
 
 			// check for folders entry in config
-			if(!xmlroot->FirstChildElement("folder"))
+			if(!xmlroot->FirstChildElement("folder") || !xmlroot->FirstChildElement("folder")->Attribute("path"))
 			{
-				cout << "ERROR - No search folders defined in config file " << &config_file[q] << endl;
+				std::cout << "ERROR - No search folders defined in config file " << &config_file[q] << std::endl;
+				std::cout << "Expecting <folder path=\"[PATH]\" />" << std::endl;
 				config[q].Clear();
 				continue;
-			}		
+			}
 			
 			if(input_file_process == 0)  // if processing folders from config
 			{
+				// iterate through search paths
 				for(tinyxml2::XMLElement *e = xmlroot->FirstChildElement("folder"); e != NULL; e = e->NextSiblingElement("folder"))
 				{
-					std::cout << "Processing root folder " << e->Attribute("path");
-					
+					//check to see if path is valid
+					if (!path_exists(std::string(e->Attribute("path"))))
+					{
+						std::cout << "ERROR - search path does not exist: " << e->Attribute("path") << " - skipping" << std::endl;
+						continue;
+					}
+
 					//check if folder should be searched recursively
 					int recurse = 0;
 					if(e->Attribute("recursive"))
 					{
 						if(std::string("yes").compare(e->Attribute("recursive")) == 0 || std::string("1").compare(e->Attribute("recursive")) == 0 || std::string("true").compare(e->Attribute("recursive")) == 0)
-						{
 							recurse = 1;
-							std::cout << " recursively";
-						}
 					}
 
-					std::cout << endl;
-
 					metasorter sorter((char*)e->Attribute("path"), &config[q]);
+
+					std::cout << std::endl << "Processing folder " << e->Attribute("path");
+					if (recurse == 1)
+						std::cout << " recursively";
+					std::cout << std::endl;
 					sorter.traverse_directory(recurse);
 					sorter.tp.wait();
+					files_examined += sorter.files_examined;
+					rule_matches += sorter.rule_matches;
 				}
-
-				std::cout << endl << "Finished." << std::endl;
 			}
 			else  // if processing files from argv[]
 			{
@@ -136,20 +148,34 @@ int main(int argc, char* argv[])
 				{
 					metasorter sorter(&input_file[input_file_counter], &config[q]);
 					sorter.process_file();
+					files_examined += sorter.files_examined;
+					rule_matches += sorter.rule_matches;
 				}
-				std::cout << endl << "Finished." << std::endl;
 			}
 		}
+
+		std::cout << endl << "Finished." << std::endl;
+		std::cout << files_examined << " files examined." << std::endl << rule_matches << " rule matches." << std::endl;
 	}
+
 	else
 	{
-		std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl << std::endl;
+		usage();
 	}
 
 	delete[] config;
 	free(input_file);
 	free(config_file);
 	return err;
+}
+
+
+void usage()
+{
+	std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
+	std::cout << "-c <config file>  --  configuration file to use" << std::endl;
+	std::cout << "-i <filename>     --  process a single file (requires -c)" << std::endl;
+	std::cout << "-g                --  create a skeleton config file in current directory" << std::endl << std::endl;
 }
 
 
@@ -182,7 +208,7 @@ void generate_skeleton_config()
 
 	std::ofstream f;
 	std::string *skeleton_config_file = new std::string(working_path_raw.string().c_str());
-	skeleton_config_file->append("/metasort_config.ini");
+	skeleton_config_file->append("/metasort_config.xml");
 	std::cout << "Generating skeleton config file: " << skeleton_config_file->c_str() << std::endl << std::endl;
     f.open(skeleton_config_file->c_str(), std::ios::out);
 	f << config->c_str();

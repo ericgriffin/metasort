@@ -12,79 +12,13 @@ metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 	strcpy(path, _path);
 	tp.size_controller().resize(4);
 	file_inspection_time = 20000;
-	logging = 0;
-	extensions = 0;
-	rules = 0;
-	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
-	
-	// check logging entry in config file
-	if(xmlroot->FirstChildElement("logging"))
-	{
-		if(xmlroot->FirstChildElement("logging")->Attribute("path"))
-		{
-			logging = 1;
-			log_mtx_.lock();
-			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
-			log_mtx_.unlock();
-		}
-	}
+	files_examined = 0;
+	rule_matches = 0;
 
-	if(logging == 0)
+	if (int config_error = check_config(config) == 1)
 	{
 		log_mtx_.lock();
-		std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
-		std::cout << "Finished." << std::endl;
-		log_mtx_.unlock();
-		exit(0);
-	}
-		
-	// check optional parameters in config file
-	if(xmlroot->FirstChildElement("file_inspection"))
-	{
-		if(xmlroot->FirstChildElement("file_inspection")->Attribute("time"))
-			file_inspection_time = atoi(xmlroot->FirstChildElement("file_inspection")->Attribute("time"));
-		else
-			std::cout << "WARNING - file_inspection time override exists but no value is set." << endl;
-	}
-
-	if(xmlroot->FirstChildElement("threadpool"))
-	{
-		if(xmlroot->FirstChildElement("threadpool")->Attribute("size"))
-			tp.size_controller().resize(atoi(xmlroot->FirstChildElement("threadpool")->Attribute("size")));
-		else
-			std::cout << "WARNING - threadpool size override exists but no value is set." << endl;
-	}
-
-	// check extensions entries in config file
-	if(xmlroot->FirstChildElement("extension"))
-	{
-		if(xmlroot->FirstChildElement("extension")->Attribute("value"))
-			extensions = 1;
-	}
-	if(extensions == 0)
-	{
-		log_mtx_.lock();
-		std::cout << "ERROR - No extensions defined. Expecting <extension value=[value]/> - aborting" << std::endl;
-		std::cout << "Finished." << std::endl;
-		logfile.close();
-		log_mtx_.unlock();
-		exit(0);
-	}
-
-	// check rule entries in config file
-	if(xmlroot->FirstChildElement("rule"))
-	{
-		if(xmlroot->FirstChildElement("rule")->FirstChildElement("action"))
-		{
-			rules = 1;
-		}	
-	}
-	if (rules == 0)
-	{
-		log_mtx_.lock();
-		std::cout << "ERROR - No rules defined - aborting" << std::endl;
-		std::cout << "Finished." << std::endl;
-		logfile.close();
+		std::cout << "Configuration Error - exiting" << std::endl;
 		log_mtx_.unlock();
 		exit(0);
 	}
@@ -105,6 +39,98 @@ metasorter::~metasorter()
 	logfile.write(logstring);
 	logfile.close();
 	log_mtx_.unlock();
+}
+
+
+int metasorter::check_config(tinyxml2::XMLDocument* config)
+{
+	logging = 0;
+	extensions = 0;
+	rules = 0;
+
+	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
+
+	// check logging entry in config file
+	if (xmlroot->FirstChildElement("logging"))
+	{
+		if (xmlroot->FirstChildElement("logging")->Attribute("path"))
+		{
+			logging = 1;
+			log_mtx_.lock();
+			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
+			log_mtx_.unlock();
+		}
+	}
+
+	if (logging == 0)
+	{
+		log_mtx_.lock();
+		std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
+		std::cout << "Finished." << std::endl;
+		log_mtx_.unlock();
+		exit(0);
+	}
+
+	// check optional parameters in config file
+	if (xmlroot->FirstChildElement("file_inspection"))
+	{
+		if (xmlroot->FirstChildElement("file_inspection")->Attribute("time"))
+			file_inspection_time = atoi(xmlroot->FirstChildElement("file_inspection")->Attribute("time"));
+		else
+		{
+			log_mtx_.lock();
+			std::cout << "WARNING - file_inspection time override exists but no value is set." << endl;
+			log_mtx_.unlock();
+		}
+	}
+
+	if (xmlroot->FirstChildElement("threadpool"))
+	{
+		if (xmlroot->FirstChildElement("threadpool")->Attribute("size"))
+			tp.size_controller().resize(atoi(xmlroot->FirstChildElement("threadpool")->Attribute("size")));
+		else
+		{
+			log_mtx_.lock();
+			std::cout << "WARNING - threadpool size override exists but no value is set." << endl;
+			log_mtx_.unlock();
+		}
+	}
+
+	// check extensions entries in config file
+	if (xmlroot->FirstChildElement("extension"))
+	{
+		if (xmlroot->FirstChildElement("extension")->Attribute("value"))
+			extensions = 1;
+	}
+	if (extensions == 0)
+	{
+		log_mtx_.lock();
+		std::cout << "ERROR - No extensions defined. Expecting <extension value=[value]/> - aborting" << std::endl;
+		std::cout << "Finished." << std::endl;
+		logfile.close();
+		log_mtx_.unlock();
+		exit(0);
+	}
+
+	// check rule entries in config file
+	if (xmlroot->FirstChildElement("rule"))
+	{
+		if (xmlroot->FirstChildElement("rule")->FirstChildElement("action"))
+		{
+			rules = 1;
+		}
+	}
+	if (rules == 0)
+	{
+		log_mtx_.lock();
+		std::cout << "ERROR - No rules defined - aborting" << std::endl;
+		std::cout << "Finished." << std::endl;
+		logfile.close();
+		log_mtx_.unlock();
+		exit(0);
+	}
+
+	return 0;
 }
 
 
@@ -131,7 +157,6 @@ int metasorter::traverse_directory(int _recurse)
 				strcpy(_asset->extension, itr->path().filename().extension().string().c_str());
 
 				// filter extensions
-							
 				if(process_extensions(_asset) == 1)
 				{
 					tp.schedule(boost::bind(&metasorter::process_asset, this, _asset));  // multi-threaded
@@ -278,7 +303,6 @@ int metasorter::process_asset(asset* _asset)
 			if(stream.compare("image") == 0) stream_type = Stream_Image;
 			if(stream.compare("menu") == 0) stream_type = Stream_Menu;
 
-			//BOOST_FOREACH(boost::property_tree::ptree::value_type &y, pt1.get_child(v.first.data()).get_child(u.first.data()))
 			for (tinyxml2::XMLElement *y = u->FirstChildElement("parameter"); y != NULL; y = y->NextSiblingElement("parameter"))
 			{
 				int exclude = 0;
@@ -438,14 +462,18 @@ int metasorter::process_asset(asset* _asset)
 			std::string rule_parameter(v->FirstChildElement("action")->Attribute("parameter"));
 			std::string rule_name(v->Attribute("name"));
 			process_rule(_asset, rule_name, rule_type, rule_parameter);
+			rule_matches++;
 
 			// don't continue processing remaining rules if file has been moved/deleted
 			if (strcmp(v->FirstChildElement("action")->Attribute("type"), "move") == 0 || strcmp(v->FirstChildElement("action")->Attribute("type"), "delete") == 0)
 			{
-				return 1;
+				break;
 			}
 		}
 	}
+
+	files_examined++;
+
 	delete _asset;
 	return err;
 }
@@ -456,13 +484,12 @@ int metasorter::process_rule(asset* _asset, std::string rule_name, ::string firs
 	int err = 0;
 
 	log_mtx_.lock();
-	logstring.assign(_asset->full_filename);
-	logstring.append(" matches rule: ");
-	logstring.append(first);
-	logstring.append(":");
-	logstring.append(second);
+	logstring.assign("MATCH - ");
+	logstring.append(rule_name);
+	logstring.append(" : ");
+	logstring.append(_asset->full_filename);
 	logfile.write(logstring);
-	std::cout << std::endl << _asset->full_filename << " MATCHES RULE \"" << rule_name << "\"" << std::endl;
+	std::cout << std::endl << "MATCH - " << rule_name << " : " << _asset->full_filename << std::endl;
 	log_mtx_.unlock();
 
 	if (first.compare("list") == 0)

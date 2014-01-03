@@ -1,8 +1,7 @@
 #include "util_functions.h"
 
-
-
 using namespace std;
+
 
 bool Wait(const unsigned long &Time)
 {
@@ -16,6 +15,55 @@ void m_itoa(int value, std::string& buf, int base)
 	int i = 30;
 	buf = "";
 	for(; value && i ; --i, value /= base) buf = "0123456789abcdef"[value % base] + buf;
+}
+
+
+int test_create_file(std::string& _filepath)
+{
+	int retval = 0;
+	boost::filesystem::path* filepath = new boost::filesystem::path(_filepath);
+
+	if (file_exists(_filepath))
+	{
+		retval = 1;
+	}
+	else
+	{
+		std::ofstream file(_filepath);
+		if (file)
+		{
+			retval = 1;
+			file.close();
+		}
+		if (boost::filesystem::exists(*filepath))
+		{
+			boost::filesystem::remove(*filepath);
+		}
+	}
+
+	return retval;
+}
+
+
+int file_exists(std::string& _filepath)
+{
+	int retval = 0;
+	boost::filesystem::path* filepath = new boost::filesystem::path(_filepath);
+	if (boost::filesystem::exists(*filepath))
+		retval = 1;
+	delete filepath;
+	return retval;
+}
+
+
+int path_exists(std::string& path)
+{
+	int retval = 0;
+	boost::filesystem::path* dirpath = new boost::filesystem::path(path);
+	if (boost::filesystem::is_directory(*dirpath))
+		retval = 1;
+	delete dirpath;
+	return retval;
 }
 
 

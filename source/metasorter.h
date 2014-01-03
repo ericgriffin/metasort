@@ -66,7 +66,10 @@ public:
 	LogFile logfile;
 	pool tp;
 	int file_inspection_time;
+	int files_examined;
+	int rule_matches;
 	
+	int check_config(tinyxml2::XMLDocument*);
 	int process_asset(asset*);
 	int traverse_directory(int);
 	int process_file();
