@@ -23,6 +23,7 @@
 #include <boost/thread.hpp>
 #include <boost/algorithm/string/case_conv.hpp> 
 #include <boost/threadpool.hpp>
+#include <boost/timer.hpp>
 
 #include <ThirdParty/tinyxml2/tinyxml2.h>
 

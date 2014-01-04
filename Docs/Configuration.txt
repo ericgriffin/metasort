@@ -54,7 +54,7 @@ Configuration Elements
 
 	Configuration elements define configuration values that are used by metasort.
 	If optional elements are omitted then the default system value is used.
-	All backslashes (\) should be entered as forward-slashes (/).
+	All backslashes (\) in file paths should be entered as forward-slashes (/).
 
 	Required elements:
 
@@ -66,7 +66,7 @@ Configuration Elements
 
 		<file_inspection time="[time_in_milliseconds]" />
 
-			- specifies the period of time each file is examined for changes before performing an action on the file.
+			- specifies the duration of time that each file is examined for changes before performing an action on the file.
 			- default value is 20000 (20 seconds).
 
 		<threadpool size="[number of threads]" />
@@ -204,7 +204,7 @@ Rule Elements
 
 			audio_layout [layout]
 				- Each digit in layout represents an audio stream, the lowest stream being the left-most digit. The value of each digit is the number of channels in the stream.
-				- For example, "audio_layout 22" would catch any files which had 2 channels in the first stream, and 2 channels in the second stream. 'audio_layout 11111111' would catch any files which had 1 channel in all 8 streams.
+				- For example, "audio_layout 22" would catch any files which had 2 channels in the first stream, and 2 channels in the second stream. 'audio_layout 11111111' would catch any files which had 8 streams of monaural audio.
 				
 			file_size [size in KB]
 				- catches files whose size is represented by the field in Kilobytes.

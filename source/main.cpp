@@ -6,9 +6,8 @@
 #include <string.h>
 
 #include "metasorter.h"
+#include "usage.h"
 
-void usage();
-void generate_skeleton_config();
 
 using namespace std;
 using namespace boost::filesystem;
@@ -40,6 +39,7 @@ int main(int argc, char* argv[])
 	int input_file_num = 0;
 	int files_examined = 0;
 	int rule_matches = 0;
+	int running_time = 0;
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
 	char* config_file = (char*)malloc(sizeof(char[255][255]));
 	tinyxml2::XMLDocument* config = new tinyxml2::XMLDocument[255];
@@ -53,6 +53,52 @@ int main(int argc, char* argv[])
 				generate_skeleton_config();
 				exit(0);
             }
+
+			if (strcmp(argv[i], "-lactions") == 0)
+			{
+				list_actions();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-lstreams") == 0)
+			{
+				list_streams();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-lgeneral") == 0)
+			{
+				list_general_parameters();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-laudio") == 0)
+			{
+				list_audio_parameters();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-lvideo") == 0)
+			{
+				list_video_parameters();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-ltext") == 0)
+			{
+				list_text_parameters();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-lother") == 0)
+			{
+				list_other_parameters();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-limage") == 0)
+			{
+				list_image_parameters();
+				exit(0);
+			}
+			if (strcmp(argv[i], "-lmenu") == 0)
+			{
+				list_menu_parameters();
+				exit(0);
+			}
 
 			if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "/h") == 0)
 			{
@@ -84,6 +130,8 @@ int main(int argc, char* argv[])
 
 	if(ok_to_run)
 	{		
+		boost::timer elapsed_time; // start timing
+		
 		for(int q = 0; q < config_num; q++)
 		{			
 			// see if config file exists
@@ -142,12 +190,14 @@ int main(int argc, char* argv[])
 
 					metasorter sorter((char*)e->Attribute("path"), &config[q]);
 
-					std::cout << std::endl << "Processing folder " << e->Attribute("path");
 					if (recurse == 1)
-						std::cout << " recursively";
-					std::cout << std::endl;
+						std::cout << std::endl << "Processing recursively: " << e->Attribute("path") << std::endl;
+					else
+						std::cout << std::endl << "Processing: " << e->Attribute("path") << std::endl;
+
 					sorter.traverse_directory(recurse);
 					sorter.tp.wait();
+
 					files_examined += sorter.files_examined;
 					rule_matches += sorter.rule_matches;
 				}
@@ -158,14 +208,15 @@ int main(int argc, char* argv[])
 				{
 					metasorter sorter(&input_file[input_file_counter], &config[q]);
 					sorter.process_file();
+
 					files_examined += sorter.files_examined;
 					rule_matches += sorter.rule_matches;
 				}
 			}
 		}
 
-		std::cout << endl << "Finished." << std::endl;
-		std::cout << files_examined << " files examined." << std::endl << rule_matches << " rule matches." << std::endl;
+		std::cout << std::endl << files_examined << " files examined." << std::endl << rule_matches << " rule matches." << std::endl;
+		std::cout << std::endl << "Finished in " << elapsed_time.elapsed() << " seconds." << std::endl;
 	}
 
 	else
@@ -179,48 +230,3 @@ int main(int argc, char* argv[])
 	return err;
 }
 
-
-void usage()
-{
-	std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
-	std::cout << "-c <config file>  --  configuration file to use" << std::endl;
-	std::cout << "-i <filename>     --  process a single file (requires -c)" << std::endl;
-	std::cout << "-g                --  create a skeleton config file in current directory" << std::endl << std::endl;
-}
-
-
-void generate_skeleton_config()
-{
-	boost::filesystem::path working_path_raw(boost::filesystem::current_path());
-	std::string *config = new std::string();
-	std::string *working_path = new std::string(working_path_raw.string().c_str());
-	
-	//change back-slashes to forward-slashes
-	std::replace(working_path->begin(), working_path->end(), '\\', '/');
-
-	config->append("<metasort version=\"1.x\">\n");
-	config->append("\t<folder path=\"");
-	config->append(working_path->c_str());
-	config->append("\" recursive=\"yes\" />\n\n");
-	config->append("\t<extension value=\"[REGEX].*\" />\n\n");
-	config->append("\t<logging path=\"");
-	config->append(working_path->c_str());
-	config->append("/metasort.log\" />\n\n");
-	config->append("\t<rule name=\"Rule1\">\n");
-	config->append("\t\t<action type=\"list\" parameter=\"");
-	config->append(working_path->c_str());
-	config->append("/metasort_list.txt\" />\n");
-	config->append("\t\t<stream type=\"general\" number=\"0\">\n");
-	config->append("\t\t\t<parameter name=\"file_size\" value=\">50\" />\n");
-	config->append("\t\t</stream>\n");
-	config->append("\t</rule>\n");
-	config->append("</metasort>\n");
-
-	std::ofstream f;
-	std::string *skeleton_config_file = new std::string(working_path_raw.string().c_str());
-	skeleton_config_file->append("/metasort_config.xml");
-	std::cout << "Generating skeleton config file: " << skeleton_config_file->c_str() << std::endl << std::endl;
-    f.open(skeleton_config_file->c_str(), std::ios::out);
-	f << config->c_str();
-	f.close();
-}

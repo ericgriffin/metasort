@@ -11,6 +11,7 @@ AM_CPPFLAGS = \
 bin_PROGRAMS = metasort
 
 metasort_SOURCES = \
+			../../source/usage.cpp \
 			../../source/asset.cpp \
 			../../source/customparameters.cpp \
 			../../source/logfile.cpp \

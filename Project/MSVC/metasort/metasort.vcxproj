@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\Source\logfile.h" />
     <ClInclude Include="..\..\..\source\md5.h" />
     <ClInclude Include="..\..\..\Source\metasorter.h" />
+    <ClInclude Include="..\..\..\source\usage.h" />
     <ClInclude Include="..\..\..\source\util_functions.h" />
   </ItemGroup>
   <ItemGroup>
@@ -33,6 +34,7 @@
     <ClCompile Include="..\..\..\source\md5.cpp" />
     <ClCompile Include="..\..\..\Source\metasorter.cpp" />
     <ClCompile Include="..\..\..\source\rule_actions.cpp" />
+    <ClCompile Include="..\..\..\source\usage.cpp" />
     <ClCompile Include="..\..\..\source\util_functions.cpp" />
   </ItemGroup>
   <ItemGroup>
