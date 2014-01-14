@@ -70,6 +70,8 @@ void list_actions()
 	std::cout << "type = delete\t\tparameter = \"IAMSURE\"\n";
 	std::cout << "type = md5file\t\tparameter = <filename> (%s=filename)\n";
 	std::cout << "type = copyonceCUSTOM1\tparameter = <destination>\n";
+	std::cout << "type = moveCUSTOM1\tparameter = <destination>\n";
+	std::cout << "type = fastmoveCUSTOM1\tparameter = <destination>\n";
 }
 
 

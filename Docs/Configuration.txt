@@ -61,6 +61,7 @@ Configuration Elements
 		<logging path="[path_to_logfile]" />
 
 			- specifies the file used for logging.
+			- optional attribute "console=[boolean]" enables verbose console output (same as (and overridden by) -v on the command-line)
 
 	Optional elements:
 
@@ -76,9 +77,9 @@ Configuration Elements
 
 	Examples:
 
-		Metasort will log to the following file:
+		Metasort will log to the following file and display verbose console information:
 
-		<logging path="c:/metasort/metasort.log" /> 
+		<logging path="c:/metasort/metasort.log" console="yes" /> 
 
 
 		Metasort will log to the specified file on the network, and examine each file for changes for 30 seconds before performing an action. Metasort will also use 8 threads:
@@ -148,6 +149,14 @@ Rule Elements
 
 			copyonceCUSTOM1
 				- same as copyonce, but capitalizes all characters in the destination filename and removes all spaces, dashes and underscores from the destination filename.
+				- actionparameter is a destination path.
+
+			moveCUSTOM1
+				- same as move, but capitalizes all characters in the destination filename and removes all spaces, dashes and underscores from the destination filename.
+				- actionparameter is a destination path.
+				
+			fastmoveCUSTOM1
+				- same as fastmove, but capitalizes all characters in the destination filename and removes all spaces, dashes and underscores from the destination filename.
 				- actionparameter is a destination path.
 
 

@@ -8,58 +8,59 @@ using namespace boost::filesystem;
 
 metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 {
-	config = _config;
-	strcpy(path, _path);
-	tp.size_controller().resize(4);
-	file_inspection_time = 20000;
-	files_examined = 0;
-	rule_matches = 0;
-	verbose = 0;
+	this->config = _config;
+	strcpy(this->path, _path);
+	this->tp.size_controller().resize(4);
+	this->file_inspection_time = 20000;
+	this->files_examined = 0;
+	this->rule_matches = 0;
+	this->actions_performed = 0;
+	this->verbose = 0;
 
-	if (int config_error = check_config(config) == 1)
+	if (int config_error = this->check_config(this->config) == 1)
 	{
-		log_mtx_.lock();
+		this->log_mtx_.lock();
 		std::cout << "Configuration Error - exiting" << std::endl;
-		log_mtx_.unlock();
+		this->log_mtx_.unlock();
 		exit(0);
 	}
 
-	log_mtx_.lock();
-	logstring.assign("Entering folder ");
-	logstring.append(path);
-	logfile.write(logstring);
-	log_mtx_.unlock();
+	this->log_mtx_.lock();
+	this->logstring.assign("Entering folder ");
+	this->logstring.append(this->path);
+	this->logfile.write(this->logstring);
+	this->log_mtx_.unlock();
 }
 
 
 metasorter::~metasorter()
 {
-	log_mtx_.lock();
-	logstring.assign("Leaving folder ");
-	logstring.append(path);
-	logfile.write(logstring);
-	logfile.close();
-	log_mtx_.unlock();
+	this->log_mtx_.lock();
+	this->logstring.assign("Leaving folder ");
+	this->logstring.append(this->path);
+	this->logfile.write(this->logstring);
+	this->logfile.close();
+	this->log_mtx_.unlock();
 }
 
 
 int metasorter::check_config(tinyxml2::XMLDocument* config)
 {
-	logging = 0;
-	extensions = 0;
-	rules = 0;
+	this->logging = 0;
+	this->extensions = 0;
+	this->rules = 0;
 
 	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
 
-	// check logging entry in config file
+	/* check logging entry in config file */
 	if (xmlroot->FirstChildElement("logging"))
 	{
 		if (xmlroot->FirstChildElement("logging")->Attribute("path"))
 		{
-			logging = 1;
-			log_mtx_.lock();
-			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
-			log_mtx_.unlock();
+			this->logging = 1;
+			this->log_mtx_.lock();
+			this->logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
+			this->log_mtx_.unlock();
 		}
 		if (xmlroot->FirstChildElement("logging")->Attribute("console"))
 		{
@@ -68,16 +69,16 @@ int metasorter::check_config(tinyxml2::XMLDocument* config)
 		}
 	}
 
-	if (logging == 0)
+	if (this->logging == 0)
 	{
-		log_mtx_.lock();
+		this->log_mtx_.lock();
 		std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
 		std::cout << "Finished." << std::endl;
-		log_mtx_.unlock();
+		this->log_mtx_.unlock();
 		exit(0);
 	}
 
-	// check optional parameters in config file
+	/* check optional parameters in config file */
 	if (xmlroot->FirstChildElement("file_inspection"))
 	{
 		if (xmlroot->FirstChildElement("file_inspection")->Attribute("time"))
@@ -522,6 +523,12 @@ int metasorter::process_rule(asset* _asset, std::string rule_name, ::string firs
 
 	else if (first.compare("copyonceCUSTOM1") == 0)
 		action_copyonceCUSTOM1(_asset, rule_name, second);
+
+	else if (first.compare("moveCUSTOM1") == 0)
+		action_moveCUSTOM1(_asset, rule_name, second);
+
+	else if (first.compare("fastmoveCUSTOM1") == 0)
+		action_fastmoveCUSTOM1(_asset, rule_name, second);
 
 	else if (first.compare("md5file") == 0)
 		action_md5file(_asset, rule_name, second);

@@ -658,3 +658,104 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 
 	return true;
 }
+
+
+int metasorter::action_moveCUSTOM1(asset* _asset, std::string first, std::string second)
+{
+	if (filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	{
+		log_mtx_.lock();
+		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+		logstring.assign(_asset->full_filename);
+		logstring.append(" is changing in filesize - skipping ");
+		logfile.write(logstring);
+		log_mtx_.unlock();
+
+		return 1;
+	}
+	std::string newfile(second);
+
+	//convert filename to uppercase
+	std::string tempfilename_uppercase(_asset->filename);
+	std::string filename_CAPS = boost::algorithm::to_upper_copy(tempfilename_uppercase);
+
+	//remove space, underscore and dash from filenames
+	std::string::iterator end_pos;
+	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), ' ');
+	filename_CAPS.erase(end_pos, filename_CAPS.end());
+	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '-');
+	filename_CAPS.erase(end_pos, filename_CAPS.end());
+	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '_');
+	filename_CAPS.erase(end_pos, filename_CAPS.end());
+
+	newfile.append(filename_CAPS);
+
+	log_mtx_.lock();
+	logstring.assign("Moving ");
+	logstring.append(_asset->full_filename);
+	logstring.append(" to ");
+	logstring.append(newfile);
+	logfile.write(logstring);
+	std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
+	log_mtx_.unlock();
+
+	std::ifstream ifs(_asset->full_filename, std::ios::binary);
+	std::ofstream ofs(newfile.c_str(), std::ios::binary);
+	ofs << ifs.rdbuf();
+	ifs.close();
+	ofs.close();
+	if (remove(_asset->full_filename) != 0)
+	{
+		log_mtx_.lock();
+		std::cout << "Error deleting file" << _asset->full_filename << std::endl;
+		logstring.append("Error deleting file");
+		logstring.append(_asset->full_filename);
+		logfile.write(logstring);
+		log_mtx_.unlock();
+	}
+	return true;
+}
+
+
+int metasorter::action_fastmoveCUSTOM1(asset* _asset, std::string first, std::string second)
+{
+	if (filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	{
+		log_mtx_.lock();
+		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
+		logstring.assign(_asset->full_filename);
+		logstring.append(" is changing in filesize - skipping ");
+		logfile.write(logstring);
+		log_mtx_.unlock();
+
+		return 1;
+	}
+	std::string newfile(second);
+
+	//convert filename to uppercase
+	std::string tempfilename_uppercase(_asset->filename);
+	std::string filename_CAPS = boost::algorithm::to_upper_copy(tempfilename_uppercase);
+
+	//remove space, underscore and dash from filenames
+	std::string::iterator end_pos;
+	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), ' ');
+	filename_CAPS.erase(end_pos, filename_CAPS.end());
+	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '-');
+	filename_CAPS.erase(end_pos, filename_CAPS.end());
+	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '_');
+	filename_CAPS.erase(end_pos, filename_CAPS.end());
+
+	newfile.append(filename_CAPS);
+
+	log_mtx_.lock();
+	logstring.assign("Moving ");
+	logstring.append(_asset->full_filename);
+	logstring.append(" to ");
+	logstring.append(newfile);
+	logfile.write(logstring);
+	std::cout << "Moving " << _asset->full_filename << " to " << newfile << std::endl;
+	log_mtx_.unlock();
+
+	boost::filesystem::rename(_asset->full_filename, newfile.c_str());
+	return true;
+}

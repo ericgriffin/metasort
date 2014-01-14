@@ -70,6 +70,7 @@ public:
 	int file_inspection_time;
 	int files_examined;
 	int rule_matches;
+	int actions_performed;
 	
 	int check_config(tinyxml2::XMLDocument*);
 	int process_asset(asset*);
@@ -101,6 +102,8 @@ public:
 	int action_delete(asset*, std::string, std::string);
 	int action_md5file(asset*, std::string, std::string);
 	int action_copyonceCUSTOM1(asset*, std::string, std::string);
+	int action_moveCUSTOM1(asset*, std::string, std::string);
+	int action_fastmoveCUSTOM1(asset*, std::string, std::string);
 
 private:
 	static const int MAX_CHAR = 1024;
