@@ -14,6 +14,7 @@ metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 	file_inspection_time = 20000;
 	files_examined = 0;
 	rule_matches = 0;
+	verbose = 0;
 
 	if (int config_error = check_config(config) == 1)
 	{
@@ -59,6 +60,11 @@ int metasorter::check_config(tinyxml2::XMLDocument* config)
 			log_mtx_.lock();
 			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
 			log_mtx_.unlock();
+		}
+		if (xmlroot->FirstChildElement("logging")->Attribute("console"))
+		{
+			if (std::string("yes").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0 || std::string("1").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0)
+				this->verbose = 1;
 		}
 	}
 
@@ -489,7 +495,8 @@ int metasorter::process_rule(asset* _asset, std::string rule_name, ::string firs
 	logstring.append(" : ");
 	logstring.append(_asset->full_filename);
 	logfile.write(logstring);
-	std::cout << std::endl << "MATCH - " << rule_name << " : " << _asset->full_filename << std::endl;
+	if (verbose)
+		std::cout << std::endl << "MATCH - " << rule_name << " : " << _asset->full_filename << std::endl;
 	log_mtx_.unlock();
 
 	if (first.compare("list") == 0)

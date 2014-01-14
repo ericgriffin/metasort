@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
 	int files_examined = 0;
 	int rule_matches = 0;
 	int running_time = 0;
+	int verbose = 0;
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
 	char* config_file = (char*)malloc(sizeof(char[255][255]));
 	tinyxml2::XMLDocument* config = new tinyxml2::XMLDocument[255];
@@ -105,6 +106,11 @@ int main(int argc, char* argv[])
 				usage();
 				exit(0);
             }
+
+			if (strcmp(argv[i], "-v") == 0)
+			{
+				verbose = 1;
+			}
 
 			if (i + 1 != argc)
 			{
@@ -189,11 +195,15 @@ int main(int argc, char* argv[])
 					}
 
 					metasorter sorter((char*)e->Attribute("path"), &config[q]);
+					if (verbose == 1)
+						sorter.verbose = 1;
+					
+					std::cout << "Using " << sorter.tp.size() << " threads." << std::endl;
 
 					if (recurse == 1)
-						std::cout << std::endl << "Processing recursively: " << e->Attribute("path") << std::endl;
+						std::cout << std::endl << "Processing folder recursively: " << e->Attribute("path") << std::endl;
 					else
-						std::cout << std::endl << "Processing: " << e->Attribute("path") << std::endl;
+						std::cout << std::endl << "Processing folder: " << e->Attribute("path") << std::endl;
 
 					sorter.traverse_directory(recurse);
 					sorter.tp.wait();
@@ -207,6 +217,8 @@ int main(int argc, char* argv[])
 				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
 				{
 					metasorter sorter(&input_file[input_file_counter], &config[q]);
+					if (verbose == 1)
+						sorter.verbose = 1;
 					sorter.process_file();
 
 					files_examined += sorter.files_examined;

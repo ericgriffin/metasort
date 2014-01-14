@@ -1,10 +1,9 @@
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "metasorter.h"
-
+#include <boost/filesystem.hpp>
 
 void usage();
 void generate_skeleton_config();

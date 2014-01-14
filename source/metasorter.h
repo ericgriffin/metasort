@@ -66,6 +66,7 @@ public:
 	std::string logstring;
 	LogFile logfile;
 	pool tp;
+	int verbose;
 	int file_inspection_time;
 	int files_examined;
 	int rule_matches;
