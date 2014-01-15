@@ -8,47 +8,47 @@ using namespace boost::filesystem;
 
 metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 {
-	this->config = _config;
-	strcpy(this->path, _path);
-	this->tp.size_controller().resize(4);
-	this->file_inspection_time = 20000;
-	this->files_examined = 0;
-	this->rule_matches = 0;
-	this->actions_performed = 0;
-	this->verbose = 0;
+	config = _config;
+	strcpy(path, _path);
+	tp.size_controller().resize(4);
+	file_inspection_time = 20000;
+	files_examined = 0;
+	rule_matches = 0;
+	actions_performed = 0;
+	verbose = 0;
 
-	if (int config_error = this->check_config(this->config) == 1)
+	if (int config_error = check_config(config) == 1)
 	{
-		this->log_mtx_.lock();
+		log_mtx_.lock();
 		std::cout << "Configuration Error - exiting" << std::endl;
-		this->log_mtx_.unlock();
+		log_mtx_.unlock();
 		exit(0);
 	}
 
-	this->log_mtx_.lock();
-	this->logstring.assign("Entering folder ");
-	this->logstring.append(this->path);
-	this->logfile.write(this->logstring);
-	this->log_mtx_.unlock();
+	log_mtx_.lock();
+	logstring.assign("Entering folder ");
+	logstring.append(path);
+	logfile.write(logstring);
+	log_mtx_.unlock();
 }
 
 
 metasorter::~metasorter()
 {
-	this->log_mtx_.lock();
-	this->logstring.assign("Leaving folder ");
-	this->logstring.append(this->path);
-	this->logfile.write(this->logstring);
-	this->logfile.close();
-	this->log_mtx_.unlock();
+	log_mtx_.lock();
+	logstring.assign("Leaving folder ");
+	logstring.append(path);
+	logfile.write(logstring);
+	logfile.close();
+	log_mtx_.unlock();
 }
 
 
 int metasorter::check_config(tinyxml2::XMLDocument* config)
 {
-	this->logging = 0;
-	this->extensions = 0;
-	this->rules = 0;
+	logging = 0;
+	extensions = 0;
+	rules = 0;
 
 	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
 
@@ -57,24 +57,24 @@ int metasorter::check_config(tinyxml2::XMLDocument* config)
 	{
 		if (xmlroot->FirstChildElement("logging")->Attribute("path"))
 		{
-			this->logging = 1;
-			this->log_mtx_.lock();
-			this->logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
-			this->log_mtx_.unlock();
+			logging = 1;
+			log_mtx_.lock();
+			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
+			log_mtx_.unlock();
 		}
 		if (xmlroot->FirstChildElement("logging")->Attribute("console"))
 		{
 			if (std::string("yes").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0 || std::string("1").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0)
-				this->verbose = 1;
+				verbose = 1;
 		}
 	}
 
-	if (this->logging == 0)
+	if (logging == 0)
 	{
-		this->log_mtx_.lock();
+		log_mtx_.lock();
 		std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
 		std::cout << "Finished." << std::endl;
-		this->log_mtx_.unlock();
+		log_mtx_.unlock();
 		exit(0);
 	}
 
@@ -277,6 +277,7 @@ int metasorter::call_MediaInfo(MediaInfo &MI, asset* _asset)
 int metasorter::process_asset(asset* _asset)
 {
 	int err = 0;
+	int stop_processing_rules = 0;
 	String To_Display;
 
 	MediaInfo MI;
@@ -464,15 +465,39 @@ int metasorter::process_asset(asset* _asset)
 
 		if(match == 1)
 		{
-			// rule matches - process rule
-			std::string rule_type(v->FirstChildElement("action")->Attribute("type"));
-			std::string rule_parameter(v->FirstChildElement("action")->Attribute("parameter"));
+			// rule matches - process rule actions
 			std::string rule_name(v->Attribute("name"));
-			process_rule(_asset, rule_name, rule_type, rule_parameter);
+			log_mtx_.lock();
+			logstring.assign("MATCH - ");
+			logstring.append(rule_name);
+			logstring.append(" : ");
+			logstring.append(_asset->full_filename);
+			logfile.write(logstring);
+			if (verbose)
+				std::cout << std::endl << "MATCH - " << rule_name << " : " << _asset->full_filename << std::endl;
+			log_mtx_.unlock();
+
+			// loop through rule actions
+			for (tinyxml2::XMLElement *q = v->FirstChildElement("action"); q != NULL; q = q->NextSiblingElement("action"))
+			{
+				std::string rule_type(q->Attribute("type"));
+				std::string rule_parameter(q->Attribute("parameter"));
+
+				process_rule(_asset, rule_name, rule_type, rule_parameter);
+				actions_performed++;
+
+				// don't continue processing remaining rules if file has been moved/deleted
+				if (strcmp(q->Attribute("type"), "move") == 0 || strcmp(q->Attribute("type"), "delete") == 0)
+				{
+					stop_processing_rules = 1;
+					break;
+				}
+			}
+
 			rule_matches++;
 
 			// don't continue processing remaining rules if file has been moved/deleted
-			if (strcmp(v->FirstChildElement("action")->Attribute("type"), "move") == 0 || strcmp(v->FirstChildElement("action")->Attribute("type"), "delete") == 0)
+			if (stop_processing_rules == 1)
 			{
 				break;
 			}
@@ -489,16 +514,6 @@ int metasorter::process_asset(asset* _asset)
 int metasorter::process_rule(asset* _asset, std::string rule_name, ::string first, std::string second)
 {
 	int err = 0;
-
-	log_mtx_.lock();
-	logstring.assign("MATCH - ");
-	logstring.append(rule_name);
-	logstring.append(" : ");
-	logstring.append(_asset->full_filename);
-	logfile.write(logstring);
-	if (verbose)
-		std::cout << std::endl << "MATCH - " << rule_name << " : " << _asset->full_filename << std::endl;
-	log_mtx_.unlock();
 
 	if (first.compare("list") == 0)
 		action_list(_asset, rule_name, second);

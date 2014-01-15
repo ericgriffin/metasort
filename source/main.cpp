@@ -12,7 +12,7 @@
 using namespace std;
 using namespace boost::filesystem;
 
-std::string metasort_version("1.4.7");
+std::string metasort_version("1.4.8");
 std::string config_version("1.x");
 
 
@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
 	int input_file_num = 0;
 	int files_examined = 0;
 	int rule_matches = 0;
+	int actions_performed = 0;
 	int running_time = 0;
 	int verbose = 0;
 	char* input_file = (char*)malloc(sizeof(char[255][255]));
@@ -197,8 +198,6 @@ int main(int argc, char* argv[])
 					metasorter sorter((char*)e->Attribute("path"), &config[q]);
 					if (verbose == 1)
 						sorter.verbose = 1;
-					
-					std::cout << "Using " << sorter.tp.size() << " threads." << std::endl;
 
 					if (recurse == 1)
 						std::cout << std::endl << "Processing folder recursively: " << e->Attribute("path") << std::endl;
@@ -210,6 +209,7 @@ int main(int argc, char* argv[])
 
 					files_examined += sorter.files_examined;
 					rule_matches += sorter.rule_matches;
+					actions_performed += sorter.actions_performed;
 				}
 			}
 			else  // if processing files from argv[]
@@ -223,11 +223,14 @@ int main(int argc, char* argv[])
 
 					files_examined += sorter.files_examined;
 					rule_matches += sorter.rule_matches;
+					actions_performed += sorter.actions_performed;
 				}
 			}
 		}
 
-		std::cout << std::endl << files_examined << " files examined." << std::endl << rule_matches << " rule matches." << std::endl;
+		std::cout << std::endl << files_examined << " files examined." << std::endl;
+		std::cout << rule_matches << " rule matches." << std::endl;
+		std::cout << actions_performed << " actions performed." << std::endl;
 		std::cout << std::endl << "Finished in " << elapsed_time.elapsed() << " seconds." << std::endl;
 	}
 
