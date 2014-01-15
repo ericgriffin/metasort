@@ -88,7 +88,7 @@ void list_streams()
 }
 
 
-std::string general_parameters[500][3]
+const std::string general_parameters[500][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },
@@ -378,7 +378,7 @@ std::string general_parameters[500][3]
 };
 
 
-std::string audio_parameters[600][3]
+const std::string audio_parameters[600][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },
@@ -604,7 +604,7 @@ std::string audio_parameters[600][3]
 };
 
 
-std::string video_parameters[600][3]
+const std::string video_parameters[600][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },
@@ -873,7 +873,7 @@ std::string video_parameters[600][3]
 };
 
 
-std::string text_parameters[600][3]
+const std::string text_parameters[600][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },
@@ -1074,7 +1074,7 @@ std::string text_parameters[600][3]
 };
 
 
-std::string other_parameters[600][3]
+const std::string other_parameters[600][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },
@@ -1138,7 +1138,7 @@ std::string other_parameters[600][3]
 };
 
 
-std::string image_parameters[600][3]
+const std::string image_parameters[600][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },
@@ -1241,7 +1241,7 @@ std::string image_parameters[600][3]
 };
 
 
-std::string menu_parameters[600][3]
+const std::string menu_parameters[600][3] =
 {
 	{ "Count", "N NI", "Count of objects available in this stream" },
 	{ "Status", "N NI", "bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)" },

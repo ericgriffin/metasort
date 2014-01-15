@@ -85,7 +85,7 @@ char* MD5::digestFile(char* filename)
 	}
 	else
     {
-		while(len = (int)fread(buffer, 1, 524288, file))
+		while((len = (int)fread(buffer, 1, 524288, file)))
 		{
 			Update(buffer, len);
 		}
