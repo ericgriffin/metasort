@@ -45,7 +45,7 @@ int test_create_file(std::string& _filepath)
 }
 
 
-int file_exists(std::string& _filepath)
+int file_exists(const std::string& _filepath)
 {
 	int retval = 0;
 	boost::filesystem::path* filepath = new boost::filesystem::path(_filepath);
@@ -56,7 +56,7 @@ int file_exists(std::string& _filepath)
 }
 
 
-int path_exists(std::string& path)
+int path_exists(const std::string& path)
 {
 	int retval = 0;
 	boost::filesystem::path* dirpath = new boost::filesystem::path(path);
