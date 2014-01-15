@@ -487,7 +487,7 @@ int metasorter::process_asset(asset* _asset)
 				actions_performed++;
 
 				// don't continue processing remaining rules if file has been moved/deleted
-				if (strcmp(q->Attribute("type"), "move") == 0 || strcmp(q->Attribute("type"), "delete") == 0)
+				if (strcmp(q->Attribute("type"), "move") == 0 || strcmp(q->Attribute("type"), "delete") == 0 || strcmp(q->Attribute("type"), "fastmove") == 0 || strcmp(q->Attribute("type"), "moveCUSTOM1") == 0 || strcmp(q->Attribute("fastmoveCUSTOM1"), "delete") == 0)
 				{
 					stop_processing_rules = 1;
 					break;
