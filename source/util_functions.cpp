@@ -29,7 +29,7 @@ int test_create_file(std::string& _filepath)
 	}
 	else
 	{
-		std::ofstream file(_filepath);
+		std::ofstream file(_filepath.c_str());
 		if (file)
 		{
 			retval = 1;
