@@ -274,195 +274,273 @@ int metasorter::call_MediaInfo(MediaInfo &MI, asset* _asset)
 }
 
 
+int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, int logical_op)
+{
+	MediaInfo MI;
+	int MI_fetched = 0;
+	int match = 1;
+	int or_match = 0;
+
+	for (tinyxml2::XMLElement *u = v->FirstChildElement("stream"); u != NULL; u = u->NextSiblingElement("stream"))
+	{
+		//determine stream and stream number
+		std::string stream(u->Attribute("type"));
+		int stream_number = atoi(u->Attribute("number"));
+
+#ifdef MEDIAINFO_LIBRARY
+		MediaInfoLib::stream_t stream_type = Stream_General;
+#else
+		MediaInfoDLL::stream_t stream_type;
+#endif
+
+		if (stream.compare("audio") == 0) stream_type = Stream_Audio;
+		if (stream.compare("video") == 0) stream_type = Stream_Video;
+		if (stream.compare("general") == 0) stream_type = Stream_General;
+		if (stream.compare("text") == 0) stream_type = Stream_Text;
+		if (stream.compare("other") == 0) stream_type = Stream_Other;
+		if (stream.compare("image") == 0) stream_type = Stream_Image;
+		if (stream.compare("menu") == 0) stream_type = Stream_Menu;
+
+		for (tinyxml2::XMLElement *y = u->FirstChildElement("parameter"); y != NULL; y = y->NextSiblingElement("parameter"))
+		{
+			int parameter_match = 1;
+			int exclude = 0;
+			int greater_than = 0;
+			int less_than = 0;
+			int is_regex = 0;
+			String asset_param_val;
+
+			// parameter name from config file
+			wchar_t* parameter_char = charToWChar(y->Attribute("name"));
+			String parameter = String(parameter_char);
+			delete parameter_char;
+
+			// parameter value from config file
+			wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
+			String parameter_val = String(parameter_val_char);
+			delete parameter_val_char;
+
+			// assign asset parameter value
+			if (custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter, MI_fetched) == 1) {}
+			else
+			{
+				if (MI_fetched == 0)
+				{
+					call_MediaInfo(MI, _asset);
+					MI_fetched = 1;
+				}
+				asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
+			}
+
+			// check for and strip exclusive character
+			String param_prefix;
+			param_prefix.assign(parameter_val, 0, 1);
+			if (param_prefix.compare(L"!") == 0)
+			{
+				exclude = 1;
+				parameter_val.assign(parameter_val, 1, parameter_val.length());
+			}
+
+			// check for and strip greater-than or less-than
+			param_prefix.assign(parameter_val, 0, 1);
+			if (param_prefix.compare(L">") == 0)
+			{
+				greater_than = 1;
+				parameter_val.assign(parameter_val, 1, parameter_val.length());
+			}
+			if (param_prefix.compare(L"<") == 0)
+			{
+				less_than = 1;
+				parameter_val.assign(parameter_val, 1, parameter_val.length());
+			}
+
+			// check for and strip regular expression
+			param_prefix.assign(parameter_val, 0, 7);
+			if (param_prefix.compare(L"[REGEX]") == 0)
+			{
+				is_regex = 1;
+				parameter_val.assign(parameter_val, 7, parameter_val.length());
+			}
+
+			// handle greater-than less-than
+			if (less_than == 1 || greater_than == 1)
+			{
+				// convert values to integers
+				char* asset_param_intval = new char[255];
+				char* configparam_intval = new char[255];
+				wcstombs(asset_param_intval, asset_param_val.c_str(), wcslen(asset_param_val.c_str()) + 1);
+				wcstombs(configparam_intval, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
+
+				// handle less-than comparison
+				if (less_than == 1)
+				{
+					//cout << "Comparing Less than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
+					if (atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
+					{
+						if (exclude == 0) {}
+						else
+						{
+							match = 0;
+							parameter_match = 0;
+						}
+					}
+					else
+					{
+						if (exclude == 1) {}
+						else 
+						{
+							match = 0;
+							parameter_match = 0;
+						}
+					}
+				}
+
+				// handle greater-than comparison
+				if (greater_than == 1)
+				{
+					//cout << "Comparing Greater than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
+					if (atoi((const char*)asset_param_intval) > atoi((const char*)configparam_intval))
+					{
+						if (exclude == 0) {}
+						else
+						{
+							match = 0;
+							parameter_match = 0;
+						}
+					}
+					else
+					{
+						if (exclude == 1) {}
+						else
+						{
+							match = 0;
+							parameter_match = 0;
+						}
+					}
+				}
+
+				delete[] asset_param_intval;
+				delete[] configparam_intval;
+			}
+
+			// handle regex comparison
+			if (greater_than == 0 && less_than == 0 && is_regex == 1)
+			{
+				// convert parameter_val to char*
+				char* pattern = new char[255];
+				wcstombs(pattern, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
+				boost::regex EXPR(pattern, boost::regex::basic);
+
+				// convert MediaInfo::String::asset_param_val to std::string
+				std::string asset_param_val_str;
+				char* asset_param_val_char = new char[255];
+				wcstombs(asset_param_val_char, asset_param_val.c_str(), asset_param_val.length() + 1);
+				asset_param_val_str.assign(asset_param_val_char);
+
+				if (boost::regex_match(asset_param_val_str, EXPR) == 1)
+				{
+					if (exclude == 0) {}
+					else
+					{
+						match = 0;
+						parameter_match = 0;
+					}
+				}
+				else
+				{
+					if (exclude == 1) {}
+					else
+					{
+						match = 0;
+						parameter_match = 0;
+					}
+				}
+
+				delete[] pattern;
+				delete[] asset_param_val_char;
+			}
+
+			// handle default comparison
+			if (greater_than == 0 && less_than == 0 && is_regex == 0)
+			{
+				//cout << "Comparing: " << asset_param_val << " TO " << parameter_val << endl;
+				if (wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
+				{
+					if (exclude == 0) {}
+					else
+					{
+						match = 0;
+						parameter_match = 0;
+					}
+				}
+				else
+				{
+					if (exclude == 1) {}
+					else
+					{
+						match = 0;
+						parameter_match = 0;
+					}
+				}
+			}
+
+			// catch first failed match on "and" blocks and break loop
+			if (logical_op == 0 && match == 0)
+			{
+				break;
+			}
+
+			// catch first match on "or" blocks and break loop
+			if (logical_op == 1 && parameter_match == 1)
+			{
+				or_match = 1;
+				break;
+			}
+		}
+
+		// don't evaluate more "and" parameters if match is already false
+		if (logical_op == 0 && match == 0)
+		{
+			break;
+		}
+
+		// don't evaluate more "or" parameters if or_match is already true
+		if (logical_op == 1 && or_match == 1)
+		{
+			match = or_match;
+			break;
+		}
+	}
+	
+	return match;
+}
+
+
+
 int metasorter::process_asset(asset* _asset)
 {
 	int err = 0;
 	int stop_processing_rules = 0;
 	String To_Display;
-
-	MediaInfo MI;
-	int MI_fetched = 0;
-	
-	// Process rules from config file
 	
 	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
 	
+	// Process rules from config file
 	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("rule"); v != NULL; v = v->NextSiblingElement("rule"))
 	{
 		int match = 1;
 
-		for (tinyxml2::XMLElement *u = v->FirstChildElement("stream"); u != NULL; u = u->NextSiblingElement("stream"))
+		// process streams outside of conditional blocks
+		match = process_stream_blocks(_asset, v, 0);
+		
+		// process streams inside "or" blocks
+		for (tinyxml2::XMLElement *u = v->FirstChildElement("or"); u != NULL; u = u->NextSiblingElement("or"))
 		{
-			//determine stream and stream number
-			std::string stream(u->Attribute("type"));
-			int stream_number = atoi(u->Attribute("number"));
-
-			#ifdef MEDIAINFO_LIBRARY
-				MediaInfoLib::stream_t stream_type = Stream_General;
-			#else
-				MediaInfoDLL::stream_t stream_type;
-			#endif
-
-			if(stream.compare("audio") == 0) stream_type = Stream_Audio;
-			if(stream.compare("video") == 0) stream_type = Stream_Video;
-			if(stream.compare("general") == 0) stream_type = Stream_General;
-			if(stream.compare("text") == 0) stream_type = Stream_Text;
-			if(stream.compare("other") == 0) stream_type = Stream_Other;
-			if(stream.compare("image") == 0) stream_type = Stream_Image;
-			if(stream.compare("menu") == 0) stream_type = Stream_Menu;
-
-			for (tinyxml2::XMLElement *y = u->FirstChildElement("parameter"); y != NULL; y = y->NextSiblingElement("parameter"))
-			{
-				int exclude = 0;
-				int greater_than = 0;
-				int less_than = 0;
-				int is_regex = 0;
-				String asset_param_val;
-
-				// parameter name from config file
-				wchar_t* parameter_char = charToWChar(y->Attribute("name"));
-				String parameter = String(parameter_char);
-				delete parameter_char;
-
-				// parameter value from config file
-				wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
-				String parameter_val = String(parameter_val_char);
-				delete parameter_val_char;
-
-				// assign asset parameter value
-				if(custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter, MI_fetched) == 1) { }
-				else
-				{
-					if(MI_fetched == 0)
-					{
-						call_MediaInfo(MI, _asset);
-						MI_fetched = 1;
-					}
-					asset_param_val.assign(MI.Get(stream_type, stream_number, parameter).c_str(), sizeof(asset_param_val));
-				}
-
-				// check for and strip exclusive character
-				String param_prefix;
-				param_prefix.assign(parameter_val,0,1);
-				if(param_prefix.compare(L"!") == 0)
-				{
-					exclude = 1;
-					parameter_val.assign(parameter_val, 1, parameter_val.length());
-				}
-
-				// check for and strip greater-than or less-than
-				param_prefix.assign(parameter_val,0,1);
-				if(param_prefix.compare(L">") == 0)
-				{
-					greater_than = 1;
-					parameter_val.assign(parameter_val, 1, parameter_val.length());
-				}
-				if(param_prefix.compare(L"<") == 0)
-				{
-					less_than = 1;
-					parameter_val.assign(parameter_val, 1, parameter_val.length());
-				}
-
-				// check for and strip regular expression
-				param_prefix.assign(parameter_val,0,7);
-				if(param_prefix.compare(L"[REGEX]") == 0)
-				{
-					is_regex = 1;
-					parameter_val.assign(parameter_val, 7, parameter_val.length());
-				}
-
-				// handle greater-than less-than
-				if(less_than == 1 || greater_than == 1)
-				{
-					// convert values to integers
-					char* asset_param_intval = new char[255];
-					char* configparam_intval = new char[255];
-					wcstombs(asset_param_intval, asset_param_val.c_str(), wcslen(asset_param_val.c_str()) + 1);
-					wcstombs(configparam_intval, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
-
-					// handle less-than comparison
-					if(less_than == 1)
-					{
-						//cout << "Comparing Less than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
-						if(atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
-						{
-							if(exclude == 0) { }
-							else match = 0;
-						}
-						else
-						{
-							if(exclude == 1) { }
-							else match = 0;
-						}
-					}
-
-					// handle greater-than comparison
-					if(greater_than == 1)
-					{
-						//cout << "Comparing Greater than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
-						if(atoi((const char*)asset_param_intval) > atoi((const char*)configparam_intval))
-						{
-							if(exclude == 0) { }
-							else match = 0;
-						}
-						else
-						{
-							if(exclude == 1) { }
-							else match = 0;
-						}
-					}
-
-					delete[] asset_param_intval;
-					delete[] configparam_intval;
-				}
-
-				// handle regex comparison
-				if(greater_than == 0 && less_than == 0 && is_regex == 1)
-				{
-					// convert parameter_val to char*
-					char* pattern = new char[255];
-					wcstombs(pattern, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
-					boost::regex EXPR(pattern, boost::regex::basic);
-
-					// convert MediaInfo::String::asset_param_val to std::string
-					std::string asset_param_val_str;
-					char* asset_param_val_char = new char[255];
-					wcstombs(asset_param_val_char, asset_param_val.c_str(), asset_param_val.length() + 1);
-					asset_param_val_str.assign(asset_param_val_char);
-
-					if(boost::regex_match(asset_param_val_str, EXPR) == 1)
-					{
-						if(exclude == 0) { }
-						else match = 0;
-					}
-					else
-					{
-						if(exclude == 1) { }
-						else match = 0;
-					}
-
-					delete[] pattern;
-					delete[] asset_param_val_char;
-				}
-
-				// handle default comparison
-				if(greater_than == 0 && less_than == 0 && is_regex == 0)
-				{
-					//cout << "Comparing: " << asset_param_val << " TO " << parameter_val << endl;
-					if(wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
-					{
-						if(exclude == 0) { }
-						else match = 0;
-					}
-					else
-					{
-						if(exclude == 1) { }
-						else match = 0;
-					}
-				}
-			}
+			int or_match = process_stream_blocks(_asset, u, 1);
+			match = match && or_match;
+			//std::cout << or_match << std::endl;
 		}
-
+		
 		if(match == 1)
 		{
 			// rule matches - process rule actions
@@ -502,6 +580,7 @@ int metasorter::process_asset(asset* _asset)
 				break;
 			}
 		}
+
 	}
 
 	files_examined++;

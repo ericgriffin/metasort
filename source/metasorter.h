@@ -74,6 +74,7 @@ public:
 	
 	int check_config(tinyxml2::XMLDocument*);
 	int process_asset(asset*);
+	int process_stream_blocks(asset*, tinyxml2::XMLElement *, int);
 	int traverse_directory(int);
 	int process_file();
 	int process_extensions(asset*);

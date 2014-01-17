@@ -12,7 +12,7 @@
 using namespace std;
 using namespace boost::filesystem;
 
-std::string metasort_version("1.4.8");
+std::string metasort_version("1.4.9");
 std::string config_version("1.x");
 
 

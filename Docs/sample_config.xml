@@ -29,4 +29,13 @@
 		</stream>
 	</rule>
 
+	<rule name="list medium size files">
+		<action type="list" parameter="d:/temp/medim_size_files.txt"/>
+		<or>
+			<stream type="general" number="0">
+				<parameter name="file_size" value=">50"/>
+				<parameter name="file_size" value="<10000"/>
+			</stream>
+		</or>
+
 </metasort>

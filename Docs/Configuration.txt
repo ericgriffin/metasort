@@ -101,6 +101,12 @@ Rule Elements
 				<parameter name="[parameter]" value="[parametervalue]" />
 				...
 			</stream>
+			<or>
+				<stream type="[streamtype]" number="[streamnumber]"
+				<parameter name="[parameter]" value="[parametervalue]" />
+				...
+				</stream>
+			</or>
 			...
 		</rule>
 
@@ -251,3 +257,7 @@ Rule Elements
 			'<' signifies less-than.
 			'>' signifies greater-than.
 			'[REGEX]' signifies a regular expression.
+
+	<or> tag
+		By default all parameters in a rule must evaluate to true for a rule's action to be executed. The boolean values of parameters that are inside of an <or> tag are logically OR'd together, and that result determines whether the <or> block evaluates to true or false.
+		- an <or> tag must be the parent of <stream> tags.

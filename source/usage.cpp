@@ -374,6 +374,15 @@ const std::string general_parameters[500][3] =
 	{ "Played_Count", "Y YI", "Number of times an item was played;;Personal" },
 	{ "EPG_Positions_Begin", "N YI", ";;" },
 	{ "EPG_Positions_End", "N YI", ";;" },
+	{ "audio_layout", "N YI", "###### where # is the number of channels in audio stream n = number of characters from left" },
+	{ "file_size", "N YI", "size of the file in Kilobytes" },
+	{ "file_modified_age", "N YI", "difference between the current time and the file's modified date in minutes" },
+	{ "file_created_age", "N YI", "difference between the current time and the file's created date in minutes" },
+	{ "file_modified_date", "N YI", "the file's modified date in ISO format [YYYYMMDD]" },
+	{ "file_created_date", "N YI", "the file's created date in ISO format [YYYYMMDD]" },
+	{ "file_name", "N YI", "the file name excluding the path" },
+	{ "file_extension", "N YI", "the file's extension, including the '.'" },
+	{ "file_path", "N YI", "the file's path, excluding the filename" },
 	{ "END", "END", "END" }
 };
 
