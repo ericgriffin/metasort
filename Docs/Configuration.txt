@@ -99,6 +99,7 @@ Rule Elements
 	 		<action type="[action]" mode="[mode]" parameter="[actionparameter]" />
 	 		<stream type="[streamtype]" number="[streamnumber]"
 				<parameter name="[parameter]" value="[parametervalue]" />
+				<parameter name="[parameter]" range="[low]:[high]" />
 				...
 			</stream>
 			<or>

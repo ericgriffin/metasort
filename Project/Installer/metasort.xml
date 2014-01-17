@@ -1,7 +1,7 @@
 <project>
     <shortName>Metasort</shortName>
     <fullName>Metasort</fullName>
-    <version>1.4.9</version>
+    <version>1.5.0</version>
     <installerFilename>${product_shortname}-setup.${platform_exec_suffix}</installerFilename>
     <leftImage>logo163.png</leftImage>
     <logoImage>logo48.png</logoImage>

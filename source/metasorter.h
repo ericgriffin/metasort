@@ -14,6 +14,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>

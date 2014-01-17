@@ -308,17 +308,33 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			int greater_than = 0;
 			int less_than = 0;
 			int is_regex = 0;
+			int is_range = 0;
 			String asset_param_val;
+			String parameter;
+			String parameter_val;
 
 			// parameter name from config file
 			wchar_t* parameter_char = charToWChar(y->Attribute("name"));
-			String parameter = String(parameter_char);
+			parameter = String(parameter_char);
 			delete parameter_char;
 
+
 			// parameter value from config file
-			wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
-			String parameter_val = String(parameter_val_char);
-			delete parameter_val_char;
+			if (y->Attribute("value"))
+			{
+				wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
+				parameter_val = String(parameter_val_char);
+				delete parameter_val_char;
+			}
+
+			// parameter range from config file
+			if (y->Attribute("range"))
+			{
+				wchar_t* parameter_val_char = charToWChar(y->Attribute("range"));
+				parameter_val = String(parameter_val_char);
+				delete parameter_val_char;
+				is_range = 1;
+			}
 
 			// assign asset parameter value
 			if (custom_parameters(asset_param_val, MI, _asset, stream_type, stream_number, parameter, MI_fetched) == 1) {}
@@ -423,6 +439,50 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 				delete[] configparam_intval;
 			}
 
+
+			// handle range comparison
+			if (is_range == 1)
+			{
+				vector<string> param_low_high;
+				boost::split(param_low_high, parameter_val, is_any_of(":"));
+
+				if (param_low_high.size() < 2)
+				{
+					cout << "ERROR: parameter range used without \":\"";
+					return 0;
+				}
+				
+				char* asset_param_intval = new char[255];
+				char* configparam_low_intval = new char[255];
+				char* configparam_high_intval = new char[255];
+				
+				strcpy(configparam_low_intval, param_low_high.at(0).c_str());
+				strcpy(configparam_high_intval, param_low_high.at(1).c_str());
+
+				wcstombs(asset_param_intval, asset_param_val.c_str(), wcslen(asset_param_val.c_str()) + 1);
+				
+				if (atoi((const char*)asset_param_intval) >= atoi((const char*)configparam_low_intval) && atoi((const char*)asset_param_intval) <= atoi((const char*)configparam_high_intval))
+				{
+					if (exclude == 0) {}
+					else
+					{
+						match = 0;
+						parameter_match = 0;
+					}
+				}
+				else
+				{
+					if (exclude == 1) {}
+					else
+					{
+						match = 0;
+						parameter_match = 0;
+					}
+				}
+
+			}
+
+
 			// handle regex comparison
 			if (greater_than == 0 && less_than == 0 && is_regex == 1)
 			{
@@ -461,7 +521,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			}
 
 			// handle default comparison
-			if (greater_than == 0 && less_than == 0 && is_regex == 0)
+			if (greater_than == 0 && less_than == 0 && is_regex == 0 && is_range == 0)
 			{
 				//cout << "Comparing: " << asset_param_val << " TO " << parameter_val << endl;
 				if (wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
