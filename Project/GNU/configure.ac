@@ -48,7 +48,7 @@ AC_CHECK_FUNCS(clock_gettime, [], [
   ])
 ])
 
-LDFLAGS="-lmediainfo -lzen -lpthread -lz ../../Libraries/boost/stage/lib/libboost_filesystem.a ../../Libraries/boost/stage/lib/libboost_regex.a ../../Libraries/boost/stage/lib/libboost_system.a ../../Libraries/boost/stage/lib/libboost_thread.a ../../Libraries/boost/stage/lib/libboost_date_time.a $LDFLAGS"
+LDFLAGS="-lmediainfo -lzen -lpthread -lz ../../lib/boost/stage/lib/libboost_filesystem.a ../../lib/boost/stage/lib/libboost_regex.a ../../lib/boost/stage/lib/libboost_system.a ../../lib/boost/stage/lib/libboost_thread.a ../../lib/boost/stage/lib/libboost_date_time.a $LDFLAGS"
 
 AC_CONFIG_FILES([Makefile])
 

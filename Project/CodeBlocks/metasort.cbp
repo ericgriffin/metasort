@@ -70,26 +70,26 @@
 		</Build>
 		<Compiler>
 			<Add option="-DUNICODE" />
-			<Add directory="../../Libraries/boost" />
-			<Add directory="../../Libraries/ZenLib/Source" />
-			<Add directory="../../Libraries/MediaInfoLib/Source" />
-			<Add directory="../../Libraries/zlib" />
+			<Add directory="../../lib/boost" />
+			<Add directory="../../lib/ZenLib/Source" />
+			<Add directory="../../lib/MediaInfoLib/Source" />
+			<Add directory="../../lib/zlib" />
 		</Compiler>
 		<Linker>
 			<Add option="-lrt" />
 			<Add library="libmediainfo.a" />
-			<Add library="../../Libraries/boost/stage/lib/libboost_filesystem.a" />
-			<Add library="../../Libraries/boost/stage/lib/libboost_regex.a" />
-			<Add library="../../Libraries/boost/stage/lib/libboost_system.a" />
+			<Add library="../../lib/boost/stage/lib/libboost_filesystem.a" />
+			<Add library="../../lib/boost/stage/lib/libboost_regex.a" />
+			<Add library="../../lib/boost/stage/lib/libboost_system.a" />
 			<Add library="libzen.a" />
 			<Add library="libpthread.a" />
 			<Add library="libz.a" />
-			<Add library="../../Libraries/boost/stage/lib/libboost_thread.a" />
-			<Add library="../../Libraries/boost/stage/lib/libboost_date_time.a" />
-			<Add directory="../../Libraries/boost/stage/lib" />
-			<Add directory="../../Libraries/MediaInfoLib/Project/GNU/Library/.libs" />
-			<Add directory="../../Libraries/ZenLib/Project/GNU/Library/.libs" />
-			<Add directory="../../Libraries/zlib" />
+			<Add library="../../lib/boost/stage/lib/libboost_thread.a" />
+			<Add library="../../lib/boost/stage/lib/libboost_date_time.a" />
+			<Add directory="../../lib/boost/stage/lib" />
+			<Add directory="../../lib/MediaInfoLib/Project/GNU/Library/.libs" />
+			<Add directory="../../lib/ZenLib/Project/GNU/Library/.libs" />
+			<Add directory="../../lib/zlib" />
 		</Linker>
 		<Unit filename="../../source/asset.cpp" />
 		<Unit filename="../../source/asset.h" />

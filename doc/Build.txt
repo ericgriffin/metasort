@@ -1,0 +1,9 @@
+Tools needed:
+
+Windows:
+Microsoft Visual Studio
+
+Linux/OS X:
+Libtool
+GNU GCC / CLANG
+

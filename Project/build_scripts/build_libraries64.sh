@@ -1,6 +1,6 @@
 #!/bin/bash
 #build zlib
-cd ../../Libraries/
+cd ../../lib/
 cd ./zlib/
 ./configure
 make

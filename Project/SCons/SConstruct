@@ -1,0 +1,14 @@
+
+env=Environment(CPPPATH='../../source/',
+                CPPDEFINES=[''],
+                LIBS=[''])
+
+#SConscript('../../source', variant_dir='build', duplicate=0)
+
+env.Append(CPPPATH = ['../../lib/boost/'])
+env.Append(CPPPATH = ['../../lib/MediaInfoLib/Source/'])
+env.Append(CPPPATH = ['../../lib/ZenLib/Source/'])
+env.Append(CPPPATH = ['../../lib/zlib/'])
+
+
+env.Program('metasort', Glob('../../source/*.cpp'))
