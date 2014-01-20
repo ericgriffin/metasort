@@ -19,7 +19,7 @@ std::string config_version("1.x");
 int main(int argc, char* argv[])
 {
 	std::cout << "Metasort " << metasort_version << std::endl;
-	std::cout << "Compiled " << timestring();
+	std::cout << "Compiled " << __DATE__ << " " << __TIME__;
 	
 #if defined(_M_X64) || defined(__amd64__) || defined(_LP64) || defined(_WIN64)
 	std::cout << " for x86-64";
