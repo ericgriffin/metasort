@@ -281,6 +281,36 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 	int match = 1;
 	int or_match = 0;
 
+	// recurse "or" blocks
+	for (tinyxml2::XMLElement *u = v->FirstChildElement("or"); u != NULL; u = u->NextSiblingElement("or"))
+	{
+		int rec_or_match = process_stream_blocks(_asset, u, 1);
+		//std::cout << "exited OR block. or_match: " << rec_or_match << " match: " << match << " match&sub_or_match:" << (match & rec_or_match) << std::endl;
+		
+		if (logical_op == 1)
+		{
+			or_match = or_match | rec_or_match;
+			match = or_match;
+		}
+		else
+			match = match & rec_or_match;
+	}
+
+	// recurse "and" blocks
+	for (tinyxml2::XMLElement *u = v->FirstChildElement("and"); u != NULL; u = u->NextSiblingElement("and"))
+	{
+		int rec_and_match = process_stream_blocks(_asset, u, 0);
+		//std::cout << "exited AND block. and_match: " << rec_and_match << " match: " << match << " match&and_match:" << (match & rec_and_match) << std::endl;
+		
+		if (logical_op == 1)
+		{
+			or_match = or_match | rec_and_match;
+			match = or_match;
+		}
+		else
+			match = match & rec_and_match;
+	}
+
 	for (tinyxml2::XMLElement *u = v->FirstChildElement("stream"); u != NULL; u = u->NextSiblingElement("stream"))
 	{
 		//determine stream and stream number
@@ -571,7 +601,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			break;
 		}
 	}
-	
+
 	return match;
 }
 
@@ -593,14 +623,8 @@ int metasorter::process_asset(asset* _asset)
 		// process streams outside of conditional blocks
 		match = process_stream_blocks(_asset, v, 0);
 		
-		// process streams inside "or" blocks
-		for (tinyxml2::XMLElement *u = v->FirstChildElement("or"); u != NULL; u = u->NextSiblingElement("or"))
-		{
-			int or_match = process_stream_blocks(_asset, u, 1);
-			match = match && or_match;
-			//std::cout << or_match << std::endl;
-		}
 		
+
 		if(match == 1)
 		{
 			// rule matches - process rule actions
