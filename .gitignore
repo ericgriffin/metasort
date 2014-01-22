@@ -19,6 +19,7 @@ build/
 autom4te.cache
 
 !lib/boost/tools/build/
+!lib/boost/boost/preprocessor/debug/
 
 lib/boost/stage/lib/
 lib/boost/bin.v2/
