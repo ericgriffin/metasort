@@ -281,20 +281,6 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 	int match = 1;
 	int or_match = 0;
 
-	// recurse "not" blocks
-	for (tinyxml2::XMLElement *u = v->FirstChildElement("not"); u != NULL; u = u->NextSiblingElement("not"))
-	{
-		int rec_not_match = process_stream_blocks(_asset, u, 2);
-		
-		if (logical_op == 1)
-		{
-			or_match = (or_match | rec_not_match) ^ 1;
-			match = (or_match) ^ 1;
-		}
-		else
-			match = (match & rec_not_match) ^ 1;
-	}
-
 	// recurse "or" blocks
 	for (tinyxml2::XMLElement *u = v->FirstChildElement("or"); u != NULL; u = u->NextSiblingElement("or"))
 	{
