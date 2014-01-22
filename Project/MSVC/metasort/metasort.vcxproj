@@ -100,7 +100,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
