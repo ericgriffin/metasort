@@ -426,6 +426,7 @@
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_SmpteSt0302.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_SmpteSt0331.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_SmpteSt0337.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Export\Export_EbuCore.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Export\Export_reVTMD.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\File__Analyze.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\File__Analyze_Buffer.cpp" />
@@ -488,6 +489,7 @@
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_TwinVQ.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_Vorbis.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Audio\File_Wvpk.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Aaf.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ancillary.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_DashMpd.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_DcpAm.cpp" />
@@ -504,6 +506,7 @@
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Lxf.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_P2_Clip.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Pmp.cpp" />
+    <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Ptx.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_SequenceInfo.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File_Xdcam_Clip.cpp" />
     <ClCompile Include="..\..\..\Source\MediaInfo\Multiple\File__ReferenceFilesHelper.cpp" />
@@ -648,6 +651,7 @@
     <ClInclude Include="..\..\..\Source\MediaInfo\Audio\File_SmpteSt0302.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Audio\File_SmpteSt0331.h" />
     <ClInclude Include="..\..\..\source\mediainfo\audio\File_SmpteSt0337.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Export\Export_EbuCore.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Export\Export_reVTMD.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\File__Analyse_Automatic.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\File__Analyze.h" />
@@ -673,6 +677,7 @@
     <ClInclude Include="..\..\..\Source\MediaInfo\MediaInfo_Internal_Const.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\MediaInfoList.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\MediaInfoList_Internal.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Aaf.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ancillary.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_DashMpd.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_DcpAm.h" />
@@ -689,6 +694,7 @@
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Lxf.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_P2_Clip.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Pmp.h" />
+    <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Ptx.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_SequenceInfo.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File_Xdcam_Clip.h" />
     <ClInclude Include="..\..\..\Source\MediaInfo\Multiple\File__ReferenceFilesHelper.h" />
@@ -824,7 +830,7 @@
     <ProjectReference Include="..\..\..\..\ZenLib\Project\MSVC2013\Library\ZenLib.vcxproj">
       <Project>{0da1da7d-f393-4e7c-a7ce-cb5c6a67bc94}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\zlib\projects\MSVC2013\zlib.vcxproj">
+    <ProjectReference Include="..\..\..\..\zlib\projects\MSVC2010\zlib.vcxproj">
       <Project>{fd328ae2-5136-460f-a622-12cfd4d4c131}</Project>
     </ProjectReference>
   </ItemGroup>

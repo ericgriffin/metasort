@@ -42,6 +42,21 @@
     #define MediaInfoNameSpace MediaInfoDLL;
 #endif
 
+
+/* 64-bit int */
+#if defined(__MINGW32__) || defined(__CYGWIN32__) || defined(__UNIX__) || defined(__MACOSX__)
+#undef  MAXTYPE_INT
+#define MAXTYPE_INT 64
+typedef unsigned long long MediaInfo_int64u;
+#elif defined(__WIN32__) || defined(_WIN32)
+#undef  MAXTYPE_INT
+#define MAXTYPE_INT 64
+typedef unsigned __int64   MediaInfo_int64u;
+#else
+#pragma message This machine has no 64-bit integer type?
+#endif
+
+
 using namespace MediaInfoNameSpace;
 using namespace boost;
 using namespace boost::threadpool;

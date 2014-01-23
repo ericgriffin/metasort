@@ -86,6 +86,7 @@ set(mediainfo_SRCS
 	MediaInfo/Duplicate/File__Duplicate__Base.cpp
 	MediaInfo/Duplicate/File__Duplicate__Writer.cpp
 	MediaInfo/Duplicate/File__Duplicate_MpegTs.cpp
+	MediaInfo/Export/Export_EbuCore.cpp
 	MediaInfo/Export/Export_Mpeg7.cpp
 	MediaInfo/Export/Export_PBCore.cpp
 	MediaInfo/Export/Export_reVTMD.cpp
@@ -102,6 +103,7 @@ set(mediainfo_SRCS
 	MediaInfo/Image/File_Tiff.cpp
 	MediaInfo/Image/File_Tga.cpp
 	MediaInfo/Multiple/File__ReferenceFilesHelper.cpp
+	MediaInfo/Multiple/File_Aaf.cpp
 	MediaInfo/Multiple/File_Ancillary.cpp
 	MediaInfo/Multiple/File_Bdav.cpp
 	MediaInfo/Multiple/File_Cdxa.cpp
@@ -140,6 +142,8 @@ set(mediainfo_SRCS
 	MediaInfo/Multiple/File_Ogg.cpp
 	MediaInfo/Multiple/File_Ogg_SubElement.cpp
 	MediaInfo/Multiple/File_P2_Clip.cpp
+	MediaInfo/Multiple/File_Pmp.cpp
+	MediaInfo/Multiple/File_Ptx.cpp
 	MediaInfo/Multiple/File_Riff.cpp
 	MediaInfo/Multiple/File_Riff_Elements.cpp
 	MediaInfo/Multiple/File_Rm.cpp
