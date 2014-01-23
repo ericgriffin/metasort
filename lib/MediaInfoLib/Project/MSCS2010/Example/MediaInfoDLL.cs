@@ -17,6 +17,8 @@
 using System;
 using System.Runtime.InteropServices;
 
+#pragma warning disable 1591 // Disable XML documentation warnings
+
 namespace MediaInfoLib
 {
     public enum StreamKind
@@ -25,8 +27,9 @@ namespace MediaInfoLib
         Video,
         Audio,
         Text,
-        Chapters,
-        Image
+        Other,
+        Image,
+        Menu,
     }
 
     public enum InfoKind
@@ -57,6 +60,14 @@ namespace MediaInfoLib
         FileOption_Max          = 0x04
     };
 
+    public enum Status
+    {
+        None        =       0x00,
+        Accepted    =       0x01,
+        Filled      =       0x02,
+        Updated     =       0x04,
+        Finalized   =       0x08,
+    }
 
     public class MediaInfo
     {
@@ -149,7 +160,7 @@ namespace MediaInfoLib
         }
         public Int64 Open_Buffer_Continue_GoTo_Get()
         {
-            if (Handle == (IntPtr)0) return 0; return (int)MediaInfo_Open_Buffer_Continue_GoTo_Get(Handle);
+            if (Handle == (IntPtr)0) return 0; return (Int64)MediaInfo_Open_Buffer_Continue_GoTo_Get(Handle);
         }
         public int Open_Buffer_Finalize()
         {

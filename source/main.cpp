@@ -12,7 +12,7 @@
 using namespace std;
 using namespace boost::filesystem;
 
-std::string metasort_version("1.5.0");
+std::string metasort_version("1.5.1");
 std::string config_version("1.x");
 
 
@@ -28,8 +28,6 @@ int main(int argc, char* argv[])
 #endif
 
 	std::cout << std::endl << std::endl;
-
-	//std::cout << "Copyright 2013 Eric Griffin" << std::endl << std::endl;
 
 	int err = 0;	
 	int ok_to_run = 0;

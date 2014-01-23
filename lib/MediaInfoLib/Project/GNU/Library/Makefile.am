@@ -78,6 +78,7 @@ lib@MediaInfoLib_LibName@_la_SOURCES = \
                        ../../../Source/MediaInfo/Duplicate/File__Duplicate__Base.cpp \
                        ../../../Source/MediaInfo/Duplicate/File__Duplicate__Writer.cpp \
                        ../../../Source/MediaInfo/Duplicate/File__Duplicate_MpegTs.cpp \
+                       ../../../Source/MediaInfo/Export/Export_EbuCore.cpp \
                        ../../../Source/MediaInfo/Export/Export_Mpeg7.cpp \
                        ../../../Source/MediaInfo/Export/Export_PBCore.cpp \
                        ../../../Source/MediaInfo/Export/Export_reVTMD.cpp \
@@ -94,6 +95,7 @@ lib@MediaInfoLib_LibName@_la_SOURCES = \
                        ../../../Source/MediaInfo/Image/File_Tiff.cpp \
                        ../../../Source/MediaInfo/Image/File_Tga.cpp \
                        ../../../Source/MediaInfo/Multiple/File__ReferenceFilesHelper.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_Aaf.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Ancillary.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Bdmv.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Cdxa.cpp \
@@ -132,6 +134,7 @@ lib@MediaInfoLib_LibName@_la_SOURCES = \
                        ../../../Source/MediaInfo/Multiple/File_Ogg_SubElement.cpp \
                        ../../../Source/MediaInfo/Multiple/File_P2_Clip.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Pmp.cpp \
+                       ../../../Source/MediaInfo/Multiple/File_Ptx.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Riff.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Riff_Elements.cpp \
                        ../../../Source/MediaInfo/Multiple/File_Rm.cpp \

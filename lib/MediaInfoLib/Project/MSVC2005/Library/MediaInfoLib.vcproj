@@ -544,6 +544,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Aaf.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Ancillary.cpp"
 					>
 				</File>
@@ -693,6 +697,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Pmp.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Ptx.cpp"
 					>
 				</File>
 				<File
@@ -875,6 +883,10 @@
 			<Filter
 				Name="Export"
 				>
+				<File
+					RelativePath="..\..\..\Source\MediaInfo\Export\Export_EbuCore.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\Source\MediaInfo\Export\Export_Mpeg7.cpp"
 					>
@@ -1246,6 +1258,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Aaf.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Ancillary.h"
 					>
 				</File>
@@ -1383,6 +1399,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Pmp.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\MediaInfo\Multiple\File_Ptx.h"
 					>
 				</File>
 				<File
@@ -1633,6 +1653,10 @@
 			<Filter
 				Name="Export"
 				>
+				<File
+					RelativePath="..\..\..\Source\MediaInfo\Export\Export_EbuCore.h"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\Source\MediaInfo\Export\Export_Mpeg7.h"
 					>
