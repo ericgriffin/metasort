@@ -1,7 +1,7 @@
 <project>
     <shortName>Metasort</shortName>
     <fullName>Metasort</fullName>
-    <version>1.4.9</version>
+    <version>1.5.1</version>
     <installerFilename>${product_shortname}-setup.${platform_exec_suffix}</installerFilename>
     <leftImage>logo163.png</leftImage>
     <logoImage>logo48.png</logoImage>
@@ -21,7 +21,7 @@
                     <platforms>all</platforms>
                     <distributionFileList>
                         <distributionDirectory>
-                            <origin>../../Docs</origin>
+                            <origin>../../doc</origin>
                         </distributionDirectory>
                     </distributionFileList>
                     <shortcutList>
@@ -79,7 +79,7 @@
                 </startMenuShortcut>
                 <startMenuFileShortcut>
                     <comment></comment>
-                    <filePath>${installdir}\Docs</filePath>
+                    <filePath>${installdir}\doc</filePath>
                     <name>Documents</name>
                     <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
