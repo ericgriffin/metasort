@@ -280,19 +280,25 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 	int MI_fetched = 0;
 	int match = 1;
 	int or_match = 0;
+	int not_match = 1;
 
 	// recurse "not" blocks
 	for (tinyxml2::XMLElement *u = v->FirstChildElement("not"); u != NULL; u = u->NextSiblingElement("not"))
 	{
 		int rec_not_match = process_stream_blocks(_asset, u, 2);
-		
+
 		if (logical_op == 1)
 		{
-			or_match = (or_match | rec_not_match) ^ 1;
-			match = (or_match) ^ 1;
+			or_match = (or_match | rec_not_match);
+			match = or_match;
+		}
+		else if (logical_op == 2)
+		{
+			not_match = (not_match & ((rec_not_match) ^ 1));
+			match = not_match;
 		}
 		else
-			match = (match & rec_not_match) ^ 1;
+			match = (match & rec_not_match);
 	}
 
 	// recurse "or" blocks
@@ -302,11 +308,16 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 		
 		if (logical_op == 1)
 		{
-			or_match = or_match | rec_or_match;
+			or_match = (or_match | rec_or_match);
 			match = or_match;
 		}
+		else if (logical_op == 2)
+		{
+			not_match = (not_match & ((rec_or_match) ^ 1));
+			match = not_match;
+		}
 		else
-			match = match & rec_or_match;
+			match = (match & rec_or_match);
 	}
 
 	// recurse "and" blocks
@@ -316,11 +327,16 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 		
 		if (logical_op == 1)
 		{
-			or_match = or_match | rec_and_match;
+			or_match = (or_match | rec_and_match);
 			match = or_match;
 		}
+		else if (logical_op == 2)
+		{
+			not_match = (not_match & ((rec_and_match) ^ 1));
+			match = not_match;
+		}
 		else
-			match = match & rec_and_match;
+			match = (match & rec_and_match);
 	}
 
 	for (tinyxml2::XMLElement *u = v->FirstChildElement("stream"); u != NULL; u = u->NextSiblingElement("stream"))
@@ -598,6 +614,13 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 				or_match = 1;
 				break;
 			}
+
+			// catch first match on "not" blocks and break loop
+			if (logical_op == 2 && parameter_match == 1)
+			{
+				not_match = 0;
+				break;
+			}
 		}
 
 		// don't evaluate more "and" parameters if match is already false
@@ -611,6 +634,16 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 		{
 			match = or_match;
 			break;
+		}
+
+		// don't evaluate more "not" parameters if not_match is already false
+		if (logical_op == 2)
+		{
+			match = not_match;
+			if (not_match == 0)
+			{
+				break;
+			}
 		}
 	}
 
