@@ -13,6 +13,7 @@ bin_PROGRAMS = metasort
 metasort_SOURCES = \
 			../../source/usage.cpp \
 			../../source/asset.cpp \
+			../../source/configuration.cpp \
 			../../source/customparameters.cpp \
 			../../source/logfile.cpp \
 			../../source/util_functions.cpp \

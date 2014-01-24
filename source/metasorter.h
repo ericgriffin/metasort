@@ -61,6 +61,7 @@ typedef unsigned __int64   MediaInfo_int64u;
 
 #include <ThirdParty/tinyxml2/tinyxml2.h>
 
+#include "configuration.h"
 #include "asset.h"
 #include "logfile.h"
 #include "util_functions.h"
@@ -77,6 +78,7 @@ public:
 	~metasorter();
 
 	char path[255];
+	configuration config2;
 	tinyxml2::XMLDocument* config;
 	std::string logstring;
 	LogFile logfile;

@@ -36,9 +36,8 @@ int main(int argc, char* argv[])
 	int actions_performed = 0;
 	int running_time = 0;
 	int verbose = 0;
-	char* input_file = (char*)malloc(sizeof(char[255][255]));
-	char* config_file = (char*)malloc(sizeof(char[255][255]));
-	tinyxml2::XMLDocument* config = new tinyxml2::XMLDocument[255];
+	
+	configuration *config = new configuration;
 
 	if (argc > 1)
 	{
@@ -111,14 +110,14 @@ int main(int argc, char* argv[])
 			{
                 if (strcmp(argv[i], "-c") == 0)
 				{
-                    strcpy(&config_file[config_num], argv[i + 1]);
+                    strcpy(&config->config_file[config_num], argv[i + 1]);
 					config_num++;
 					required_flags++;
                 }
 				if (strcmp(argv[i], "-i") == 0)
 				{
 					input_file_process = 1;
-                    strcpy(&input_file[input_file_num], argv[i + 1]);
+                    strcpy(&config->input_file[input_file_num], argv[i + 1]);
 					input_file_num++;
                 }
 			}
@@ -136,36 +135,36 @@ int main(int argc, char* argv[])
 		for(int q = 0; q < config_num; q++)
 		{			
 			// see if config file exists
-			if (!file_exists(std::string(&config_file[q])))
+			if (!file_exists(std::string(&config->config_file[q])))
 			{
-				std::cout << std::endl << "ERROR - Config file " << &config_file[q] << " does not exist - skipping" << std::endl;
+				std::cout << std::endl << "ERROR - Config file " << &config->config_file[q] << " does not exist - skipping" << std::endl;
 				continue;
 			}
 
 			// parse the xml config file
-			if(config[q].LoadFile(&config_file[q]) != 0)
+			if(config->config[q].LoadFile(&config->config_file[q]) != 0)
 			{
-				std::cout << std::endl << "ERROR - XML not valid in config file " << &config_file[q] << " - skipping" << std::endl;
+				std::cout << std::endl << "ERROR - XML not valid in config file " << &config->config_file[q] << " - skipping" << std::endl;
 				continue;
 			}
 
-			tinyxml2::XMLElement* xmlroot = config[q].FirstChildElement("metasort");
+			tinyxml2::XMLElement* xmlroot = config->config[q].FirstChildElement("metasort");
 			
 			// check config file version
 			if(!xmlroot->Attribute("version") || config_version.compare(xmlroot->Attribute("version")) != 0)
 			{
-				std::cout << "ERROR - Wrong config version for " << &config_file[q] << ". ";
+				std::cout << "ERROR - Wrong config version for " << &config->config_file[q] << ". ";
 				std::cout << "Expecting <metasort version=\"" << config_version << "\">" << std::endl;
-				config[q].Clear();
+				config->config[q].Clear();
 				continue;
 			}
 
 			// check for folders entry in config
 			if(!xmlroot->FirstChildElement("folder") || !xmlroot->FirstChildElement("folder")->Attribute("path"))
 			{
-				std::cout << "ERROR - No search folders defined in config file " << &config_file[q] << std::endl;
+				std::cout << "ERROR - No search folders defined in config file " << &config->config_file[q] << std::endl;
 				std::cout << "Expecting <folder path=\"[PATH]\" />" << std::endl;
-				config[q].Clear();
+				config->config[q].Clear();
 				continue;
 			}
 			
@@ -189,7 +188,7 @@ int main(int argc, char* argv[])
 							recurse = 1;
 					}
 
-					metasorter sorter((char*)e->Attribute("path"), &config[q]);
+					metasorter sorter((char*)e->Attribute("path"), &config->config[q]);
 					if (verbose == 1)
 						sorter.verbose = 1;
 
@@ -210,7 +209,7 @@ int main(int argc, char* argv[])
 			{
 				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
 				{
-					metasorter sorter(&input_file[input_file_counter], &config[q]);
+					metasorter sorter(&config->input_file[input_file_counter], &config->config[q]);
 					if (verbose == 1)
 						sorter.verbose = 1;
 					sorter.process_file();
@@ -233,9 +232,8 @@ int main(int argc, char* argv[])
 		usage();
 	}
 
-	delete[] config;
-	free(input_file);
-	free(config_file);
+	delete config;
+
 	return err;
 }
 
