@@ -2,15 +2,13 @@
 #include "md5.h"
 #include "util_functions.h"
 
-using namespace boost::filesystem;
-
 
 int metasorter::action_list(asset* _asset, std::string first, std::string second)
 {
 	list_mtx_.lock();
-	ofstream listfile;
-	listfile.open(second.c_str(), ios::app);
-	listfile << _asset->full_filename << endl;
+	std::ofstream listfile;
+	listfile.open(second.c_str(), std::ios::app);
+	listfile << _asset->full_filename << std::endl;
 	listfile.close();
 	list_mtx_.unlock();
 	return true;
@@ -143,7 +141,7 @@ int metasorter::action_copyonce(asset* _asset, std::string first, std::string se
 
 	// set history file name
 	boost::filesystem::path dest_file = boost::filesystem::path(second);
-	string histfile_name = std::string(dest_file.parent_path().string().c_str());
+	std::string histfile_name = std::string(dest_file.parent_path().string().c_str());
 	histfile_name.append("/.metasort.history");
 			
 	//determine file's modified time
@@ -191,7 +189,7 @@ int metasorter::action_copyonce(asset* _asset, std::string first, std::string se
 						logstring.append(histfile_name);
 						logstring.append(" - skipping");
 						logfile.write(logstring);
-						cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
+						std::cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << std::endl;
 						log_mtx_.unlock();
 
 						continue;
@@ -204,7 +202,7 @@ int metasorter::action_copyonce(asset* _asset, std::string first, std::string se
 				
 		if(file_in_history == 0)
 		{
-			std::ofstream histfile_o(histfile_name.c_str(), ios::out | ios::app);
+			std::ofstream histfile_o(histfile_name.c_str(), std::ios::out | std::ios::app);
 			if(histfile_o.is_open())
 			{
 				histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
@@ -340,7 +338,7 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 
 	// set history file name
 	boost::filesystem::path dest_file = boost::filesystem::path(second);
-	string histfile_name = std::string(dest_file.parent_path().string().c_str());
+	std::string histfile_name = std::string(dest_file.parent_path().string().c_str());
 	histfile_name.append("/.metasort.history");
 			
 	//determine file's modified time
@@ -388,7 +386,7 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 						logstring.append(histfile_name);
 						logstring.append(" - skipping");
 						logfile.write(logstring);
-						cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << endl;
+						std::cout << _asset->full_filename << " exists in history file " << histfile_name << " - skipping" << std::endl;
 						log_mtx_.unlock();
 
 						continue;
@@ -401,7 +399,7 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 				
 		if(file_in_history == 0)
 		{
-			std::ofstream histfile_o(histfile_name.c_str(), ios::out | ios::app);
+			std::ofstream histfile_o(histfile_name.c_str(), std::ios::out | std::ios::app);
 			if(histfile_o.is_open())
 			{
 				histfile_o.write(_asset->full_filename, strlen(_asset->full_filename));
@@ -566,7 +564,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 		while (itr != boost::filesystem::directory_iterator())
 		{
 			// if it is a file
-			if(itr->status().type() != directory_file)
+			if (itr->status().type() != boost::filesystem::directory_file)
 			{
 				md5_search_filename = itr->path().string();
 				std::replace(md5_search_filename.begin(), md5_search_filename.end(), '\\', '/');
@@ -639,8 +637,8 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 				list_mtx_.lock();
 				std::ofstream fout(md5_filename.c_str(), std::ios::binary);
 				fout << md5_hash;
-				fout << endl;
-				fout << flush;
+				fout << std::endl;
+				fout << std::flush;
 				fout.close();
 				list_mtx_.unlock();
 			}

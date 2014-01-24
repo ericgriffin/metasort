@@ -1,3 +1,6 @@
+#ifndef MD5_H
+#define MD5_H 1
+
 #include <stdio.h>
 #include <string.h>
 
@@ -71,3 +74,5 @@ static unsigned char PADDING[64] = {
 #define II(a, b, c, d, x, s, ac) {(a) += I((b), (c), (d)) + (x) + (UINT4)(ac); (a) = ROTATE_LEFT((a), (s)); (a) += (b);}
 
 #pragma endregion
+
+#endif

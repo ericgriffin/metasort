@@ -1,4 +1,6 @@
 // logfile.cpp
+#ifndef LOGFILE_H
+#define LOGFILE_H 1
 
 #include <time.h>
 #include <string>
@@ -8,8 +10,6 @@
 #include <iomanip>
 #include <ctime>
 #include <boost/thread.hpp>
-
-using namespace std;
 
 class LogFile
 {	
@@ -22,7 +22,7 @@ public:
 
 	boost::mutex mtx_;
 
-	ofstream logfile;
+	std::ofstream logfile;
 	double cpu_time();
 	int *time_numbers();
 	void timestamp();
@@ -31,3 +31,5 @@ public:
 	int close();
 	void write(std::string);
 };
+
+#endif

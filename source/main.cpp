@@ -8,10 +8,6 @@
 #include "metasorter.h"
 #include "usage.h"
 
-
-using namespace std;
-using namespace boost::filesystem;
-
 std::string metasort_version("1.5.1");
 std::string config_version("1.x");
 
@@ -142,14 +138,14 @@ int main(int argc, char* argv[])
 			// see if config file exists
 			if (!file_exists(std::string(&config_file[q])))
 			{
-				std::cout << endl << "ERROR - Config file " << &config_file[q] << " does not exist - skipping" << std::endl;
+				std::cout << std::endl << "ERROR - Config file " << &config_file[q] << " does not exist - skipping" << std::endl;
 				continue;
 			}
 
 			// parse the xml config file
 			if(config[q].LoadFile(&config_file[q]) != 0)
 			{
-				std::cout << endl << "ERROR - XML not valid in config file " << &config_file[q] << " - skipping" << std::endl;
+				std::cout << std::endl << "ERROR - XML not valid in config file " << &config_file[q] << " - skipping" << std::endl;
 				continue;
 			}
 

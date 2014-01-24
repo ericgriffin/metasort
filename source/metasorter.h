@@ -4,6 +4,38 @@
 
 #define MEDIAINFO_LIBRARY 1
 
+
+/* 64-bit int */
+#if defined(__MINGW32__) || defined(__CYGWIN32__) || defined(__UNIX__) || defined(__MACOSX__)
+#undef  MAXTYPE_INT
+#define MAXTYPE_INT 64
+typedef unsigned long long MediaInfo_int64u;
+#elif defined(__WIN32__) || defined(_WIN32)
+#undef  MAXTYPE_INT
+#define MAXTYPE_INT 64
+typedef unsigned __int64   MediaInfo_int64u;
+#else
+#pragma message This machine has no 64-bit integer type?
+#endif
+
+
+#ifdef __MINGW32__
+#ifdef _UNICODE
+#define _itot _itow
+#else
+#define _itot itoa
+#endif
+#endif
+
+
+#ifdef MEDIAINFO_LIBRARY
+#include "MediaInfo/MediaInfo.h" //Staticly-loaded library (.lib or .a or .so)
+#define MediaInfoNameSpace MediaInfoLib;
+#else
+#include "MediaInfoDLL/MediaInfoDLL.h" //Dynamicly-loaded library (.dll or .so)
+#define MediaInfoNameSpace MediaInfoDLL;
+#endif
+
 #include <iostream>
 #include <stdexcept>
 #include <iomanip>
@@ -34,41 +66,7 @@
 #include "util_functions.h"
 
 
-#ifdef MEDIAINFO_LIBRARY
-    #include "MediaInfo/MediaInfo.h" //Staticly-loaded library (.lib or .a or .so)
-    #define MediaInfoNameSpace MediaInfoLib;
-#else
-    #include "MediaInfoDLL/MediaInfoDLL.h" //Dynamicly-loaded library (.dll or .so)
-    #define MediaInfoNameSpace MediaInfoDLL;
-#endif
-
-
-/* 64-bit int */
-#if defined(__MINGW32__) || defined(__CYGWIN32__) || defined(__UNIX__) || defined(__MACOSX__)
-#undef  MAXTYPE_INT
-#define MAXTYPE_INT 64
-typedef unsigned long long MediaInfo_int64u;
-#elif defined(__WIN32__) || defined(_WIN32)
-#undef  MAXTYPE_INT
-#define MAXTYPE_INT 64
-typedef unsigned __int64   MediaInfo_int64u;
-#else
-#pragma message This machine has no 64-bit integer type?
-#endif
-
-
 using namespace MediaInfoNameSpace;
-using namespace boost;
-using namespace boost::threadpool;
-using namespace std;
-
-#ifdef __MINGW32__
-    #ifdef _UNICODE
-        #define _itot _itow
-    #else
-        #define _itot itoa
-    #endif
-#endif
 
 
 class metasorter
@@ -77,12 +75,12 @@ class metasorter
 public:
 	metasorter(char*, tinyxml2::XMLDocument* config);
 	~metasorter();
-	
+
 	char path[255];
 	tinyxml2::XMLDocument* config;
 	std::string logstring;
 	LogFile logfile;
-	pool tp;
+	boost::threadpool::pool tp;
 	int verbose;
 	int file_inspection_time;
 	int files_examined;
@@ -124,6 +122,8 @@ public:
 	int action_fastmoveCUSTOM1(asset*, std::string, std::string);
 
 private:
+	const int DEFAULT_THREADPOOL_SIZE = 4;
+	const int DEFAULT_FILE_INSPECTION_TIME = 20000;
 	static const int MAX_CHAR = 1024;
 	int find_matches_ids[1024];
 	int find_matches_count;

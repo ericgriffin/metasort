@@ -16,7 +16,7 @@ int LogFile::open(std::string _filename)
 {
 	mtx_.lock();
 	int err = 0;
-	logfile.open(_filename.c_str(), fstream::app);
+	logfile.open(_filename.c_str(), std::fstream::app);
 	mtx_.unlock();
 	return err;
 }
@@ -33,7 +33,7 @@ int LogFile::close()
 void LogFile::write(std::string _logdata)
 {
 	mtx_.lock();
-	logfile << timestring() << " " << _logdata << endl;
+	logfile << timestring() << " " << _logdata << std::endl;
 	mtx_.unlock();
 }
 

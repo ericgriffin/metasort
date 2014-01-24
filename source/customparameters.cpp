@@ -79,7 +79,7 @@ int metasorter::proc_audio_layout(MediaInfoLib::String &_asset_param_val, MediaI
 
 int metasorter::proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, _asset->filename, strlen(_asset->filename) + 1);
 	tempstring2.assign(tempstring3);
@@ -90,7 +90,7 @@ int metasorter::proc_file_name(MediaInfoLib::String &_asset_param_val, asset* _a
 
 int metasorter::proc_file_extension(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, _asset->extension, strlen(_asset->extension) + 1);
 	tempstring2.assign(tempstring3);
@@ -101,7 +101,7 @@ int metasorter::proc_file_extension(MediaInfoLib::String &_asset_param_val, asse
 
 int metasorter::proc_file_path(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, _asset->path, strlen(_asset->path) + 1);
 	tempstring2.assign(tempstring3);
@@ -115,7 +115,7 @@ int metasorter::proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _a
 	std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
 	file_info_file.seekg( 0, std::ios::end );
 	std::string tempstring;
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	m_itoa((int)(file_info_file.tellg() / 1024), tempstring, 10);
 	wchar_t *tempstring3 = new wchar_t[255];
 	mbstowcs(tempstring3, tempstring.c_str(), strlen(tempstring.c_str()) + 1);
@@ -130,7 +130,7 @@ int metasorter::proc_file_size(MediaInfoLib::String &_asset_param_val, asset* _a
 int metasorter::proc_file_modified_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	std::string tempstring;
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 
 	std::time_t file_modified_time;
@@ -154,7 +154,7 @@ int metasorter::proc_file_modified_age(MediaInfoLib::String &_asset_param_val, a
 int metasorter::proc_file_created_age(MediaInfoLib::String &_asset_param_val, asset* _asset)
 {
 	std::string tempstring;
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 
 	std::time_t file_create_time;
@@ -180,7 +180,7 @@ int metasorter::proc_file_modified_date(MediaInfoLib::String &_asset_param_val, 
 {
 	char buf[9];
 	std::string tempstring;
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 
 	std::time_t file_modified_time;
@@ -208,7 +208,7 @@ int metasorter::proc_file_created_date(MediaInfoLib::String &_asset_param_val, a
 {
 	char buf[9];
 	std::string tempstring;
-	String tempstring2;
+	MediaInfoLib::String tempstring2;
 	wchar_t *tempstring3 = new wchar_t[255];
 
 	std::time_t file_create_time;

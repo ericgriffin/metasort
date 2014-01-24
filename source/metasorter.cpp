@@ -4,20 +4,19 @@
 #include "asset.h"
 #include "util_functions.h"
 
-using namespace boost::filesystem;
 
 metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 {
 	config = _config;
 	strcpy(path, _path);
-	tp.size_controller().resize(4);
-	file_inspection_time = 20000;
+	tp.size_controller().resize(DEFAULT_THREADPOOL_SIZE);
+	file_inspection_time = DEFAULT_FILE_INSPECTION_TIME;
 	files_examined = 0;
 	rule_matches = 0;
 	actions_performed = 0;
 	verbose = 0;
 
-	if (int config_error = check_config(config) == 1)
+	if (check_config(config) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << "Configuration Error - exiting" << std::endl;
@@ -86,7 +85,7 @@ int metasorter::check_config(tinyxml2::XMLDocument* config)
 		else
 		{
 			log_mtx_.lock();
-			std::cout << "WARNING - file_inspection time override exists but no value is set." << endl;
+			std::cout << "WARNING - file_inspection time override exists but no value is set." << std::endl;
 			log_mtx_.unlock();
 		}
 	}
@@ -98,7 +97,7 @@ int metasorter::check_config(tinyxml2::XMLDocument* config)
 		else
 		{
 			log_mtx_.lock();
-			std::cout << "WARNING - threadpool size override exists but no value is set." << endl;
+			std::cout << "WARNING - threadpool size override exists but no value is set." << std::endl;
 			log_mtx_.unlock();
 		}
 	}
@@ -155,7 +154,7 @@ int metasorter::traverse_directory(int _recurse)
 		while (itr != boost::filesystem::directory_iterator())
 		{
 			// if it is a file
-			if(itr->status().type() != directory_file)
+			if (itr->status().type() != boost::filesystem::directory_file)
 			{
 				asset* _asset = new asset;
 				strcpy(_asset->full_filename, itr->path().string().c_str());
@@ -180,7 +179,7 @@ int metasorter::traverse_directory(int _recurse)
 		while (itr_r != boost::filesystem::recursive_directory_iterator())
 		{
 			// if it is a file
-            if(itr_r->status().type() != directory_file)
+			if (itr_r->status().type() != boost::filesystem::directory_file)
 			{
 				asset* _asset = new asset;
 				strcpy(_asset->full_filename, itr_r->path().string().c_str());
@@ -367,13 +366,13 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			int less_than = 0;
 			int is_regex = 0;
 			int is_range = 0;
-			String asset_param_val;
-			String parameter;
-			String parameter_val;
+			MediaInfoLib::String asset_param_val;
+			MediaInfoLib::String parameter;
+			MediaInfoLib::String parameter_val;
 
 			// parameter name from config file
 			wchar_t* parameter_char = charToWChar(y->Attribute("name"));
-			parameter = String(parameter_char);
+			parameter = MediaInfoLib::String(parameter_char);
 			delete parameter_char;
 
 
@@ -381,7 +380,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			if (y->Attribute("value"))
 			{
 				wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
-				parameter_val = String(parameter_val_char);
+				parameter_val = MediaInfoLib::String(parameter_val_char);
 				delete parameter_val_char;
 			}
 
@@ -389,7 +388,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			if (y->Attribute("range"))
 			{
 				wchar_t* parameter_val_char = charToWChar(y->Attribute("range"));
-				parameter_val = String(parameter_val_char);
+				parameter_val = MediaInfoLib::String(parameter_val_char);
 				delete parameter_val_char;
 				is_range = 1;
 			}
@@ -407,7 +406,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			}
 
 			// check for and strip exclusive character
-			String param_prefix;
+			MediaInfoLib::String param_prefix;
 			param_prefix.assign(parameter_val, 0, 1);
 			if (param_prefix.compare(L"!") == 0)
 			{
@@ -501,12 +500,12 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			// handle range comparison
 			if (is_range == 1)
 			{
-				vector<string> param_low_high;
-				boost::split(param_low_high, parameter_val, is_any_of(":"));
+				std::vector<std::string> param_low_high;
+				boost::split(param_low_high, parameter_val, boost::is_any_of(":"));
 
 				if (param_low_high.size() < 2)
 				{
-					cout << "ERROR: parameter range used without \":\"";
+					std::cout << "ERROR: parameter range used without \":\"";
 					return 0;
 				}
 				
@@ -656,7 +655,6 @@ int metasorter::process_asset(asset* _asset)
 {
 	int err = 0;
 	int stop_processing_rules = 0;
-	String To_Display;
 	
 	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
 	
@@ -719,7 +717,7 @@ int metasorter::process_asset(asset* _asset)
 }
 
 
-int metasorter::process_rule(asset* _asset, std::string rule_name, ::string first, std::string second)
+int metasorter::process_rule(asset* _asset, std::string rule_name, std::string first, std::string second)
 {
 	int err = 0;
 
@@ -780,10 +778,10 @@ int metasorter::process_extensions(asset* _asset)
 	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("extension"); v != NULL; v = v->NextSiblingElement("extension"))
 	{
 		int ext_is_regex = 0;
-		String extension_prefix;
-		String extension_regex_suffix;
+		MediaInfoLib::String extension_prefix;
+		MediaInfoLib::String extension_regex_suffix;
 		wchar_t* temp_str = charToWChar(v->Attribute("value"));
-		String full_extension = String(temp_str);
+		MediaInfoLib::String full_extension = MediaInfoLib::String(temp_str);
 		delete temp_str;
 		extension_prefix.assign(full_extension,0,7);
 		

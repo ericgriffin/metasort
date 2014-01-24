@@ -1,3 +1,5 @@
+#ifndef UTIL_FUNCTIONS_H
+#define UTIL_FUNCTIONS_H 1
 
 #include <iostream>
 #include <stdexcept>
@@ -26,3 +28,5 @@ std::string get_file_extension(const std::string&);
 int compare_file_modified_time(std::string, std::string);
 time_t file_modified_time(std::string);
 char * timestring();
+
+#endif

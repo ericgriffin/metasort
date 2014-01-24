@@ -1,3 +1,5 @@
+#ifndef USAGE_H
+#define USAGE_H 1
 
 #include <iostream>
 #include <stdio.h>
@@ -17,3 +19,5 @@ void list_text_parameters();
 void list_other_parameters();
 void list_image_parameters();
 void list_menu_parameters();
+
+#endif
