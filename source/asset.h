@@ -1,6 +1,12 @@
-// asset.h
-#ifndef ASSET_H
-#define ASSET_H 1
+/*  asset.h
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
+#ifndef _ASSET_H_
+#define _ASSET_H_ 1
 
 class asset
     {
@@ -16,4 +22,4 @@ class asset
 		
 	};
 	
-#endif
+#endif // _ASSET_H_

@@ -143,7 +143,12 @@ Rule Elements
 				- actionparameter is a destination path.
 
 			exec
-				- executes a system command specified by the actionparameter. The variable %s represents the filename matching the rule conditions and can be used as a command-line parameter.
+				- executes a system command specified by the actionparameter. 
+				- These variables can be used as a command-line parameters:
+					- %s represents the full filename (with path) matching the rule conditions.
+					- %f represents the filename (without path) matching the rule conditions.
+					- %p represents the path of the filename matching the rule conditions.
+					- %e represents the extension of the filename matching the rule conditions.
 				- actionparameter is a command-line command.
 
 			delete

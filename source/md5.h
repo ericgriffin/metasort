@@ -1,5 +1,12 @@
-#ifndef MD5_H
-#define MD5_H 1
+/*  md5.h
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
+#ifndef _MD5_H_
+#define _MD5_H_ 1
 
 #include <stdio.h>
 #include <string.h>
@@ -75,4 +82,4 @@ static unsigned char PADDING[64] = {
 
 #pragma endregion
 
-#endif
+#endif // _MD5_H_

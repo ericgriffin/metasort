@@ -93,15 +93,21 @@
 		</Linker>
 		<Unit filename="../../source/asset.cpp" />
 		<Unit filename="../../source/asset.h" />
+		<Unit filename="../../source/configuration.cpp" />
+		<Unit filename="../../source/configuration.h" />
 		<Unit filename="../../source/customparameters.cpp" />
 		<Unit filename="../../source/logfile.cpp" />
 		<Unit filename="../../source/logfile.h" />
+		<Unit filename="../../source/md5.cpp" />
+		<Unit filename="../../source/md5.h" />
+		<Unit filename="../../source/usage.cpp" />
+		<Unit filename="../../source/usage.h" />
 		<Unit filename="../../source/main.cpp" />
 		<Unit filename="../../source/metasorter.cpp" />
 		<Unit filename="../../source/metasorter.h" />
-		<Unit filename="../../source/rule_actions.cpp" />
-		<Unit filename="../../source/util_functions.cpp" />
-		<Unit filename="../../source/util_functions.h" />
+		<Unit filename="../../source/actions.cpp" />
+		<Unit filename="../../source/metasortutil.cpp" />
+		<Unit filename="../../source/metasortutil.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
