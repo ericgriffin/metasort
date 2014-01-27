@@ -1,16 +1,21 @@
-#include "util_functions.h"
+/*  util_functions.cpp
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
 
-using namespace std;
+#include "metasortutil.h"
 
 
-bool Wait(const unsigned long &Time)
+bool metasortutil::Wait(const unsigned long &Time)
 {
 	boost::this_thread::sleep(boost::posix_time::milliseconds(Time));
     return 1;
 }
 
 
-void m_itoa(int value, std::string& buf, int base)
+void metasortutil::m_itoa(int value, std::string& buf, int base)
 {
 	int i = 30;
 	buf = "";
@@ -18,12 +23,12 @@ void m_itoa(int value, std::string& buf, int base)
 }
 
 
-int test_create_file(std::string& _filepath)
+int metasortutil::test_create_file(std::string& _filepath)
 {
 	int retval = 0;
 	boost::filesystem::path* filepath = new boost::filesystem::path(_filepath);
 
-	if (file_exists(_filepath))
+	if (metasortutil::file_exists(_filepath))
 	{
 		retval = 1;
 	}
@@ -45,7 +50,7 @@ int test_create_file(std::string& _filepath)
 }
 
 
-int file_exists(const std::string& _filepath)
+int metasortutil::file_exists(const std::string& _filepath)
 {
 	int retval = 0;
 	boost::filesystem::path* filepath = new boost::filesystem::path(_filepath);
@@ -56,7 +61,7 @@ int file_exists(const std::string& _filepath)
 }
 
 
-int path_exists(const std::string& path)
+int metasortutil::path_exists(const std::string& path)
 {
 	int retval = 0;
 	boost::filesystem::path* dirpath = new boost::filesystem::path(path);
@@ -67,7 +72,7 @@ int path_exists(const std::string& path)
 }
 
 
-bool string_replace(std::string& str, const std::string& from, const std::string& to)
+bool metasortutil::string_replace(std::string& str, const std::string& from, const std::string& to)
 {
 	size_t start_pos = str.find(from);
 	if(start_pos == std::string::npos)
@@ -77,24 +82,24 @@ bool string_replace(std::string& str, const std::string& from, const std::string
 }
 
 
-string get_file_extension(const string& s)
+std::string metasortutil::get_file_extension(const std::string& s)
 {
    size_t i = s.rfind('.', s.length( ));
-   if (i != string::npos) {
+   if (i != std::string::npos) {
       return(s.substr(i+1, s.length( ) - i));
    }
    return(std::string(""));
 }
 
 
-int compare_file_modified_time(std::string file1, std::string file2)
+int metasortutil::compare_file_modified_time(std::string file1, std::string file2)
 {
 	int result = 0;
 	time_t file_modified_time1;
 	time_t file_modified_time2;
 
-	file_modified_time1 = file_modified_time(file1);
-	file_modified_time2 = file_modified_time(file2);
+	file_modified_time1 = metasortutil::file_modified_time(file1);
+	file_modified_time2 = metasortutil::file_modified_time(file2);
 	
 	if(difftime(file_modified_time1, file_modified_time2) == 0)
 		result = 0;
@@ -107,7 +112,7 @@ int compare_file_modified_time(std::string file1, std::string file2)
 }
 
 
-time_t file_modified_time(std::string file)
+time_t metasortutil::file_modified_time(std::string file)
 {
 	std::time_t file_modified_time1;
 	struct tm* clock1 = new tm;
@@ -121,7 +126,7 @@ time_t file_modified_time(std::string file)
 }
 
 
-wchar_t* charToWChar(const char* text)
+wchar_t* metasortutil::charToWChar(const char* text)
 {
     size_t size = strlen(text) + 1;
     wchar_t* wa = new wchar_t[size];
@@ -130,7 +135,7 @@ wchar_t* charToWChar(const char* text)
 }
 
 
-bool is_number(const std::string& s)
+bool metasortutil::is_number(const std::string& s)
 {
     std::string::const_iterator it = s.begin();
     while (it != s.end() && std::isdigit((unsigned char)*it)) ++it;
@@ -139,11 +144,11 @@ bool is_number(const std::string& s)
 
 
 // returns 0 if filesize does not change over x seconds, 1 if it changes
-int filesize_changing(char filename[255], int wait_time)
+int metasortutil::filesize_changing(char filename[255], int wait_time)
 {
 	int changing = 0;
-	ofstream file;
-	file.open(filename, ios::app);
+	std::ofstream file;
+	file.open(filename, std::ios::app);
 
 	if(!file.is_open())  //check to see if the file is locked
 	{
@@ -151,11 +156,11 @@ int filesize_changing(char filename[255], int wait_time)
 	}
 	else  //check to see if the filesize is changing
 	{
-		file.seekp(0, ifstream::end);
+		file.seekp(0, std::ifstream::end);
 		int filesize1 = (int)file.tellp();
 		file.close();
 		Wait(wait_time);
-		file.open(filename, ios::app);
+		file.open(filename, std::ios::app);
 		file.seekp(0, std::ifstream::end);
 		int filesize2 = (int)file.tellp();
 		if(filesize1 != filesize2)
@@ -167,7 +172,7 @@ int filesize_changing(char filename[255], int wait_time)
 }
 
 
-char * timestring()
+char * metasortutil::timestring()
 {
 # define TIME_SIZE 40
 
@@ -184,4 +189,15 @@ char * timestring()
 	len = std::strftime(s, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr);
 	return s;
 # undef TIME_SIZE
+}
+
+
+int metasortutil::fill_file_placeholders(asset* _asset, std::string& execstring)
+{
+	int err = 0;
+	metasortutil::string_replace(execstring, "%s", _asset->full_filename);
+	metasortutil::string_replace(execstring, "%p", _asset->path);
+	metasortutil::string_replace(execstring, "%f", _asset->filename);
+	metasortutil::string_replace(execstring, "%e", _asset->extension);
+	return err;
 }

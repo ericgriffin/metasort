@@ -1,6 +1,11 @@
+/*  rule_actions.cpp
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
 #include "metasorter.h"
-#include "md5.h"
-#include "util_functions.h"
 
 
 int metasorter::action_list(asset* _asset, std::string first, std::string second)
@@ -17,7 +22,7 @@ int metasorter::action_list(asset* _asset, std::string first, std::string second
 
 int metasorter::action_move(asset* _asset, std::string first, std::string second)
 {
-	if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if(metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -60,7 +65,7 @@ int metasorter::action_move(asset* _asset, std::string first, std::string second
 
 int metasorter::action_fastmove(asset* _asset, std::string first, std::string second)
 {
-	if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if(metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -90,7 +95,7 @@ int metasorter::action_fastmove(asset* _asset, std::string first, std::string se
 
 int metasorter::action_copy(asset* _asset, std::string first, std::string second)
 {
-	if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if(metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -124,7 +129,7 @@ int metasorter::action_copy(asset* _asset, std::string first, std::string second
 
 int metasorter::action_copyonce(asset* _asset, std::string first, std::string second)
 {
-	if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if(metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -162,7 +167,7 @@ int metasorter::action_copyonce(asset* _asset, std::string first, std::string se
 	std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
 	file_info_file.seekg( 0, std::ios::end );
 	std::string file_size_str;
-	m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
+	metasortutil::m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
 
 	hist_mtx_.lock();
 
@@ -285,8 +290,8 @@ int metasorter::action_exec(asset* _asset, std::string first, std::string second
 {
 	std::string execstring(second);
 	execstring.append(" ");
-	string_replace(execstring, "%s", _asset->full_filename);
-	while(string_replace(execstring, "/", "\\"));
+	metasortutil::fill_file_placeholders(_asset, execstring);
+	while(metasortutil::string_replace(execstring, "/", "\\"));
 			
 	log_mtx_.lock();
 	logstring.assign("Executing: ");
@@ -321,7 +326,7 @@ int metasorter::action_delete(asset* _asset, std::string first, std::string seco
 // copies files one time (saves history), sets all characters to uppercase and removes ' ', '-', '_' from filename
 int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::string second)
 {
-	if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if(metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -359,7 +364,7 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 	std::ifstream file_info_file(_asset->full_filename, std::ios::binary | std::ios::in );
 	file_info_file.seekg( 0, std::ios::end );
 	std::string file_size_str;
-	m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
+	metasortutil::m_itoa((int)(file_info_file.tellg() / 1024), file_size_str, 10);
 
 	hist_mtx_.lock();
 
@@ -506,8 +511,8 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 	boost::filesystem::path md5_dir_path = md5_file_fullpath.parent_path();  //used for directory searching for pre-existing md5 file
 	std::string action_param_filename(md5_file_fullpath.filename().string().c_str());  //used for determining if md5 should be generated for for a file
 
-	string_replace(action_param_filename, "%s", ".*");
-	string_replace(md5_filename, "%s", _asset->filename);
+	metasortutil::string_replace(action_param_filename, "%s", ".*");
+	metasortutil::fill_file_placeholders(_asset, md5_filename);
 
 	//strip quotation marks around string if they exist
 	if(second[0] == '"')
@@ -521,7 +526,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 
 	//determine file extension of 'second' parameter
 	std::string action_param_extension(".");
-	action_param_extension.append(get_file_extension(second));
+	action_param_extension.append(metasortutil::get_file_extension(second));
 	std::string asset_filename;
 	asset_filename.assign(_asset->filename);
 
@@ -574,7 +579,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 				{
 					md5_exists = 1;
 
-					if(compare_file_modified_time(asset_full_filename, md5_search_filename) > 0)
+					if(metasortutil::compare_file_modified_time(asset_full_filename, md5_search_filename) > 0)
 					{
 						md5_exists = 0;
 
@@ -620,7 +625,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 		{	
 			MD5 md5;
 
-			if(filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+			if(metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 			{
 				log_mtx_.lock();
 				std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -660,7 +665,7 @@ int metasorter::action_md5file(asset* _asset, std::string first, std::string sec
 
 int metasorter::action_moveCUSTOM1(asset* _asset, std::string first, std::string second)
 {
-	if (filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if (metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;
@@ -717,7 +722,7 @@ int metasorter::action_moveCUSTOM1(asset* _asset, std::string first, std::string
 
 int metasorter::action_fastmoveCUSTOM1(asset* _asset, std::string first, std::string second)
 {
-	if (filesize_changing(_asset->full_filename, file_inspection_time) == 1)
+	if (metasortutil::filesize_changing(_asset->full_filename, file_inspection_time) == 1)
 	{
 		log_mtx_.lock();
 		std::cout << _asset->full_filename << " is changing in filesize - skipping " << std::endl;

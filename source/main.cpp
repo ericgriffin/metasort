@@ -1,4 +1,10 @@
-// main.cpp
+/*  main.cpp
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
 
 #include <iostream>
 #include <stdio.h>
@@ -9,7 +15,6 @@
 #include "usage.h"
 
 std::string metasort_version("1.5.1");
-std::string config_version("1.x");
 
 
 int main(int argc, char* argv[])
@@ -18,26 +23,29 @@ int main(int argc, char* argv[])
 	std::cout << "Compiled " << __DATE__ << " " << __TIME__;
 	
 #if defined(_M_X64) || defined(__amd64__) || defined(_LP64) || defined(_WIN64)
-	std::cout << " for x86-64";
+	std::cout << " for x86-64" << std::endl << std::endl;
 #else
-	std::cout << " for x86";
+	std::cout << " for x86" << std::endl << std::endl;
 #endif
 
-	std::cout << std::endl << std::endl;
-
-	int err = 0;	
+	int err = 0;
 	int ok_to_run = 0;
 	int required_flags = 0;
-	int config_num = 0;
-	int input_file_process = 0;
-	int input_file_num = 0;
+	
+
+	
+	int verbose = 0;
+
+	// performance counters
 	int files_examined = 0;
 	int rule_matches = 0;
 	int actions_performed = 0;
 	int running_time = 0;
-	int verbose = 0;
 	
-	configuration *config = new configuration;
+	//configuration *config = new configuration;
+	metasorter sorter;
+
+	boost::timer elapsed_time; // start timing
 
 	if (argc > 1)
 	{
@@ -101,129 +109,37 @@ int main(int argc, char* argv[])
 				exit(0);
             }
 
-			if (strcmp(argv[i], "-v") == 0)
-			{
-				verbose = 1;
-			}
-
 			if (i + 1 != argc)
 			{
                 if (strcmp(argv[i], "-c") == 0)
 				{
-                    strcpy(&config->config_file[config_num], argv[i + 1]);
-					config_num++;
+					if (sorter.load_config_file(std::string(argv[i + 1])) == 1)
+						ok_to_run = -1;
+					else
+						ok_to_run = 1;
 					required_flags++;
                 }
 				if (strcmp(argv[i], "-i") == 0)
 				{
-					input_file_process = 1;
-                    strcpy(&config->input_file[input_file_num], argv[i + 1]);
-					input_file_num++;
+					sorter.set_input_file(std::string(argv[i + 1]));
                 }
 			}
 		}
-		if(required_flags > 0)
-		{
-			ok_to_run = 1;
-		}
+
 	}
 
-	if(ok_to_run)
+	if (ok_to_run == 1 && required_flags > 0)
 	{		
-		boost::timer elapsed_time; // start timing
-		
-		for(int q = 0; q < config_num; q++)
-		{			
-			// see if config file exists
-			if (!file_exists(std::string(&config->config_file[q])))
-			{
-				std::cout << std::endl << "ERROR - Config file " << &config->config_file[q] << " does not exist - skipping" << std::endl;
-				continue;
-			}
+		sorter.run();
 
-			// parse the xml config file
-			if(config->config[q].LoadFile(&config->config_file[q]) != 0)
-			{
-				std::cout << std::endl << "ERROR - XML not valid in config file " << &config->config_file[q] << " - skipping" << std::endl;
-				continue;
-			}
+		std::cout << std::endl << sorter.files_examined << " files examined." << std::endl;
+		std::cout << sorter.rule_matches << " rule matches." << std::endl;
+		std::cout << sorter.actions_performed << " actions performed." << std::endl;
+		std::cout << std::endl << "Finished in " << elapsed_time.elapsed() << " seconds." << std::endl;
+	}
 
-			tinyxml2::XMLElement* xmlroot = config->config[q].FirstChildElement("metasort");
-			
-			// check config file version
-			if(!xmlroot->Attribute("version") || config_version.compare(xmlroot->Attribute("version")) != 0)
-			{
-				std::cout << "ERROR - Wrong config version for " << &config->config_file[q] << ". ";
-				std::cout << "Expecting <metasort version=\"" << config_version << "\">" << std::endl;
-				config->config[q].Clear();
-				continue;
-			}
-
-			// check for folders entry in config
-			if(!xmlroot->FirstChildElement("folder") || !xmlroot->FirstChildElement("folder")->Attribute("path"))
-			{
-				std::cout << "ERROR - No search folders defined in config file " << &config->config_file[q] << std::endl;
-				std::cout << "Expecting <folder path=\"[PATH]\" />" << std::endl;
-				config->config[q].Clear();
-				continue;
-			}
-			
-			if(input_file_process == 0)  // if processing folders from config
-			{
-				// iterate through search paths
-				for(tinyxml2::XMLElement *e = xmlroot->FirstChildElement("folder"); e != NULL; e = e->NextSiblingElement("folder"))
-				{
-					//check to see if path is valid
-					if (!path_exists(std::string(e->Attribute("path"))))
-					{
-						std::cout << "ERROR - search path does not exist: " << e->Attribute("path") << " - skipping" << std::endl;
-						continue;
-					}
-
-					//check if folder should be searched recursively
-					int recurse = 0;
-					if(e->Attribute("recursive"))
-					{
-						if(std::string("yes").compare(e->Attribute("recursive")) == 0 || std::string("1").compare(e->Attribute("recursive")) == 0 || std::string("true").compare(e->Attribute("recursive")) == 0)
-							recurse = 1;
-					}
-
-					metasorter sorter((char*)e->Attribute("path"), &config->config[q]);
-					if (verbose == 1)
-						sorter.verbose = 1;
-
-					if (recurse == 1)
-						std::cout << std::endl << "Processing folder recursively: " << e->Attribute("path") << std::endl;
-					else
-						std::cout << std::endl << "Processing folder: " << e->Attribute("path") << std::endl;
-
-					sorter.traverse_directory(recurse);
-					sorter.tp.wait();
-
-					files_examined += sorter.files_examined;
-					rule_matches += sorter.rule_matches;
-					actions_performed += sorter.actions_performed;
-				}
-			}
-			else  // if processing files from argv[]
-			{
-				for(int input_file_counter = 0; input_file_counter < input_file_num; input_file_counter++)
-				{
-					metasorter sorter(&config->input_file[input_file_counter], &config->config[q]);
-					if (verbose == 1)
-						sorter.verbose = 1;
-					sorter.process_file();
-
-					files_examined += sorter.files_examined;
-					rule_matches += sorter.rule_matches;
-					actions_performed += sorter.actions_performed;
-				}
-			}
-		}
-
-		std::cout << std::endl << files_examined << " files examined." << std::endl;
-		std::cout << rule_matches << " rule matches." << std::endl;
-		std::cout << actions_performed << " actions performed." << std::endl;
+	else if (ok_to_run == -1)
+	{
 		std::cout << std::endl << "Finished in " << elapsed_time.elapsed() << " seconds." << std::endl;
 	}
 
@@ -231,8 +147,6 @@ int main(int argc, char* argv[])
 	{
 		usage();
 	}
-
-	delete config;
 
 	return err;
 }

@@ -1,28 +1,23 @@
-// metasorter.cpp
+/*  metasorter.cpp
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
 
 #include "metasorter.h"
-#include "asset.h"
-#include "util_functions.h"
 
 
-metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
+metasorter::metasorter()
 {
-	config = _config;
-	strcpy(path, _path);
-	tp.size_controller().resize(DEFAULT_THREADPOOL_SIZE);
+	config = new configuration(this);
 	file_inspection_time = DEFAULT_FILE_INSPECTION_TIME;
+	tp.size_controller().resize(DEFAULT_THREADPOOL_SIZE);
 	files_examined = 0;
 	rule_matches = 0;
 	actions_performed = 0;
 	verbose = 0;
-
-	if (check_config(config) == 1)
-	{
-		log_mtx_.lock();
-		std::cout << "Configuration Error - exiting" << std::endl;
-		log_mtx_.unlock();
-		exit(0);
-	}
+	run_type = 0;
 
 	log_mtx_.lock();
 	logstring.assign("Entering folder ");
@@ -34,109 +29,13 @@ metasorter::metasorter(char* _path, tinyxml2::XMLDocument* _config)
 
 metasorter::~metasorter()
 {
+	delete config;
 	log_mtx_.lock();
 	logstring.assign("Leaving folder ");
 	logstring.append(path);
 	logfile.write(logstring);
 	logfile.close();
 	log_mtx_.unlock();
-}
-
-
-int metasorter::check_config(tinyxml2::XMLDocument* config)
-{
-	logging = 0;
-	extensions = 0;
-	rules = 0;
-
-	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
-
-	/* check logging entry in config file */
-	if (xmlroot->FirstChildElement("logging"))
-	{
-		if (xmlroot->FirstChildElement("logging")->Attribute("path"))
-		{
-			logging = 1;
-			log_mtx_.lock();
-			logfile.open(xmlroot->FirstChildElement("logging")->Attribute("path"));
-			log_mtx_.unlock();
-		}
-		if (xmlroot->FirstChildElement("logging")->Attribute("console"))
-		{
-			if (std::string("yes").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0 || std::string("1").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0)
-				verbose = 1;
-		}
-	}
-
-	if (logging == 0)
-	{
-		log_mtx_.lock();
-		std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
-		std::cout << "Finished." << std::endl;
-		log_mtx_.unlock();
-		exit(0);
-	}
-
-	/* check optional parameters in config file */
-	if (xmlroot->FirstChildElement("file_inspection"))
-	{
-		if (xmlroot->FirstChildElement("file_inspection")->Attribute("time"))
-			file_inspection_time = atoi(xmlroot->FirstChildElement("file_inspection")->Attribute("time"));
-		else
-		{
-			log_mtx_.lock();
-			std::cout << "WARNING - file_inspection time override exists but no value is set." << std::endl;
-			log_mtx_.unlock();
-		}
-	}
-
-	if (xmlroot->FirstChildElement("threadpool"))
-	{
-		if (xmlroot->FirstChildElement("threadpool")->Attribute("size"))
-			tp.size_controller().resize(atoi(xmlroot->FirstChildElement("threadpool")->Attribute("size")));
-		else
-		{
-			log_mtx_.lock();
-			std::cout << "WARNING - threadpool size override exists but no value is set." << std::endl;
-			log_mtx_.unlock();
-		}
-	}
-
-	// check extensions entries in config file
-	if (xmlroot->FirstChildElement("extension"))
-	{
-		if (xmlroot->FirstChildElement("extension")->Attribute("value"))
-			extensions = 1;
-	}
-	if (extensions == 0)
-	{
-		log_mtx_.lock();
-		std::cout << "ERROR - No extensions defined. Expecting <extension value=[value]/> - aborting" << std::endl;
-		std::cout << "Finished." << std::endl;
-		logfile.close();
-		log_mtx_.unlock();
-		exit(0);
-	}
-
-	// check rule entries in config file
-	if (xmlroot->FirstChildElement("rule"))
-	{
-		if (xmlroot->FirstChildElement("rule")->FirstChildElement("action"))
-		{
-			rules = 1;
-		}
-	}
-	if (rules == 0)
-	{
-		log_mtx_.lock();
-		std::cout << "ERROR - No rules defined - aborting" << std::endl;
-		std::cout << "Finished." << std::endl;
-		logfile.close();
-		log_mtx_.unlock();
-		exit(0);
-	}
-
-	return 0;
 }
 
 
@@ -371,7 +270,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			MediaInfoLib::String parameter_val;
 
 			// parameter name from config file
-			wchar_t* parameter_char = charToWChar(y->Attribute("name"));
+			wchar_t* parameter_char = metasortutil::charToWChar(y->Attribute("name"));
 			parameter = MediaInfoLib::String(parameter_char);
 			delete parameter_char;
 
@@ -379,7 +278,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			// parameter value from config file
 			if (y->Attribute("value"))
 			{
-				wchar_t* parameter_val_char = charToWChar(y->Attribute("value"));
+				wchar_t* parameter_val_char = metasortutil::charToWChar(y->Attribute("value"));
 				parameter_val = MediaInfoLib::String(parameter_val_char);
 				delete parameter_val_char;
 			}
@@ -387,7 +286,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			// parameter range from config file
 			if (y->Attribute("range"))
 			{
-				wchar_t* parameter_val_char = charToWChar(y->Attribute("range"));
+				wchar_t* parameter_val_char = metasortutil::charToWChar(y->Attribute("range"));
 				parameter_val = MediaInfoLib::String(parameter_val_char);
 				delete parameter_val_char;
 				is_range = 1;
@@ -656,7 +555,7 @@ int metasorter::process_asset(asset* _asset)
 	int err = 0;
 	int stop_processing_rules = 0;
 	
-	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
+	tinyxml2::XMLElement* xmlroot = config->config->FirstChildElement("metasort");
 	
 	// Process rules from config file
 	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("rule"); v != NULL; v = v->NextSiblingElement("rule"))
@@ -773,14 +672,14 @@ int metasorter::process_extensions(asset* _asset)
 {
 	int valid_extension = 0;
 
-	tinyxml2::XMLElement* xmlroot = config->FirstChildElement("metasort");
+	//tinyxml2::XMLElement* xmlroot = metasort_config->config->FirstChildElement("metasort");
 
-	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("extension"); v != NULL; v = v->NextSiblingElement("extension"))
+	for (tinyxml2::XMLElement *v = config->xmlroot->FirstChildElement("extension"); v != NULL; v = v->NextSiblingElement("extension"))
 	{
 		int ext_is_regex = 0;
 		MediaInfoLib::String extension_prefix;
 		MediaInfoLib::String extension_regex_suffix;
-		wchar_t* temp_str = charToWChar(v->Attribute("value"));
+		wchar_t* temp_str = metasortutil::charToWChar(v->Attribute("value"));
 		MediaInfoLib::String full_extension = MediaInfoLib::String(temp_str);
 		delete temp_str;
 		extension_prefix.assign(full_extension,0,7);
@@ -819,6 +718,72 @@ int metasorter::process_extensions(asset* _asset)
 }
 
 
+int metasorter::load_config_file(std::string file)
+{
+	int err = 0;
+	err = config->read_configuration(file);
+	return err;
+}
+
+
+int metasorter::set_input_file(std::string file)
+{
+	int err = 0;
+	err = config->set_input_file(file);
+	if (err == 0)
+		run_type = 1;
+	return err;
+}
+
+int metasorter::run()
+{
+	int err = 0;
+
+	if (run_type == 0)  // if processing folders from config
+	{
+		// iterate through search paths
+		for (tinyxml2::XMLElement *e = config->xmlroot->FirstChildElement("folder"); e != NULL; e = e->NextSiblingElement("folder"))
+		{
+			//check to see if path is valid
+			if (!metasortutil::path_exists(std::string(e->Attribute("path"))))
+			{
+				std::cout << "ERROR - search path does not exist: " << e->Attribute("path") << " - skipping" << std::endl;
+				continue;
+			}
+			else
+			{
+				strcpy(path, e->Attribute("path"));
+			}
+
+			//check if folder should be searched recursively
+			int recurse = 0;
+			if (e->Attribute("recursive"))
+			{
+				if (std::string("yes").compare(e->Attribute("recursive")) == 0 || std::string("1").compare(e->Attribute("recursive")) == 0 || std::string("true").compare(e->Attribute("recursive")) == 0)
+					recurse = 1;
+			}
+
+			if (verbose == 1)
+				verbose = 1;
+
+			if (recurse == 1)
+				std::cout << std::endl << "Processing folder recursively: " << e->Attribute("path") << std::endl;
+			else
+				std::cout << std::endl << "Processing folder: " << e->Attribute("path") << std::endl;
+
+			traverse_directory(recurse);
+			tp.wait();
+		}
+	}
+	else  // if processing files from argv[]
+	{
+		if (verbose == 1)
+			verbose = 1;
+		process_file();
+	}
+
+	return err;
+}
 
 
 

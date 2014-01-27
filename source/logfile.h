@@ -1,6 +1,12 @@
-// logfile.cpp
-#ifndef LOGFILE_H
-#define LOGFILE_H 1
+/*  logfile.h
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
+#ifndef _LOGFILE_H_
+#define _LOGFILE_H_ 1
 
 #include <time.h>
 #include <string>
@@ -32,4 +38,4 @@ public:
 	void write(std::string);
 };
 
-#endif
+#endif // _LOGFILE_H_

@@ -1,5 +1,12 @@
-#ifndef USAGE_H
-#define USAGE_H 1
+/*  usage.h
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
+#ifndef _USAGE_H_
+#define _USAGE_H_ 1
 
 #include <iostream>
 #include <stdio.h>
@@ -20,4 +27,4 @@ void list_other_parameters();
 void list_image_parameters();
 void list_menu_parameters();
 
-#endif
+#endif // _USAGE_H_

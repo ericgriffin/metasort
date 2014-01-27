@@ -25,7 +25,7 @@
     <ClInclude Include="..\..\..\source\md5.h" />
     <ClInclude Include="..\..\..\Source\metasorter.h" />
     <ClInclude Include="..\..\..\source\usage.h" />
-    <ClInclude Include="..\..\..\source\util_functions.h" />
+    <ClInclude Include="..\..\..\source\metasortutil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\asset.cpp" />
@@ -35,9 +35,9 @@
     <ClCompile Include="..\..\..\Source\main.cpp" />
     <ClCompile Include="..\..\..\source\md5.cpp" />
     <ClCompile Include="..\..\..\Source\metasorter.cpp" />
-    <ClCompile Include="..\..\..\source\rule_actions.cpp" />
+    <ClCompile Include="..\..\..\source\actions.cpp" />
     <ClCompile Include="..\..\..\source\usage.cpp" />
-    <ClCompile Include="..\..\..\source\util_functions.cpp" />
+    <ClCompile Include="..\..\..\source\metasortutil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\lib\MediaInfoLib\Project\MSVC2013\Library\MediaInfoLib.vcxproj">

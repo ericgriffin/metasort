@@ -1,6 +1,13 @@
-// metasorter.h
-#ifndef METASORTER_H
-#define METASORTER_H 1
+/*  metasorter.h
+ *  Copyright (c) Eric Griffin
+ *
+ *  For conditions of distribution and use, see the
+ *  LICENSE file in the root of the source tree.
+ */
+
+
+#ifndef _METASORTER_H_
+#define _METASORTER_H_ 1
 
 #define MEDIAINFO_LIBRARY 1
 
@@ -64,7 +71,8 @@ typedef unsigned __int64   MediaInfo_int64u;
 #include "configuration.h"
 #include "asset.h"
 #include "logfile.h"
-#include "util_functions.h"
+#include "metasortutil.h"
+#include "md5.h"
 
 
 using namespace MediaInfoNameSpace;
@@ -74,21 +82,32 @@ class metasorter
 {
 		
 public:
-	metasorter(char*, tinyxml2::XMLDocument* config);
+	metasorter();
 	~metasorter();
 
 	char path[255];
-	configuration config2;
-	tinyxml2::XMLDocument* config;
+	class configuration* config;
 	std::string logstring;
 	LogFile logfile;
 	boost::threadpool::pool tp;
 	int verbose;
+
 	int file_inspection_time;
+	int logging;
+	int extensions;
+	int rules;
+	
 	int files_examined;
 	int rule_matches;
 	int actions_performed;
+
+	// 0 if scanning paths from config file
+	// 1 if reading individual files from argv
+	int run_type;
 	
+	int run();
+	int load_config_file(std::string);
+	int set_input_file(std::string);
 	int check_config(tinyxml2::XMLDocument*);
 	int process_asset(asset*);
 	int process_stream_blocks(asset*, tinyxml2::XMLElement *, int);
@@ -122,6 +141,11 @@ public:
 	int action_copyonceCUSTOM1(asset*, std::string, std::string);
 	int action_moveCUSTOM1(asset*, std::string, std::string);
 	int action_fastmoveCUSTOM1(asset*, std::string, std::string);
+	
+	boost::mutex list_mtx_;
+	boost::mutex log_mtx_;
+	boost::mutex hist_mtx_;
+	
 
 private:
 	const int DEFAULT_THREADPOOL_SIZE = 4;
@@ -129,14 +153,10 @@ private:
 	static const int MAX_CHAR = 1024;
 	int find_matches_ids[1024];
 	int find_matches_count;
-	int logging;
-	int extensions;
-	int rules;
-	boost::mutex list_mtx_;
-	boost::mutex log_mtx_;
-	boost::mutex hist_mtx_;
+	
+	
 
 };
 	
 
-#endif
+#endif // _METASORTER_H_
