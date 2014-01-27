@@ -565,8 +565,6 @@ int metasorter::process_asset(asset* _asset)
 		// process streams outside of conditional blocks
 		match = process_stream_blocks(_asset, v, 0);
 		
-		
-
 		if(match == 1)
 		{
 			// rule matches - process rule actions
@@ -606,7 +604,6 @@ int metasorter::process_asset(asset* _asset)
 				break;
 			}
 		}
-
 	}
 
 	files_examined++;
