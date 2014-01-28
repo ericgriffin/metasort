@@ -33,7 +33,15 @@ configuration::~configuration()
 int configuration::set_input_file(std::string file)
 {
 	int err = 0;
+
 	input_file->assign(file);
+
+	if (!metasortutil::file_exists(*input_file))
+	{
+		std::cout << std::endl << "ERROR - Config file " << *input_file << " does not exist" << std::endl;
+		return 1;
+	}
+	
 	return err;
 }
 
@@ -50,14 +58,14 @@ int configuration::read_configuration(std::string file)
 	// see if config file exists
 	if (!metasortutil::file_exists(*config_file))
 	{
-		std::cout << std::endl << "ERROR - Config file " << *config_file << " does not exist - skipping" << std::endl;
+		std::cout << std::endl << "ERROR - Config file " << *config_file << " does not exist" << std::endl;
 		return 1;
 	}
 
 	// parse the xml config file
 	if (config->LoadFile(config_file->c_str()) != 0)
 	{
-		std::cout << std::endl << "ERROR - XML not valid in config file " << *config_file << " - skipping" << std::endl;
+		std::cout << std::endl << "ERROR - XML not valid in config file " << *config_file << std::endl;
 		err = 1;
 		return 1;
 	}
@@ -129,8 +137,7 @@ int configuration::read_configuration(std::string file)
 		if (logging == 0)
 		{
 			_parent->log_mtx_.lock();
-			std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/> - aborting." << std::endl;
-			std::cout << "Finished." << std::endl;
+			std::cout << std::endl << "ERROR - No logging defined. Expecting <logging path=[path]/>" << std::endl;
 			_parent->log_mtx_.unlock();
 			err = 1;
 		}
@@ -169,8 +176,7 @@ int configuration::read_configuration(std::string file)
 		if (extensions == 0)
 		{
 			_parent->log_mtx_.lock();
-			std::cout << "ERROR - No extensions defined. Expecting <extension value=[value]/> - aborting" << std::endl;
-			std::cout << "Finished." << std::endl;
+			std::cout << "ERROR - No extensions defined. Expecting <extension value=[value]/>" << std::endl;
 			_parent->logfile.close();
 			_parent->log_mtx_.unlock();
 			err = 1;
@@ -187,8 +193,7 @@ int configuration::read_configuration(std::string file)
 		if (rules == 0)
 		{
 			_parent->log_mtx_.lock();
-			std::cout << "ERROR - No rules defined - aborting" << std::endl;
-			std::cout << "Finished." << std::endl;
+			std::cout << "ERROR - No rules defined" << std::endl;
 			_parent->logfile.close();
 			_parent->log_mtx_.unlock();
 			err = 1;

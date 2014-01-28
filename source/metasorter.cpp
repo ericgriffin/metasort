@@ -106,7 +106,7 @@ int metasorter::traverse_directory(int _recurse)
 int metasorter::process_file()
 {
 	int err = 0;
-
+	
 	asset* _asset = new asset;
 	boost::filesystem::path file_path = boost::filesystem::path(path);
 
@@ -395,7 +395,6 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 				delete[] configparam_intval;
 			}
 
-
 			// handle range comparison
 			if (is_range == 1)
 			{
@@ -437,7 +436,6 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 				}
 
 			}
-
 
 			// handle regex comparison
 			if (greater_than == 0 && less_than == 0 && is_regex == 1)
@@ -556,7 +554,7 @@ int metasorter::process_asset(asset* _asset)
 	int stop_processing_rules = 0;
 	
 	tinyxml2::XMLElement* xmlroot = config->config->FirstChildElement("metasort");
-	
+
 	// Process rules from config file
 	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("rule"); v != NULL; v = v->NextSiblingElement("rule"))
 	{
@@ -726,9 +724,8 @@ int metasorter::load_config_file(std::string file)
 int metasorter::set_input_file(std::string file)
 {
 	int err = 0;
-	err = config->set_input_file(file);
-	if (err == 0)
-		run_type = 1;
+	run_type = 1;
+	err = config->set_input_file(file);	
 	return err;
 }
 
@@ -760,22 +757,20 @@ int metasorter::run()
 					recurse = 1;
 			}
 
-			if (verbose == 1)
-				verbose = 1;
-
 			if (recurse == 1)
-				std::cout << std::endl << "Processing folder recursively: " << e->Attribute("path") << std::endl;
+				std::cout << std::endl << "Scanning folder recursively: " << e->Attribute("path");
 			else
-				std::cout << std::endl << "Processing folder: " << e->Attribute("path") << std::endl;
+				std::cout << std::endl << "Scanning folder: " << e->Attribute("path");
 
 			traverse_directory(recurse);
 			tp.wait();
+
+			std::cout << " - DONE" << std::endl;
 		}
 	}
-	else  // if processing files from argv[]
+	else  // if processing input files from argv[]
 	{
-		if (verbose == 1)
-			verbose = 1;
+		strcpy(path, config->input_file->c_str());
 		process_file();
 	}
 
