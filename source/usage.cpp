@@ -11,7 +11,7 @@
 
 void usage()
 {
-	std::cout << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
+	std::cout << std::endl << "Usage: metasort -c <config file> [-i <filename>] [-g]" << std::endl;
 	std::cout << "-c <config file>\t--  configuration file to use" << std::endl;
 	std::cout << "-i <filename>\t\t--  process a single file (requires -c)" << std::endl;
 	std::cout << "-g\t\t\t--  create a skeleton config file in current directory" << std::endl;
