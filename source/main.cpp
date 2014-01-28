@@ -14,7 +14,7 @@
 #include "metasorter.h"
 #include "usage.h"
 
-std::string metasort_version("1.5.1");
+std::string metasort_version("1.5.2");
 
 
 int main(int argc, char* argv[])
@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 #endif
 
 	int err = 0;
+	int continuous_run = 0;
 	int using_input_files = 0;
 	int required_flags = 0;
 
@@ -41,15 +42,17 @@ int main(int argc, char* argv[])
 	std::vector<std::string> configs;
 	std::vector<std::string> input_files;
 	
-	//configuration *config = new configuration;
-	metasorter sorter;
-
 	boost::timer elapsed_time; // start timing
 
 	if (argc > 1)
 	{
 		for (int i = 1; i < argc; i++) 
 		{ 
+			if (strcmp(argv[i], "-D") == 0)
+			{
+				continuous_run = 1;
+			}
+
 			if (strcmp(argv[i], "-g") == 0 )
 			{
 				generate_skeleton_config();
@@ -121,58 +124,83 @@ int main(int argc, char* argv[])
                 }
 			}
 		}
-
 	}
+	
 
-	if (required_flags > 0)
-	{	
-		for (unsigned config_counter = 0; config_counter < configs.size(); ++config_counter)
+	do
+	{
+		metasorter *sorter = new metasorter();
+
+		elapsed_time.restart();
+
+		if (required_flags > 0)
 		{
-			if (sorter.load_config_file(configs.at(config_counter)) == 0)
+			for (unsigned config_counter = 0; config_counter < configs.size(); ++config_counter)
 			{
-				std::cout << std::endl << "Using configuration file: " << configs.at(config_counter) << std::endl;
-
-				for (unsigned input_file_counter = 0; input_file_counter < input_files.size(); ++input_file_counter)
+				if (sorter->load_config_file(configs.at(config_counter)) == 0)
 				{
-					using_input_files = 1;
-					std::cout << "Scanning input file " << input_files.at(input_file_counter) << std::endl;
+					std::cout << std::endl << "Using configuration file: " << configs.at(config_counter) << std::endl;
 
-					if (sorter.set_input_file(input_files.at(input_file_counter)) == 0)
+					for (unsigned input_file_counter = 0; input_file_counter < input_files.size(); ++input_file_counter)
 					{
-						sorter.run();
-					}
-					else
-					{
-						std::cout << std::endl << "ABORTING - Error opening: " << input_files.at(config_counter) << std::endl;
-					}
+						using_input_files = 1;
+						std::cout << "Scanning input file " << input_files.at(input_file_counter) << std::endl;
 
-					files_examined += sorter.files_examined;
-					rule_matches += sorter.rule_matches;
-					actions_performed += sorter.actions_performed;
+						if (sorter->set_input_file(input_files.at(input_file_counter)) == 0)
+						{
+							sorter->run();
+						}
+						else
+						{
+							std::cout << std::endl << "ABORTING - Error opening: " << input_files.at(config_counter) << std::endl;
+						}
+
+						files_examined += sorter->files_examined;
+						rule_matches += sorter->rule_matches;
+						actions_performed += sorter->actions_performed;
+					}
+					
+					if (using_input_files == 0)
+					{
+						sorter->run();
+					}
 				}
 
-				if (using_input_files == 0)
+				else
 				{
-					sorter.run();
+					std::cout << std::endl << "ABORTING - Configuration error in: " << configs.at(config_counter) << std::endl;
+					break;
 				}
 			}
-			else
-			{
-				std::cout << std::endl <<  "ABORTING - Configuration error in: " << configs.at(config_counter) << std::endl;
-				break;
-			}
+
+			std::cout << std::endl << sorter->files_examined << " files examined." << std::endl;
+			std::cout << sorter->rule_matches << " rule matches." << std::endl;
+			std::cout << sorter->actions_performed << " actions performed." << std::endl;
+			std::cout << std::endl << "Finished in " << elapsed_time.elapsed() << " seconds." << std::endl;
 		}
 
-		std::cout << std::endl << sorter.files_examined << " files examined." << std::endl;
-		std::cout << sorter.rule_matches << " rule matches." << std::endl;
-		std::cout << sorter.actions_performed << " actions performed." << std::endl;
-		std::cout << std::endl << "Finished in " << elapsed_time.elapsed() << " seconds." << std::endl;
-	}
+		else
+		{
+			usage();
+			break;
+		}
 
-	else
-	{
-		usage();
-	}
+		if (continuous_run == 1)
+		{
+			metasortutil::Wait(10000);
+
+			sorter->files_examined = 0;
+			sorter->rule_matches = 0;
+			sorter->actions_performed = 0;
+			files_examined = 0;
+			rule_matches = 0;
+			actions_performed = 0;
+			running_time = 0;
+		}
+
+		delete sorter;
+
+	} while (continuous_run == 1);
 
 	return err;
 }

@@ -145,6 +145,9 @@ public:
 	boost::mutex list_mtx_;
 	boost::mutex log_mtx_;
 	boost::mutex hist_mtx_;
+	boost::mutex file_examined_mtx_;
+	boost::mutex rule_matches_mtx_;
+	boost::mutex actions_performed_mtx_;
 	
 
 private:

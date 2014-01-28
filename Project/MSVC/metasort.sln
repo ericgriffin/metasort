@@ -6,10 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", "{F696A30D-66C6-46A8-B1BC-04B13BF14290}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{680C7FCA-E3E6-4490-BCE4-29824ADC8CFF}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-		Performance2.psess = Performance2.psess
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\lib\zlib\projects\MSVC2010\zlib.vcxproj", "{FD328AE2-5136-460F-A622-12CFD4D4C131}"
 EndProject

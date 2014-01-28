@@ -584,7 +584,9 @@ int metasorter::process_asset(asset* _asset)
 				std::string rule_parameter(q->Attribute("parameter"));
 
 				process_rule(_asset, rule_name, rule_type, rule_parameter);
+				actions_performed_mtx_.lock();
 				actions_performed++;
+				actions_performed_mtx_.unlock();
 
 				// don't continue processing remaining rules if file has been moved/deleted
 				if (strcmp(q->Attribute("type"), "move") == 0 || strcmp(q->Attribute("type"), "delete") == 0 || strcmp(q->Attribute("type"), "fastmove") == 0 || strcmp(q->Attribute("type"), "moveCUSTOM1") == 0 || strcmp(q->Attribute("type"), "fastmoveCUSTOM1") == 0)
@@ -594,7 +596,9 @@ int metasorter::process_asset(asset* _asset)
 				}
 			}
 
+			rule_matches_mtx_.lock();
 			rule_matches++;
+			rule_matches_mtx_.unlock();
 
 			// don't continue processing remaining rules if file has been moved/deleted
 			if (stop_processing_rules == 1)
@@ -604,7 +608,9 @@ int metasorter::process_asset(asset* _asset)
 		}
 	}
 
+	file_examined_mtx_.lock();
 	files_examined++;
+	file_examined_mtx_.unlock();
 
 	delete _asset;
 	return err;

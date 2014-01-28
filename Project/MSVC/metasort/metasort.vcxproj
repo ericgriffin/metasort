@@ -115,6 +115,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>
@@ -222,9 +223,10 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>CompileAsCpp</CompileAs>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
