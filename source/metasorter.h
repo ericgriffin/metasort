@@ -151,8 +151,8 @@ public:
 	
 
 private:
-	const int DEFAULT_THREADPOOL_SIZE = 4;
-	const int DEFAULT_FILE_INSPECTION_TIME = 20000;
+	static const int DEFAULT_THREADPOOL_SIZE = 4;
+	static const int DEFAULT_FILE_INSPECTION_TIME = 20000;
 	static const int MAX_CHAR = 1024;
 
 };
