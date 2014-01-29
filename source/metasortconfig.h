@@ -13,7 +13,6 @@
 #include "metasorter.h"
 
 
-
 class metasortconfig
 {
 public:

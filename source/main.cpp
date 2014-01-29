@@ -14,7 +14,7 @@
 #include "metasorter.h"
 #include "usage.h"
 
-std::string metasort_version("1.5.2");
+std::string metasort_version("1.5.3");
 
 
 int main(int argc, char* argv[])
@@ -23,9 +23,9 @@ int main(int argc, char* argv[])
 	std::cout << "Compiled " << __DATE__ << " " << __TIME__;
 	
 #if defined(_M_X64) || defined(__amd64__) || defined(_LP64) || defined(_WIN64)
-	std::cout << " for x86-64" << std::endl << std::endl;
+	std::cout << " for x86-64" << std::endl << std::endl << std::endl;
 #else
-	std::cout << " for x86" << std::endl;
+	std::cout << " for x86" << std::endl << std::endl;
 #endif
 
 	int err = 0;
@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
 	std::vector<std::string> configs;
 	std::vector<std::string> input_files;
 	
+	metasorter *sorter;
 	boost::timer elapsed_time; // start timing
 
 	if (argc > 1)
@@ -125,11 +126,10 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
-	
 
 	do
 	{
-		metasorter *sorter = new metasorter();
+		sorter = new metasorter();
 
 		elapsed_time.restart();
 
@@ -139,12 +139,9 @@ int main(int argc, char* argv[])
 			{
 				if (sorter->load_config_file(configs.at(config_counter)) == 0)
 				{
-					std::cout << std::endl << "Using configuration file: " << configs.at(config_counter) << std::endl;
-
 					for (unsigned input_file_counter = 0; input_file_counter < input_files.size(); ++input_file_counter)
 					{
 						using_input_files = 1;
-						std::cout << "Scanning input file " << input_files.at(input_file_counter) << std::endl;
 
 						if (sorter->set_input_file(input_files.at(input_file_counter)) == 0)
 						{
@@ -152,7 +149,7 @@ int main(int argc, char* argv[])
 						}
 						else
 						{
-							std::cout << std::endl << "ABORTING - Error opening: " << input_files.at(config_counter) << std::endl;
+							break;
 						}
 
 						files_examined += sorter->files_examined;
@@ -168,7 +165,6 @@ int main(int argc, char* argv[])
 
 				else
 				{
-					std::cout << std::endl << "ABORTING - Configuration error in: " << configs.at(config_counter) << std::endl;
 					break;
 				}
 			}

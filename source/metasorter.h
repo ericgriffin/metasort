@@ -20,10 +20,10 @@
 #endif
 
 #ifdef MEDIAINFO_LIBRARY
-#include "MediaInfo/MediaInfo.h" //Staticly-loaded library (.lib or .a or .so)
+#include "MediaInfo/MediaInfo.h"  // Staticly-loaded library (.lib or .a or .so)
 #define MediaInfoNameSpace MediaInfoLib;
 #else
-#include "MediaInfoDLL/MediaInfoDLL.h" //Dynamicly-loaded library (.dll or .so)
+#include "MediaInfoDLL/MediaInfoDLL.h"  // Dynamicly-loaded library (.dll or .so)
 #define MediaInfoNameSpace MediaInfoDLL;
 #endif
 
@@ -42,6 +42,7 @@
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/tokenizer.hpp>
@@ -75,6 +76,7 @@ public:
 	LogFile logfile;
 	boost::threadpool::pool tp;
 	int verbose;
+	int debug;
 
 	int file_inspection_time;
 	int logging;

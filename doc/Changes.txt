@@ -1,3 +1,9 @@
+1.5.2 --> 1.5.3
+-----------------
+- Improved logging
+- Added "debug=[boolean]" attribute to logging tag. Outputs parameter comparison data.
+- Numeric comparisons can now use floating point values instead of integers.
+
 1.5.1 --> 1.5.2
 -----------------
 - Certain actions can now use %s (full filename incl. path), %f (filename excl. path), %p (path), and %e (extension) as variables in action parameters.
