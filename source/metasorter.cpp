@@ -434,7 +434,9 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 						parameter_match = 0;
 					}
 				}
-
+				delete[] asset_param_intval;
+				delete[] configparam_low_intval;
+				delete[] configparam_high_intval;
 			}
 
 			// handle regex comparison
