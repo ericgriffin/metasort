@@ -17,25 +17,14 @@ metasorter::metasorter()
 	rule_matches = 0;
 	actions_performed = 0;
 	verbose = 0;
+	debug = 0;
 	run_type = 0;
-
-	log_mtx_.lock();
-	logstring.assign("Entering folder ");
-	logstring.append(path);
-	logfile.write(logstring);
-	log_mtx_.unlock();
 }
 
 
 metasorter::~metasorter()
 {
 	delete config;
-	log_mtx_.lock();
-	logstring.assign("Leaving folder ");
-	logstring.append(path);
-	logfile.write(logstring);
-	logfile.close();
-	log_mtx_.unlock();
 }
 
 
@@ -142,6 +131,7 @@ int metasorter::call_MediaInfo(MediaInfo &MI, asset* _asset)
 		log_mtx_.unlock();
 		return 1;
 	}
+
 	unsigned char* From_Buffer = new unsigned char[7 * 188];	//prepare a memory buffer for reading
 	size_t From_Buffer_Size;
 
@@ -346,8 +336,43 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 				// handle less-than comparison
 				if (less_than == 1)
 				{
-					//cout << "Comparing Less than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
-					if (atoi((const char*)asset_param_intval) < atoi((const char*)configparam_intval))
+					// debug information
+					if (debug)
+					{
+						char* parameter_mbs = new char[255];
+						wcstombs(parameter_mbs, parameter.c_str(), wcslen(parameter.c_str()) + 1);
+						
+						log_mtx_.lock();
+						logstring.assign("Comparing ");
+						logstring.append(_asset->full_filename);
+						logstring.append(" (");
+						logstring.append(stream);
+						logstring.append(" ");
+						logstring.append(boost::lexical_cast<std::string>(stream_number));
+						logstring.append(" ");
+						logstring.append(parameter_mbs);
+						logstring.append("): ");
+						logstring.append(asset_param_intval);
+						logstring.append(" ");
+						if (exclude == 1)
+							logstring.append("!");
+						logstring.append("< ");
+						logstring.append(configparam_intval);
+						logfile.write(logstring);
+
+						if (verbose)
+						{
+							std::cout << "Comparing " << _asset->full_filename << " (" << stream << " " << stream_number << " " << parameter_mbs << "): " << ((const char*)asset_param_intval) << " ";
+							if (exclude == 1)
+								std::cout << "!";
+							std::cout << "< " << atof((const char*)configparam_intval) << std::endl; // debug mode
+						}
+
+						log_mtx_.unlock();
+						delete[] parameter_mbs;
+					}
+
+					if (atof((const char*)asset_param_intval) < atof((const char*)configparam_intval))
 					{
 						if (exclude == 0) {}
 						else
@@ -370,8 +395,43 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 				// handle greater-than comparison
 				if (greater_than == 1)
 				{
-					//cout << "Comparing Greater than: " << atoi((const char*)asset_param_intval) << " TO " << atoi((const char*)configparam_intval) << endl;
-					if (atoi((const char*)asset_param_intval) > atoi((const char*)configparam_intval))
+					// debug information
+					if (debug)
+					{
+						char* parameter_mbs = new char[255];
+						wcstombs(parameter_mbs, parameter.c_str(), wcslen(parameter.c_str()) + 1);
+
+						log_mtx_.lock();
+						logstring.assign("Comparing ");
+						logstring.append(_asset->full_filename);
+						logstring.append(" (");
+						logstring.append(stream);
+						logstring.append(" ");
+						logstring.append(boost::lexical_cast<std::string>(stream_number));
+						logstring.append(" ");
+						logstring.append(parameter_mbs);
+						logstring.append("): ");
+						logstring.append(asset_param_intval);
+						logstring.append(" ");
+						if (exclude == 1)
+							logstring.append("!");
+						logstring.append("> ");
+						logstring.append(configparam_intval);
+						logfile.write(logstring);
+
+						if (verbose)
+						{
+							std::cout << "Comparing " << _asset->full_filename << " (" << stream << " " << stream_number << " " << parameter_mbs << "): " << (const char*)asset_param_intval << " ";
+							if (exclude == 1)
+								std::cout << "!";
+							std::cout << "> " << (const char*)configparam_intval << std::endl; // debug mode
+						}
+
+						log_mtx_.unlock();
+						delete[] parameter_mbs;
+					}
+
+					if (atof((const char*)asset_param_intval) > atof((const char*)configparam_intval))
 					{
 						if (exclude == 0) {}
 						else
@@ -416,7 +476,55 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 
 				wcstombs(asset_param_intval, asset_param_val.c_str(), wcslen(asset_param_val.c_str()) + 1);
 				
-				if (atoi((const char*)asset_param_intval) >= atoi((const char*)configparam_low_intval) && atoi((const char*)asset_param_intval) <= atoi((const char*)configparam_high_intval))
+				// debug information
+				if (debug)
+				{
+					char* parameter_mbs = new char[255];
+					wcstombs(parameter_mbs, parameter.c_str(), wcslen(parameter.c_str()) + 1);
+
+					log_mtx_.lock();
+					logstring.assign("Comparing ");
+					logstring.append(_asset->full_filename);
+					logstring.append(" (");
+					logstring.append(stream);
+					logstring.append(" ");
+					logstring.append(boost::lexical_cast<std::string>(stream_number));
+					logstring.append(" ");
+					logstring.append(parameter_mbs);
+					logstring.append("): ");
+					logstring.append(configparam_low_intval);
+					if (exclude == 1)
+						logstring.append(" >= ");
+					else
+						logstring.append(" <= ");
+					logstring.append(asset_param_intval);
+					if (exclude == 1)
+						logstring.append(" <= ");
+					else
+						logstring.append(" >= ");
+					logstring.append(configparam_high_intval);
+					logfile.write(logstring);
+
+					if (verbose)
+					{
+						std::cout << "Comparing range " << _asset->full_filename << " (" << stream << " " << stream_number << " " << parameter_mbs << "): " << configparam_low_intval;
+						if (exclude == 1)
+							std::cout << " >= ";
+						else
+							std::cout << " <= ";
+						std::cout << asset_param_intval;
+						if (exclude == 1)
+							std::cout << " <= ";
+						else
+							std::cout << " >= ";
+						std::cout << configparam_high_intval << std::endl; // debug mode
+					}
+
+					log_mtx_.unlock();
+					delete[] parameter_mbs;
+				}
+
+				if (atof((const char*)asset_param_intval) >= atof((const char*)configparam_low_intval) && atof((const char*)asset_param_intval) <= atof((const char*)configparam_high_intval))
 				{
 					if (exclude == 0) {}
 					else
@@ -479,7 +587,50 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 			// handle default comparison
 			if (greater_than == 0 && less_than == 0 && is_regex == 0 && is_range == 0)
 			{
-				//cout << "Comparing: " << asset_param_val << " TO " << parameter_val << endl;
+				if (debug)
+				{
+					char* asset_param_mbsval = new char[255];
+					char* configparam_mbsval = new char[255];
+					char* parameter_mbs = new char[255];
+					wcstombs(asset_param_mbsval, asset_param_val.c_str(), wcslen(asset_param_val.c_str()) + 1);
+					wcstombs(configparam_mbsval, parameter_val.c_str(), wcslen(parameter_val.c_str()) + 1);
+					wcstombs(parameter_mbs, parameter.c_str(), wcslen(parameter.c_str()) + 1);
+
+					log_mtx_.lock();
+					logstring.assign("Comparing ");
+					logstring.append(_asset->full_filename);
+					logstring.append(" (");
+					logstring.append(stream);
+					logstring.append(" ");
+					logstring.append(boost::lexical_cast<std::string>(stream_number));
+					logstring.append(" ");
+					logstring.append(parameter_mbs);
+					logstring.append("): ");
+					logstring.append(asset_param_mbsval);
+					logstring.append(" ");
+					if (exclude == 1)
+						logstring.append("!");
+					logstring.append("= ");
+					logstring.append(configparam_mbsval);
+					logfile.write(logstring);
+					
+					if (verbose)
+					{
+						std::wcout << "Comparing " << _asset->full_filename << " (";
+						std::cout << stream;
+						std::wcout << " " << stream_number << " " << parameter_mbs << "): " << asset_param_val.c_str() << " ";
+						if (exclude == 1)
+							std::cout << "!";
+						std::wcout << "= " << parameter_val.c_str() << std::endl; // debug mode
+					}
+
+					log_mtx_.unlock();
+
+					delete[] asset_param_mbsval;
+					delete[] configparam_mbsval;
+					delete[] parameter_mbs;
+				}
+
 				if (wcscmp(asset_param_val.c_str(), parameter_val.c_str()) == 0)
 				{
 					if (exclude == 0) {}
@@ -725,6 +876,24 @@ int metasorter::load_config_file(std::string file)
 {
 	int err = 0;
 	err = config->read_configuration(file);
+	if (err == 0)
+	{
+		log_mtx_.lock();
+		logstring.assign("Using configuration file ");
+		logstring.append(file);
+		logfile.write(logstring);
+		std::cout << std::endl << "Using configuration file: " << file << std::endl;
+		log_mtx_.unlock();
+	}
+	else
+	{
+		log_mtx_.lock();
+		logstring.assign("ABORTING - Configuration error in: ");
+		logstring.append(file);
+		logfile.write(logstring);
+		std::cout << std::endl << "ABORTING - Configuration error in " << file << std::endl;
+		log_mtx_.unlock();
+	}
 	return err;
 }
 
@@ -733,7 +902,16 @@ int metasorter::set_input_file(std::string file)
 {
 	int err = 0;
 	run_type = 1;
-	err = config->set_input_file(file);	
+	err = config->set_input_file(file);
+	if (err == 1)
+	{
+		log_mtx_.lock();
+		logstring.assign("ABORTING - Error opening ");
+		logstring.append(file);
+		logfile.write(logstring);
+		std::cout << std::endl << "ABORTING - Error opening " << file << std::endl;
+		log_mtx_.unlock();
+	}
 	return err;
 }
 
@@ -766,21 +944,63 @@ int metasorter::run()
 			}
 
 			if (recurse == 1)
+			{
+				log_mtx_.lock();
+				logstring.assign("Scanning folder recursively ");
+				logstring.append(path);
+				logfile.write(logstring);
 				std::cout << std::endl << "Scanning folder recursively: " << e->Attribute("path");
+				log_mtx_.unlock();
+			}
 			else
+			{
+				log_mtx_.lock();
+				logstring.assign("Scanning folder ");
+				logstring.append(path);
+				logfile.write(logstring);
 				std::cout << std::endl << "Scanning folder: " << e->Attribute("path");
-
+				log_mtx_.unlock();
+			}
 			traverse_directory(recurse);
 			tp.wait();
 
 			std::cout << " - DONE" << std::endl;
+		
+			log_mtx_.lock();
+			logstring.assign("Finished scanning folder ");
+			logstring.append(path);
+			logfile.write(logstring);
+			log_mtx_.unlock();
 		}
 	}
 	else  // if processing input files from argv[]
 	{
 		strcpy(path, config->input_file->c_str());
+
+		log_mtx_.lock();
+		logstring.assign("Scanning input file ");
+		logstring.append(path);
+		logfile.write(logstring);
+		std::cout << std::endl << "Scanning input file " << path << std::endl;
+		log_mtx_.unlock();
+
 		process_file();
+		
+		log_mtx_.lock();
+		logstring.assign("Finished scanning file ");
+		logstring.append(path);
+		logfile.write(logstring);
+		log_mtx_.unlock();
+
 	}
+
+	log_mtx_.lock();
+	logstring.assign("Finished with config file ");
+	logstring.append(*config->config_file);
+	logfile.write(logstring);
+	std::cout << std::endl << "Finished with config file " << *config->config_file << std::endl;
+	logfile.close();
+	log_mtx_.unlock();
 
 	return err;
 }

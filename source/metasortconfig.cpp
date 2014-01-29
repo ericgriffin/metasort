@@ -38,7 +38,7 @@ int metasortconfig::set_input_file(std::string file)
 
 	if (!metasortutil::file_exists(*input_file))
 	{
-		std::cout << std::endl << "ERROR - Config file " << *input_file << " does not exist" << std::endl;
+		std::cout << std::endl << "ERROR - Input file " << *input_file << " does not exist" << std::endl;
 		return 1;
 	}
 	
@@ -131,6 +131,11 @@ int metasortconfig::read_configuration(std::string file)
 			{
 				if (std::string("yes").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0 || std::string("1").compare(xmlroot->FirstChildElement("logging")->Attribute("console")) == 0)
 					_parent->verbose = 1;
+			}
+			if (xmlroot->FirstChildElement("logging")->Attribute("debug"))
+			{
+				if (std::string("yes").compare(xmlroot->FirstChildElement("logging")->Attribute("debug")) == 0 || std::string("1").compare(xmlroot->FirstChildElement("logging")->Attribute("debug")) == 0)
+					_parent->debug = 1;
 			}
 		}
 
