@@ -30,10 +30,10 @@
     <ClInclude Include="..\..\..\source\usage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\configuration.h">
+    <ClInclude Include="..\..\..\source\metasortutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\metasortutil.h">
+    <ClInclude Include="..\..\..\source\metasortconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,13 +59,13 @@
     <ClCompile Include="..\..\..\source\usage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\configuration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\metasortutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\actions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\metasortconfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

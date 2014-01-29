@@ -93,8 +93,8 @@
 		</Linker>
 		<Unit filename="../../source/asset.cpp" />
 		<Unit filename="../../source/asset.h" />
-		<Unit filename="../../source/configuration.cpp" />
-		<Unit filename="../../source/configuration.h" />
+		<Unit filename="../../source/metasortconfig.cpp" />
+		<Unit filename="../../source/metasortconfig.h" />
 		<Unit filename="../../source/customparameters.cpp" />
 		<Unit filename="../../source/logfile.cpp" />
 		<Unit filename="../../source/logfile.h" />

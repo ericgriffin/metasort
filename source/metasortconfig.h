@@ -5,8 +5,8 @@
  *  LICENSE file in the root of the source tree.
  */
 
-#ifndef _CONFIGURATION_H_
-#define _CONFIGURATION_H_ 1
+#ifndef _METASORTCONFIG_H_
+#define _METASORTCONFIG_H_ 1
 
 #include <iostream>
 #include <ThirdParty/tinyxml2/tinyxml2.h>
@@ -14,11 +14,11 @@
 
 
 
-class configuration
+class metasortconfig
 {
 public:
-	configuration(class metasorter *);
-	~configuration();
+	metasortconfig(class metasorter *);
+	~metasortconfig();
 	
 	metasorter* _parent;
 	std::string* config_file;

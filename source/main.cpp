@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
 
 		if (continuous_run == 1)
 		{
-			metasortutil::Wait(10000);
+			metasortutil::Wait(100);
 
 			sorter->files_examined = 0;
 			sorter->rule_matches = 0;

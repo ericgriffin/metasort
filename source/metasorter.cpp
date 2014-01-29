@@ -10,7 +10,7 @@
 
 metasorter::metasorter()
 {
-	config = new configuration(this);
+	config = new metasortconfig(this);
 	file_inspection_time = DEFAULT_FILE_INSPECTION_TIME;
 	tp.size_controller().resize(DEFAULT_THREADPOOL_SIZE);
 	files_examined = 0;
@@ -434,7 +434,9 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 						parameter_match = 0;
 					}
 				}
-
+				delete[] asset_param_intval;
+				delete[] configparam_low_intval;
+				delete[] configparam_high_intval;
 			}
 
 			// handle regex comparison
