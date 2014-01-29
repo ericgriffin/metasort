@@ -6,13 +6,13 @@
  */
 
 
-#include "configuration.h"
+#include "metasortconfig.h"
 
 
 std::string config_version("1.x");
 
 
-configuration::configuration(class metasorter* _parent)
+metasortconfig::metasortconfig(class metasorter* _parent)
 {
 	this->_parent = _parent;
 	
@@ -22,7 +22,7 @@ configuration::configuration(class metasorter* _parent)
 }
 
 
-configuration::~configuration()
+metasortconfig::~metasortconfig()
 {
 	delete config;
 	delete config_file;
@@ -30,7 +30,7 @@ configuration::~configuration()
 }
 
 
-int configuration::set_input_file(std::string file)
+int metasortconfig::set_input_file(std::string file)
 {
 	int err = 0;
 
@@ -46,7 +46,7 @@ int configuration::set_input_file(std::string file)
 }
 
 
-int configuration::read_configuration(std::string file)
+int metasortconfig::read_configuration(std::string file)
 {
 	int err = 0;
 	int logging = 0;

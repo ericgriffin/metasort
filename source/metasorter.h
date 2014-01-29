@@ -52,7 +52,7 @@
 
 #include <ThirdParty/tinyxml2/tinyxml2.h>
 
-#include "configuration.h"
+#include "metasortconfig.h"
 #include "asset.h"
 #include "logfile.h"
 #include "metasortutil.h"
@@ -70,7 +70,7 @@ public:
 	~metasorter();
 
 	char path[255];
-	class configuration* config;
+	class metasortconfig* config;
 	std::string logstring;
 	LogFile logfile;
 	boost::threadpool::pool tp;

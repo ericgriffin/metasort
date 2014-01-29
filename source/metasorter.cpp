@@ -10,7 +10,7 @@
 
 metasorter::metasorter()
 {
-	config = new configuration(this);
+	config = new metasortconfig(this);
 	file_inspection_time = DEFAULT_FILE_INSPECTION_TIME;
 	tp.size_controller().resize(DEFAULT_THREADPOOL_SIZE);
 	files_examined = 0;
