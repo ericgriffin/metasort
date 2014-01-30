@@ -65,8 +65,11 @@ int metasortutil::path_exists(const std::string& path)
 {
 	int retval = 0;
 	boost::filesystem::path* dirpath = new boost::filesystem::path(path);
-	if (boost::filesystem::is_directory(*dirpath))
-		retval = 1;
+	if (boost::filesystem::exists(*dirpath))
+	{
+		if (boost::filesystem::is_directory(*dirpath))
+			retval = 1;
+	}
 	delete dirpath;
 	return retval;
 }

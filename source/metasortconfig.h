@@ -11,6 +11,7 @@
 #include <iostream>
 #include <ThirdParty/tinyxml2/tinyxml2.h>
 #include "metasorter.h"
+#include "usage.h"
 
 
 class metasortconfig
@@ -28,7 +29,9 @@ public:
 	// initialization functions
 	int read_configuration(std::string);
 	int set_input_file(std::string);
-
+	int validateparameters(tinyxml2::XMLElement *, int, std::string);
+	int validateactions(tinyxml2::XMLElement *, int);
+	int validatestreams(tinyxml2::XMLElement *, int, std::string);
 };
 
 #endif // _CONFIGURATION_H_

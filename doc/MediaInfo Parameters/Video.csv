@@ -1,8 +1,8 @@
 Count;;;N NI;;;Count of objects available in this stream
 Status;;;N NI;;;bit field (0=IsAccepted, 1=IsFilled, 2=IsUpdated, 3=IsFinished)
 StreamCount;;;N NI;;;Count of streams of that kind available
-StreamKind;Video;;N NI;;;Stream type name
-StreamKind/String;;;N NI;;;Stream type name
+StreamKind;Video;;N NT;;;Stream type name
+StreamKind/String;;;N NT;;;Stream type name
 StreamKindID;;;N NI;;;Number of the stream (base=0)
 StreamKindPos;;;N NI;;;When multiple streams, number of the stream (base=1)
 StreamOrder;;;N YI;;;Stream order in the file, whatever is the kind of stream (base=0)
@@ -168,6 +168,7 @@ ScanType_Original;;;N YT;;;
 ScanType_Original/String;;;Y NT;;;
 ScanOrder;;;N YT;;;;
 ScanOrder/String;;;Y NT;;;;
+ScanOrder_StoredDisplayedInverted;;;Y YT;;;;
 ScanOrder_Original;;;N YT;;;;
 ScanOrder_Original/String;;;Y NT;;;;
 Interlacement;;;N NT;;;Deprecated, do not use in new projects;
@@ -261,3 +262,11 @@ Encoded_Date;;;Y YT;;;UTC time that the encoding of this item was completed bega
 Tagged_Date;;;Y YT;;;UTC time that the tags were done for this item.;;Temporal
 Encryption;;;Y YT;;;;;
 BufferSize;;;N YT;;;Defines the size of the buffer needed to decode the sequence.
+colour_description_present;;;N YT;;;Presence of colour description
+colour_primaries;;;Y YT;;;Chromaticity coordinates of the source primaries
+transfer_characteristics;;;Y YT;;;Opto-electronic transfer characteristic of the source picture
+matrix_coefficients;;;Y YT;;;Matrix coefficients used in deriving luma and chroma signals from the green, blue, and red primaries
+colour_description_present_Original;;;N YT;;;Presence of colour description
+colour_primaries_Original;;;Y YT;;;Chromaticity coordinates of the source primaries
+transfer_characteristics_Original;;;Y YT;;;Opto-electronic transfer characteristic of the source picture
+matrix_coefficients_Original;;;Y YT;;;Matrix coefficients used in deriving luma and chroma signals from the green, blue, and red primaries

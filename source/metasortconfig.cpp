@@ -204,8 +204,114 @@ int metasortconfig::read_configuration(std::string file)
 			err = 1;
 		}
 
+		err |= validatestreams(xmlroot, 0, "");
+		err |= validateactions(xmlroot, 0);
+		err |= validateparameters(xmlroot, 0, "");
+
 		if (err == 1)
 			config->Clear();
+	}
+
+	return err;
+}
+
+
+int metasortconfig::validateparameters(tinyxml2::XMLElement *v, int err, std::string rule_name)
+{
+	// skip non parameter tags
+	for (tinyxml2::XMLElement *e = v->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
+	{
+		if (std::string("rule").compare(e->Name()) == 0)
+			rule_name.assign(e->ToElement()->Attribute("name"));
+		err = validateparameters(e, err, rule_name);
+	}
+
+	// check rule parameters
+	for (tinyxml2::XMLElement *u = v->FirstChildElement("parameter"); u != NULL; u = u->NextSiblingElement("parameter"))
+	{
+		if (parameter_lookup(u->Parent()->ToElement()->Attribute("type"), u->Attribute("name")) == 0)
+		{
+			_parent->log_mtx_.lock();
+			_parent->logstring.assign("ERROR - parameter '");
+			_parent->logstring.append(u->Attribute("name"));
+			_parent->logstring.append("' in '");
+			_parent->logstring.append(u->Parent()->ToElement()->Attribute("type"));
+			_parent->logstring.append("' stream in rule '");
+			_parent->logstring.append(rule_name);
+			_parent->logstring.append("' is undefined.");
+			_parent->logfile.write(_parent->logstring);
+			std::cout << std::endl << "ERROR - parameter '" << u->Attribute("name");
+			std::cout << "' in '" << u->Parent()->ToElement()->Attribute("type") << "' stream in rule '";
+			std::cout << rule_name << "' is undefined." << std::endl;
+			_parent->log_mtx_.unlock();
+			err = 1;
+		}
+	}
+
+	return err;
+}
+
+
+int metasortconfig::validateactions(tinyxml2::XMLElement *v, int err)
+{
+
+	// skip non parameter tags
+	for (tinyxml2::XMLElement *e = v->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
+	{
+		err = validateactions(e, err);
+	}
+
+	// check rule parameters
+	for (tinyxml2::XMLElement *u = v->FirstChildElement("action"); u != NULL; u = u->NextSiblingElement("action"))
+	{
+		if (action_lookup(u->Attribute("type")) == 0)
+		{
+			_parent->log_mtx_.lock();
+			_parent->logstring.assign("ERROR - action '");
+			_parent->logstring.append(u->Attribute("type"));
+			_parent->logstring.append("' in rule '");
+			_parent->logstring.append(u->Parent()->ToElement()->Attribute("name"));
+			_parent->logstring.append("' is undefined.");
+			_parent->logfile.write(_parent->logstring);
+			std::cout << std::endl << "ERROR - action '" << u->Attribute("type");
+			std::cout << "' in rule '" << u->Parent()->ToElement()->Attribute("name") << "' is undefined." << std::endl;
+			_parent->log_mtx_.unlock();
+			err = 1;
+		}
+	}
+
+	return err;
+}
+
+
+int metasortconfig::validatestreams(tinyxml2::XMLElement *v, int err, std::string rule_name)
+{
+
+	// skip non parameter tags
+	for (tinyxml2::XMLElement *e = v->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
+	{
+		if (std::string("rule").compare(e->Name()) == 0)
+			rule_name.assign(e->ToElement()->Attribute("name"));
+		err = validatestreams(e, err, rule_name);
+	}
+
+	// check rule parameters
+	for (tinyxml2::XMLElement *u = v->FirstChildElement("stream"); u != NULL; u = u->NextSiblingElement("stream"))
+	{
+		if (stream_lookup(u->Attribute("type")) == 0)
+		{
+			_parent->log_mtx_.lock();
+			_parent->logstring.assign("ERROR - stream '");
+			_parent->logstring.append(u->Attribute("type"));
+			_parent->logstring.append("' in rule ");
+			_parent->logstring.append(u->Parent()->ToElement()->Attribute("name"));
+			_parent->logstring.append(" is undefined.");
+			_parent->logfile.write(_parent->logstring);
+			std::cout << std::endl << "ERROR - stream '" << u->Attribute("type");
+			std::cout << "' in rule '" << rule_name << "' is undefined." << std::endl;
+			_parent->log_mtx_.unlock();
+			err = 1;
+		}
 	}
 
 	return err;

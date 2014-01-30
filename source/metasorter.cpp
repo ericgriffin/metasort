@@ -875,17 +875,16 @@ int metasorter::process_extensions(asset* _asset)
 int metasorter::load_config_file(std::string file)
 {
 	int err = 0;
+	log_mtx_.lock();
+	logstring.assign("Using configuration file ");
+	logstring.append(file);
+	logfile.write(logstring);
+	std::cout << std::endl << "Using configuration file: " << file << std::endl;
+	log_mtx_.unlock();
+
 	err = config->read_configuration(file);
-	if (err == 0)
-	{
-		log_mtx_.lock();
-		logstring.assign("Using configuration file ");
-		logstring.append(file);
-		logfile.write(logstring);
-		std::cout << std::endl << "Using configuration file: " << file << std::endl;
-		log_mtx_.unlock();
-	}
-	else
+
+	if (err == 1)
 	{
 		log_mtx_.lock();
 		logstring.assign("ABORTING - Configuration error in: ");
@@ -946,10 +945,10 @@ int metasorter::run()
 			if (recurse == 1)
 			{
 				log_mtx_.lock();
-				logstring.assign("Scanning folder recursively ");
+				logstring.assign("Scanning folder and subfolders ");
 				logstring.append(path);
 				logfile.write(logstring);
-				std::cout << std::endl << "Scanning folder recursively: " << e->Attribute("path");
+				std::cout << std::endl << "Scanning folder and subfolders: " << e->Attribute("path") << std::endl;
 				log_mtx_.unlock();
 			}
 			else
@@ -958,13 +957,11 @@ int metasorter::run()
 				logstring.assign("Scanning folder ");
 				logstring.append(path);
 				logfile.write(logstring);
-				std::cout << std::endl << "Scanning folder: " << e->Attribute("path");
+				std::cout << std::endl << "Scanning folder: " << e->Attribute("path") << std::endl;
 				log_mtx_.unlock();
 			}
 			traverse_directory(recurse);
 			tp.wait();
-
-			std::cout << " - DONE" << std::endl;
 		
 			log_mtx_.lock();
 			logstring.assign("Finished scanning folder ");
@@ -995,15 +992,12 @@ int metasorter::run()
 	}
 
 	log_mtx_.lock();
-	logstring.assign("Finished with config file ");
+	logstring.assign("Finished with config file: ");
 	logstring.append(*config->config_file);
 	logfile.write(logstring);
-	std::cout << std::endl << "Finished with config file " << *config->config_file << std::endl;
+	std::cout << std::endl << "Finished with config file: " << *config->config_file << std::endl;
 	logfile.close();
 	log_mtx_.unlock();
 
 	return err;
 }
-
-
-

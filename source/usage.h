@@ -16,6 +16,9 @@
 #include <boost/filesystem.hpp>
 
 void usage();
+int parameter_lookup(std::string, std::string);
+int action_lookup(std::string);
+int stream_lookup(std::string);
 void generate_skeleton_config();
 void list_actions();
 void list_streams();
