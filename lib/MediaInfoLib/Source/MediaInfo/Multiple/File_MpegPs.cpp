@@ -233,9 +233,6 @@ File_MpegPs::File_MpegPs()
         SubStream_Demux=NULL;
         Demux_StreamIsBeingParsed_type=(int8u)-1;
     #endif //MEDIAINFO_DEMUX
-    #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-        FromAribStdB24B37=false;
-    #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
 
     //Out
     HasTimeStamps=false;
@@ -1314,13 +1311,8 @@ void File_MpegPs::Header_Parse()
     PES_FirstByte_Value=true;
 
     //Reinit
-    #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-        if (!FromAribStdB24B37)
-    #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-        {
-            FrameInfo.PTS=(int64u)-1;
-            FrameInfo.DTS=(int64u)-1;
-        }
+    FrameInfo.PTS=(int64u)-1;
+    FrameInfo.DTS=(int64u)-1;
 
     #if MEDIAINFO_TRACE
     if (Trace_Activated)
@@ -1524,21 +1516,15 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
         BS_End();
 
         //Filling
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.PTS=(((int64u)PTS_32)<<30)
-                            | (((int64u)PTS_29)<<15)
-                            | (((int64u)PTS_14));
+        FrameInfo.PTS=(((int64u)PTS_32)<<30)
+                    | (((int64u)PTS_29)<<15)
+                    | (((int64u)PTS_14));
         if (Streams[stream_id].Searching_TimeStamp_End && stream_id!=0xBD && stream_id!=0xFD) //0xBD and 0xFD can contain multiple streams, TimeStamp management is in Streams management
         {
             if (Streams[stream_id].TimeStamp_End.PTS.TimeStamp==(int64u)-1)
                 Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
-                        FrameInfo.PTS+=0x200000000LL;
+            while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
+                FrameInfo.PTS+=0x200000000LL;
             Streams[stream_id].TimeStamp_End.DTS.File_Pos=Streams[stream_id].TimeStamp_End.PTS.File_Pos=File_Offset+Buffer_Offset;
             Streams[stream_id].TimeStamp_End.DTS.TimeStamp=Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
         }
@@ -1549,10 +1535,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
             Streams[stream_id].Searching_TimeStamp_Start=false;
         }
         Element_Info_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/90));
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+        FrameInfo.DTS=FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
         HasTimeStamps=true;
         Element_End0();
     }
@@ -1575,21 +1558,15 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
         BS_End();
 
         //Filling
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.PTS=(((int64u)PTS_32)<<30)
-                            | (((int64u)PTS_29)<<15)
-                            | (((int64u)PTS_14));
+        FrameInfo.PTS=(((int64u)PTS_32)<<30)
+                    | (((int64u)PTS_29)<<15)
+                    | (((int64u)PTS_14));
         if (Streams[stream_id].Searching_TimeStamp_End)
         {
             if (Streams[stream_id].TimeStamp_End.PTS.TimeStamp==(int64u)-1)
                 Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
-                        FrameInfo.PTS+=0x200000000LL;
+            while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
+                FrameInfo.PTS+=0x200000000LL;
             Streams[stream_id].TimeStamp_End.PTS.File_Pos=File_Offset+Buffer_Offset;
             Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
         }
@@ -1599,10 +1576,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
             Streams[stream_id].TimeStamp_Start.PTS.TimeStamp=FrameInfo.PTS;
         }
         Element_Info_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/90));
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+        FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
         Element_End0();
 
         Element_Begin1("DTS");
@@ -1627,11 +1601,8 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
         {
             if (Streams[stream_id].TimeStamp_End.DTS.TimeStamp==(int64u)-1)
                 Streams[stream_id].TimeStamp_End.DTS.TimeStamp=FrameInfo.DTS;
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    while (FrameInfo.DTS+0x100000000LL<Streams[stream_id].TimeStamp_End.DTS.TimeStamp)
-                        FrameInfo.DTS+=0x200000000LL;
+            while (FrameInfo.DTS+0x100000000LL<Streams[stream_id].TimeStamp_End.DTS.TimeStamp)
+                FrameInfo.DTS+=0x200000000LL;
             Streams[stream_id].TimeStamp_End.DTS.File_Pos=File_Offset+Buffer_Offset;
             Streams[stream_id].TimeStamp_End.DTS.TimeStamp=FrameInfo.DTS;
         }
@@ -1641,10 +1612,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
             Streams[stream_id].Searching_TimeStamp_Start=false;
         }
         Element_Info_From_Milliseconds(float64_int64s(((float64)FrameInfo.DTS)/90));
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.DTS*1000000/90; //In ns
+        FrameInfo.DTS=FrameInfo.DTS*1000000/90; //In ns
         Element_End0();
     }
     else
@@ -1750,12 +1718,9 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
             Get_S2 (15, PTS_14,                                     "PTS_14");
             Mark_1();
             BS_End();
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    FrameInfo.PTS=(((int64u)PTS_32)<<30)
-                                | (((int64u)PTS_29)<<15)
-                                | (((int64u)PTS_14));
+            FrameInfo.PTS=(((int64u)PTS_32)<<30)
+                        | (((int64u)PTS_29)<<15)
+                        | (((int64u)PTS_14));
             Element_Info_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/90));
             Element_End0();
             Element_End0();
@@ -1776,12 +1741,9 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
                 Element_DoNotTrust(""); //Mark bits are wrong
                 return;
             }
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    FrameInfo.PTS=                                  ((((int64u)Buffer[Buffer_Pos  ]&0x0E))<<29)
-                      | ( ((int64u)Buffer[Buffer_Pos+1]      )<<22)|((((int64u)Buffer[Buffer_Pos+2]&0xFE))<<14)
-                      | ( ((int64u)Buffer[Buffer_Pos+3]      )<< 7)|((((int64u)Buffer[Buffer_Pos+4]&0xFE))>> 1);
+            FrameInfo.PTS=                                  ((((int64u)Buffer[Buffer_Pos  ]&0x0E))<<29)
+              | ( ((int64u)Buffer[Buffer_Pos+1]      )<<22)|((((int64u)Buffer[Buffer_Pos+2]&0xFE))<<14)
+              | ( ((int64u)Buffer[Buffer_Pos+3]      )<< 7)|((((int64u)Buffer[Buffer_Pos+4]&0xFE))>> 1);
             Element_Offset+=5;
         #if MEDIAINFO_TRACE
         }
@@ -1792,11 +1754,8 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
         {
             if (Streams[stream_id].TimeStamp_End.PTS.TimeStamp==(int64u)-1)
                 Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
-                        FrameInfo.PTS+=0x200000000LL;
+            while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
+                FrameInfo.PTS+=0x200000000LL;
             Streams[stream_id].TimeStamp_End.DTS.File_Pos=Streams[stream_id].TimeStamp_End.PTS.File_Pos=File_Offset+Buffer_Offset;
             Streams[stream_id].TimeStamp_End.DTS.TimeStamp=Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
         }
@@ -1806,10 +1765,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
             Streams[stream_id].TimeStamp_Start.DTS.TimeStamp=Streams[stream_id].TimeStamp_Start.PTS.TimeStamp=FrameInfo.PTS;
             Streams[stream_id].Searching_TimeStamp_Start=false;
         }
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+        FrameInfo.DTS=FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
         HasTimeStamps=true;
     }
     else if (PTS_DTS_flags==0x3)
@@ -1834,12 +1790,9 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
             Get_S2 (15, PTS_14,                                     "PTS_14");
             Mark_1();
             BS_End();
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    FrameInfo.PTS=(((int64u)PTS_32)<<30)
-                                | (((int64u)PTS_29)<<15)
-                                | (((int64u)PTS_14));
+            FrameInfo.PTS=(((int64u)PTS_32)<<30)
+                        | (((int64u)PTS_29)<<15)
+                        | (((int64u)PTS_14));
             Element_Info_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/90));
             Element_End0();
         }
@@ -1859,12 +1812,9 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
                 Element_DoNotTrust(""); //Mark bits are wrong
                 return;
             }
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    FrameInfo.PTS=                                  ((((int64u)Buffer[Buffer_Pos  ]&0x0E))<<29)
-                      | ( ((int64u)Buffer[Buffer_Pos+1]      )<<22)|((((int64u)Buffer[Buffer_Pos+2]&0xFE))<<14)
-                      | ( ((int64u)Buffer[Buffer_Pos+3]      )<< 7)|((((int64u)Buffer[Buffer_Pos+4]&0xFE))>> 1);
+            FrameInfo.PTS=                                  ((((int64u)Buffer[Buffer_Pos  ]&0x0E))<<29)
+              | ( ((int64u)Buffer[Buffer_Pos+1]      )<<22)|((((int64u)Buffer[Buffer_Pos+2]&0xFE))<<14)
+              | ( ((int64u)Buffer[Buffer_Pos+3]      )<< 7)|((((int64u)Buffer[Buffer_Pos+4]&0xFE))>> 1);
             Element_Offset+=5;
         #if MEDIAINFO_TRACE
         }
@@ -1875,11 +1825,8 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
         {
             if (Streams[stream_id].TimeStamp_End.PTS.TimeStamp==(int64u)-1)
                 Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
-                        FrameInfo.PTS+=0x200000000LL;
+            while (FrameInfo.PTS+0x100000000LL<Streams[stream_id].TimeStamp_End.PTS.TimeStamp)
+                FrameInfo.PTS+=0x200000000LL;
             Streams[stream_id].TimeStamp_End.PTS.File_Pos=File_Offset+Buffer_Offset;
             Streams[stream_id].TimeStamp_End.PTS.TimeStamp=FrameInfo.PTS;
         }
@@ -1889,10 +1836,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
             Streams[stream_id].TimeStamp_Start.PTS.TimeStamp=FrameInfo.PTS;
             //Streams[stream_id].Searching_TimeStamp_Start=false; //Done with DTS
         }
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+        FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
 
         #if MEDIAINFO_TRACE
         if (Trace_Activated)
@@ -1946,11 +1890,8 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
         {
             if (Streams[stream_id].TimeStamp_End.DTS.TimeStamp==(int64u)-1)
                 Streams[stream_id].TimeStamp_End.DTS.TimeStamp=FrameInfo.DTS;
-            #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                if (!FromAribStdB24B37)
-            #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                    while (FrameInfo.DTS+0x100000000LL<Streams[stream_id].TimeStamp_End.DTS.TimeStamp)
-                        FrameInfo.DTS+=0x200000000LL;
+            while (FrameInfo.DTS+0x100000000LL<Streams[stream_id].TimeStamp_End.DTS.TimeStamp)
+                FrameInfo.DTS+=0x200000000LL;
             Streams[stream_id].TimeStamp_End.DTS.File_Pos=File_Offset+Buffer_Offset;
             Streams[stream_id].TimeStamp_End.DTS.TimeStamp=FrameInfo.DTS;
         }
@@ -1959,10 +1900,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
             Streams[stream_id].TimeStamp_Start.DTS.TimeStamp=FrameInfo.DTS;
             Streams[stream_id].Searching_TimeStamp_Start=false;
         }
-        #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-            if (!FromAribStdB24B37)
-        #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.DTS*1000000/90; //In ns
+        FrameInfo.DTS=FrameInfo.DTS*1000000/90; //In ns
         HasTimeStamps=true;
     }
     else if (!FromTS)
@@ -2101,7 +2039,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
                 {
                     File_AribStdB24B37* Parser=(File_AribStdB24B37*)Streams_Private1[private_stream_1_ID].Parsers[0];
                     Parser->ParseCcis=true;
-                    Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, 16);
+                    Parser->Open_Buffer_Continue(Buffer+Buffer_Offset+(size_t)Element_Offset, 16);
                 }
                 else
                     Skip_B16(                                   "PES_private_data");

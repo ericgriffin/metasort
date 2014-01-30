@@ -626,9 +626,7 @@ bool File_Mpeg4v::Demux_UnpacketizeContainer_Test()
                         case 0xB3 :
                         case 0xB6 :
                                     MustBreak=true; break;
-                        default   :
-                                    Demux_Offset+=3;
-                                    MustBreak=false;
+                        default   : MustBreak=false;
                     }
                     if (MustBreak)
                         break; //while() loop

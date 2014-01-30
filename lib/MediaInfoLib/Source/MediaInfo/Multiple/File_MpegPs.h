@@ -84,9 +84,6 @@ public :
     #if MEDIAINFO_SEEK
         int64u Unsynch_Frame_Count_Temp;
     #endif //MEDIAINFO_SEEK
-    #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
-        bool FromAribStdB24B37;
-    #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
 
     //Out
     bool   HasTimeStamps;
