@@ -1,3 +1,8 @@
+1.5.3 --> 1.5.4
+-----------------
+- Bug fixes
+- Added parameter, action and stream validation
+
 1.5.2 --> 1.5.3
 -----------------
 - Improved logging
