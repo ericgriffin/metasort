@@ -14,7 +14,7 @@
 #include "metasorter.h"
 #include "usage.h"
 
-std::string metasort_version("1.5.4");
+std::string metasort_version("1.5.5");
 
 
 int main(int argc, char* argv[])

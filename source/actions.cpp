@@ -34,7 +34,18 @@ int metasorter::action_move(asset* _asset, std::string first, std::string second
 		return 1;
 	}
 	std::string newfile(second);
-	newfile.append(_asset->filename);
+
+	// if destination is not directory (ends in / or \), fill in filename placeholders
+	char last_char = newfile.back();
+	if (last_char == '/' || last_char == '\\')
+	{
+		newfile.append(_asset->filename);
+	}
+	else
+	{
+		metasortutil::fill_file_placeholders(_asset, newfile);
+	}
+	
 
 	log_mtx_.lock();
 	logstring.assign("Moving ");
@@ -77,7 +88,17 @@ int metasorter::action_fastmove(asset* _asset, std::string first, std::string se
 		return 1;
 	}
 	std::string newfile(second);
-	newfile.append(_asset->filename);
+	
+	// if destination is not directory (ends in / or \), fill in filename placeholders
+	char last_char = newfile.back();
+	if (last_char == '/' || last_char == '\\')
+	{
+		newfile.append(_asset->filename);
+	}
+	else
+	{
+		metasortutil::fill_file_placeholders(_asset, newfile);
+	}
 
 	log_mtx_.lock();
 	logstring.assign("Moving ");
@@ -107,7 +128,17 @@ int metasorter::action_copy(asset* _asset, std::string first, std::string second
 		return 1;
 	}
 	std::string newfile(second);
-	newfile.append(_asset->filename);
+	
+	// if destination is not directory (ends in / or \), fill in filename placeholders
+	char last_char = newfile.back();
+	if (last_char == '/' || last_char == '\\')
+	{
+		newfile.append(_asset->filename);
+	}
+	else
+	{
+		metasortutil::fill_file_placeholders(_asset, newfile);
+	}
 
 	log_mtx_.lock();
 	logstring.assign("Copying ");
@@ -265,7 +296,17 @@ int metasorter::action_copyonce(asset* _asset, std::string first, std::string se
 	{
 		// copy the file
 		std::string newfile(second);
-		newfile.append(_asset->filename);
+		
+		// if destination is not directory (ends in / or \), fill in filename placeholders
+		char last_char = newfile.back();
+		if (last_char == '/' || last_char == '\\')
+		{
+			newfile.append(_asset->filename);
+		}
+		else
+		{
+			metasortutil::fill_file_placeholders(_asset, newfile);
+		}
 
 		log_mtx_.lock();
 		logstring.assign("Copying ");
@@ -291,7 +332,6 @@ int metasorter::action_exec(asset* _asset, std::string first, std::string second
 	std::string execstring(second);
 	execstring.append(" ");
 	metasortutil::fill_file_placeholders(_asset, execstring);
-	while(metasortutil::string_replace(execstring, "/", "\\"));
 			
 	log_mtx_.lock();
 	logstring.assign("Executing: ");
@@ -476,7 +516,16 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 		end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '_');
 		filename_CAPS.erase(end_pos, filename_CAPS.end());
 		
-		newfile.append(filename_CAPS);
+		// if destination is not directory (ends in / or \), fill in filename placeholders
+		char last_char = newfile.back();
+		if (last_char == '/' || last_char == '\\')
+		{
+			newfile.append(filename_CAPS);
+		}
+		else
+		{
+			metasortutil::fill_file_placeholders(_asset, newfile);
+		}
 				
 		log_mtx_.lock();
 		logstring.assign("Copying ");
@@ -691,7 +740,16 @@ int metasorter::action_moveCUSTOM1(asset* _asset, std::string first, std::string
 	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '_');
 	filename_CAPS.erase(end_pos, filename_CAPS.end());
 
-	newfile.append(filename_CAPS);
+	// if destination is not directory (ends in / or \), fill in filename placeholders
+	char last_char = newfile.back();
+	if (last_char == '/' || last_char == '\\')
+	{
+		newfile.append(filename_CAPS);
+	}
+	else
+	{
+		metasortutil::fill_file_placeholders(_asset, newfile);
+	}
 
 	log_mtx_.lock();
 	logstring.assign("Moving ");
@@ -748,7 +806,16 @@ int metasorter::action_fastmoveCUSTOM1(asset* _asset, std::string first, std::st
 	end_pos = std::remove(filename_CAPS.begin(), filename_CAPS.end(), '_');
 	filename_CAPS.erase(end_pos, filename_CAPS.end());
 
-	newfile.append(filename_CAPS);
+	// if destination is not directory (ends in / or \), fill in filename placeholders
+	char last_char = newfile.back();
+	if (last_char == '/' || last_char == '\\')
+	{
+		newfile.append(filename_CAPS);
+	}
+	else
+	{
+		metasortutil::fill_file_placeholders(_asset, newfile);
+	}
 
 	log_mtx_.lock();
 	logstring.assign("Moving ");
