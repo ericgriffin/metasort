@@ -52,26 +52,26 @@ int metasortutil::test_create_file(std::string& _filepath)
 
 int metasortutil::file_exists(const std::string& _filepath)
 {
-	int retval = 0;
+	int exists = 0;
 	boost::filesystem::path* filepath = new boost::filesystem::path(_filepath);
 	if (boost::filesystem::exists(*filepath))
-		retval = 1;
+		exists = 1;
 	delete filepath;
-	return retval;
+	return exists;
 }
 
 
 int metasortutil::path_exists(const std::string& path)
 {
-	int retval = 0;
+	int exists = 0;
 	boost::filesystem::path* dirpath = new boost::filesystem::path(path);
 	if (boost::filesystem::exists(*dirpath))
 	{
 		if (boost::filesystem::is_directory(*dirpath))
-			retval = 1;
+			exists = 1;
 	}
 	delete dirpath;
-	return retval;
+	return exists;
 }
 
 
