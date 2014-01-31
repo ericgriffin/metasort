@@ -278,6 +278,40 @@ int metasortconfig::validateactions(tinyxml2::XMLElement *v, int err)
 			_parent->log_mtx_.unlock();
 			err = 1;
 		}
+		else
+		{
+			// check whether destination path exists for move/copy actions
+			if (strcmp("move", u->Attribute("type")) == 0 || strcmp("fastmove", u->Attribute("type")) == 0 ||
+				strcmp("copy", u->Attribute("type")) == 0 || strcmp("copyonce", u->Attribute("type")) == 0 ||
+				strcmp("copyonceCUSTOM1", u->Attribute("type")) == 0 || strcmp("moveCUSTOM1", u->Attribute("type")) == 0 ||
+				strcmp("fastmoveCUSTOM1", u->Attribute("type")) == 0)
+			{
+				std::string path_to_check(u->Attribute("parameter"));
+				char ch = path_to_check.back();
+				// strip characters from end until / or \ remains
+				while (ch != '/' && ch != '\\')
+				{
+					//strip last character from parameter
+					path_to_check.assign(path_to_check.substr(0, path_to_check.size() - 1));
+					ch = *path_to_check.rbegin();
+				}
+
+				if (metasortutil::path_exists(path_to_check) == 0)
+				{
+					_parent->log_mtx_.lock();
+					_parent->logstring.assign("ERROR - destination for action '");
+					_parent->logstring.append(u->Attribute("type"));
+					_parent->logstring.append("' in rule '");
+					_parent->logstring.append(u->Parent()->ToElement()->Attribute("name"));
+					_parent->logstring.append("' is invalid.");
+					_parent->logfile.write(_parent->logstring);
+					std::cout << std::endl << "ERROR - destination for action '" << u->Attribute("type");
+					std::cout << "' in rule '" << u->Parent()->ToElement()->Attribute("name") << "' is invalid." << std::endl;
+					_parent->log_mtx_.unlock();
+					err = 1;
+				}
+			}
+		}
 	}
 
 	return err;
