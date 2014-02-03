@@ -36,7 +36,7 @@ int metasorter::action_move(asset* _asset, std::string first, std::string second
 	std::string newfile(second);
 
 	// if destination is not directory (ends in / or \), fill in filename placeholders
-	char last_char = newfile.back();
+	char last_char = *newfile.rbegin();
 	if (last_char == '/' || last_char == '\\')
 	{
 		newfile.append(_asset->filename);
@@ -90,7 +90,7 @@ int metasorter::action_fastmove(asset* _asset, std::string first, std::string se
 	std::string newfile(second);
 	
 	// if destination is not directory (ends in / or \), fill in filename placeholders
-	char last_char = newfile.back();
+	char last_char = *newfile.rbegin();
 	if (last_char == '/' || last_char == '\\')
 	{
 		newfile.append(_asset->filename);
@@ -130,7 +130,7 @@ int metasorter::action_copy(asset* _asset, std::string first, std::string second
 	std::string newfile(second);
 	
 	// if destination is not directory (ends in / or \), fill in filename placeholders
-	char last_char = newfile.back();
+	char last_char = *newfile.rbegin();
 	if (last_char == '/' || last_char == '\\')
 	{
 		newfile.append(_asset->filename);
@@ -298,7 +298,7 @@ int metasorter::action_copyonce(asset* _asset, std::string first, std::string se
 		std::string newfile(second);
 		
 		// if destination is not directory (ends in / or \), fill in filename placeholders
-		char last_char = newfile.back();
+		char last_char = *newfile.rbegin();
 		if (last_char == '/' || last_char == '\\')
 		{
 			newfile.append(_asset->filename);
@@ -517,7 +517,7 @@ int metasorter::action_copyonceCUSTOM1(asset* _asset, std::string first, std::st
 		filename_CAPS.erase(end_pos, filename_CAPS.end());
 		
 		// if destination is not directory (ends in / or \), fill in filename placeholders
-		char last_char = newfile.back();
+		char last_char = *newfile.rbegin();
 		if (last_char == '/' || last_char == '\\')
 		{
 			newfile.append(filename_CAPS);
@@ -741,7 +741,7 @@ int metasorter::action_moveCUSTOM1(asset* _asset, std::string first, std::string
 	filename_CAPS.erase(end_pos, filename_CAPS.end());
 
 	// if destination is not directory (ends in / or \), fill in filename placeholders
-	char last_char = newfile.back();
+	char last_char = *newfile.rbegin();
 	if (last_char == '/' || last_char == '\\')
 	{
 		newfile.append(filename_CAPS);
@@ -807,7 +807,7 @@ int metasorter::action_fastmoveCUSTOM1(asset* _asset, std::string first, std::st
 	filename_CAPS.erase(end_pos, filename_CAPS.end());
 
 	// if destination is not directory (ends in / or \), fill in filename placeholders
-	char last_char = newfile.back();
+	char last_char = *newfile.rbegin();
 	if (last_char == '/' || last_char == '\\')
 	{
 		newfile.append(filename_CAPS);

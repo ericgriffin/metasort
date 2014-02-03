@@ -287,7 +287,7 @@ int metasortconfig::validateactions(tinyxml2::XMLElement *v, int err)
 				strcmp("fastmoveCUSTOM1", u->Attribute("type")) == 0)
 			{
 				std::string path_to_check(u->Attribute("parameter"));
-				char ch = path_to_check.back();
+				char ch = *path_to_check.rbegin();
 				// strip characters from end until / or \ remains
 				while (ch != '/' && ch != '\\')
 				{
