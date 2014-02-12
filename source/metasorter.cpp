@@ -704,7 +704,7 @@ int metasorter::process_stream_blocks(asset* _asset, tinyxml2::XMLElement *v, in
 int metasorter::process_asset(asset* _asset)
 {
 	int err = 0;
-	int stop_processing_rules = 0;
+	int stop_processing_rules = 1;
 	
 	tinyxml2::XMLElement* xmlroot = config->config->FirstChildElement("metasort");
 
@@ -712,6 +712,19 @@ int metasorter::process_asset(asset* _asset)
 	for (tinyxml2::XMLElement *v = xmlroot->FirstChildElement("rule"); v != NULL; v = v->NextSiblingElement("rule"))
 	{
 		int match = 1;
+
+		// see if "continue" parameter is set - evaluates next rule even if current rule matches
+		if (v->Attribute("continue"))
+		{
+			if (strcmp(v->Attribute("continue"), "1") == 0 || strcmp(v->Attribute("continue"), "true") == 0 || strcmp(v->Attribute("continue"), "yes") == 0)
+			{
+				stop_processing_rules = 0;
+			}
+			else
+			{
+				stop_processing_rules = 1;
+			}
+		}
 
 		// process streams outside of conditional blocks
 		match = process_stream_blocks(_asset, v, 0);
