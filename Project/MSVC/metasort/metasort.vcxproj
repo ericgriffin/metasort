@@ -275,7 +275,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\lib\ZenLib\Project\MSVC2013\Library\x64\Release;$(ProjectDir)\..\..\..\lib\zlib\projects\MSVC2010\x64\Release;$(ProjectDir)\..\..\..\lib\MediaInfoLib\Project\MSVC2012\Library\x64\Release;$(ProjectDir)\..\..\..\lib\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\lib\ZenLib\Project\MSVC2013\Library\x64\Release;$(ProjectDir)\..\..\..\lib\zlib\projects\MSVC2010\x64\Release;$(ProjectDir)\..\..\..\lib\MediaInfoLib\Project\MSVC2013\Library\x64\Release;$(ProjectDir)\..\..\..\lib\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>zlib.lib;ZenLib.lib;MediaInfo.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkStatus>
       </LinkStatus>
